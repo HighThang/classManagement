@@ -1,0 +1,39 @@
+<div class="container">
+    <div class="slide-in">
+        <h3 class="centered-title">Classroom Management</h3>
+        <mat-card class="login-card">
+            <mat-card-header>
+                <mat-card-title>Đăng nhập</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <form [formGroup]="loginForm">
+                    <div class="icon-grid">
+                        <app-icon iconName="person"></app-icon>
+                        <app-text-field [label]="'Tên tài khoản hoặc Email'" formControlName="username"
+                            [placeholder]="'Điền tên tài khoản hoặc email'"></app-text-field>
+                    </div>
+
+                    <div class="icon-grid">
+                        <app-icon iconName="lock"></app-icon>
+                        <app-text-field [label]="'Mật khẩu'" formControlName="password"
+                            [placeholder]="'Điền mật khẩu của bạn'" [type]="passwordFieldType">
+                        </app-text-field>
+                    </div>
+
+                    <div class="actions-row">
+                        <app-check-box formControlName="rememberMe" [label]="'Nhớ tài khoản'"
+                            [disable]="false"></app-check-box>
+                        <app-button [type]="'warning'">Quên mật khẩu</app-button>
+                    </div>
+
+                    <div class="login">
+                        <app-button [type]="'primary'" class="login-button" [disabled]="!loginForm.valid"
+                            (click)="onLogin()">
+                            Đăng nhập
+                        </app-button>
+                    </div>
+                </form>
+            </mat-card-content>
+        </mat-card>
+    </div>
+</div>

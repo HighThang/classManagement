@@ -1,0 +1,83 @@
+button {
+    transition: background-color 0.3s, color 0.3s, box-shadow 0.3s, transform 0.3s;
+
+    &.primary {
+        background-color: var(--theme-primary) !important;
+        color: var(--text-button-color);
+
+        &:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px);
+        }
+
+        &:focus {
+            box-shadow: 0 0 0 3px rgba(var(--theme-primary-rgb), 0.4);
+        }
+
+        &.disabled {
+            background-color: gray !important; 
+            opacity: 0.5;
+        }
+    }
+
+    &.success {
+        background-color: var(--color-success) !important;
+        color: var(--text-button-color);
+
+        &:hover {
+            background-color: var(--color-success-dark);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px);
+        }
+
+        &:focus {
+            box-shadow: 0 0 0 3px rgba(var(--color-success-rgb), 0.4);
+        }
+    }
+
+    &.warning {
+        background-color: var(--color-warning) !important;
+        color: var(--text-button-color);
+
+        &:hover {
+            background-color: var(--color-warning-dark);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px);
+        }
+
+        &:focus {
+            box-shadow: 0 0 0 3px rgba(var(--color-warning-rgb), 0.4);
+        }
+    }
+
+    &.danger {
+        background-color: var(--color-danger) !important;
+        color: var(--text-button-color);
+
+        &:hover {
+            background-color: var(--color-danger-dark);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px);
+        }
+
+        &:focus {
+            box-shadow: 0 0 0 3px rgba(var(--color-danger-rgb), 0.4);
+        }
+    }
+
+    &.small {
+        font-size: 12px;
+        padding: 4px 8px;
+    }
+
+    &.medium {
+        font-size: 14px;
+        padding: 6px 12px;
+        width: 100%;
+    }
+
+    &.large {
+        font-size: 16px;
+        padding: 8px 16px;
+    }
+}

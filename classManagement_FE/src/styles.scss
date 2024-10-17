@@ -1,0 +1,94 @@
+@use '@angular/material' as mat;
+
+@include mat.core();
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+.swal2-popup {
+  font-family: 'Roboto', sans-serif !important;
+  font-size: 14px;
+}
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+@mixin custom-material-theme($primary, $accent, $warn) {
+  $theme: mat.m2-define-light-theme((
+    color: (
+      primary: $primary,
+      accent: $accent,
+      warn: $warn,
+    ),
+  ));
+
+  @include mat.all-component-themes($theme);
+}
+
+:root {
+  --color-primary: #409EFF;
+  --color-success: #67C23A;
+  --color-warning: #ffb74b;
+  --color-danger: #F56C6C;
+  --text-button-color: white;
+  --text-disable-color: rgb(167, 167, 167);
+}
+
+.theme-cornflowerblue {
+  --theme-background: cornflowerblue;
+  --theme-primary: cornflowerblue;
+  --theme-accent: cornflowerblue;
+  --theme-warn: cornflowerblue;
+
+  --theme-color-sidebar: cornflowerblue;
+  --theme-color-icon: cornflowerblue;
+  --theme-background-hover: cornflowerblue;
+  --theme-checked:cornflowerblue;
+  --theme-border-input: cornflowerblue;
+
+  @include custom-material-theme(
+    mat.m2-define-palette(mat.$m2-indigo-palette, 500),
+    mat.m2-define-palette(mat.$m2-pink-palette, A200),
+    mat.m2-define-palette(mat.$m2-red-palette)
+  );
+}
+
+.theme-red {
+  --theme-background: #f24b50;
+  --theme-primary: #f24b50;
+  --theme-accent: #f24b50;
+  --theme-warn: #f24b50;
+
+  --theme-color-sidebar: #f24b50;
+  --theme-color-icon: #f24b50;
+  --theme-background-hover: #f24b50;
+  --theme-checked:#f24b50;
+  --theme-border-input: #f24b50;
+
+  @include custom-material-theme(
+    mat.m2-define-palette(mat.$m2-red-palette, 500),
+    mat.m2-define-palette(mat.$m2-pink-palette, A200),
+    mat.m2-define-palette(mat.$m2-red-palette)
+  );
+}
+
+.theme-lightgreen {
+  --theme-background: #8bc34a;
+  --theme-primary: #8bc34a;
+  --theme-accent: #8bc34a;
+  --theme-warn: #8bc34a;
+
+  --theme-color-sidebar: #8bc34a;
+  --theme-color-icon: #8bc34a;
+  --theme-background-hover: #8bc34a;
+  --theme-checked:#8bc34a;
+  --theme-border-input: #8bc34a;
+
+  @include custom-material-theme(
+    mat.m2-define-palette(mat.$m2-light-green-palette, 500),
+    mat.m2-define-palette(mat.$m2-pink-palette, A200),
+    mat.m2-define-palette(mat.$m2-red-palette)
+  );
+}
+
+.mat-mdc-checkbox-ripple, .mdc-checkbox__ripple {
+  display: none;
+}

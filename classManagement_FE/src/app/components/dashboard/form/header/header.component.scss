@@ -1,0 +1,217 @@
+// Header
+.header {
+    background-color: var(--theme-background);
+    color: white;
+    box-shadow: 0 1px 5px rgb(128, 125, 125);
+    width: 100%;
+    height: 50px;
+    display: flex;
+    justify-content: space-between;
+    z-index: 3;
+    position: relative;
+}
+
+.box1 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    p {
+        font-size: 20px;
+        line-height: 20px;
+        font-weight: 600;
+        margin: 0;
+        cursor: pointer;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4); 
+    }
+
+    i {
+        cursor: pointer;
+    }
+
+    mat-icon {
+        margin-left: 20px;
+        cursor: pointer;
+    }
+}
+
+.box2 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    i {
+        cursor: pointer;
+    }
+
+    mat-icon {
+        margin-right: 20px;
+        cursor: pointer;
+    }
+}
+
+.icon {
+    margin: 5px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+
+    img {
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+    }
+}
+
+.underline-animation {
+    position: relative;
+    color: white;
+    text-decoration: none;
+    font-weight: 777;
+    margin-left: 40px;
+}
+
+.underline-animation::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -6px;
+    width: 100%;
+    height: 3px;
+    background: white;
+    border-radius: 5px;
+    transform-origin: right;
+    transform: scaleX(0);
+    transition: transform .5s;
+}
+
+.underline-animation:hover::after {
+    transform-origin: left;
+    transform: scaleX(1);
+}
+
+// SidebarRight - Theme
+.side-bar-right {
+    width: 222px;
+    height: 100vh;
+    background-color: #fff;
+    transform: translateX(100%);
+    animation: slideIn 0.4s forwards;
+    transition: transform 0.4s ease;
+    z-index: 2;
+    position: fixed;
+    right: 0;
+}
+
+.color {
+    color: #333 !important;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    border-top: 1px solid #e0e0e0;
+    padding: 10px;
+    cursor: pointer;
+    position: relative;
+    transition: background-color 0.3s ease;
+}
+
+.color:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.color-cornflowerblue,
+.color-red,
+.color-lightgreen {
+    margin-right: 10px;
+    width: 25px;
+    height: 25px;
+    border-radius: 5px;
+}
+
+.color-cornflowerblue {
+    background-color: cornflowerblue;
+}
+
+.color-red {
+    background-color: #f24b50;
+}
+
+.color-lightgreen {
+    background-color: #8bc34a;
+}
+
+.title {
+    margin: 20px 0 !important;
+}
+
+.active {
+    background: rgba(0, 0, 0, 0.03) !important;
+}
+
+span {
+    position: absolute;
+    left: 40px;
+    top: 15px;
+}
+
+button.active::after {
+    font-family: 'Material Icons';
+    position: absolute;
+    right: 10px;
+    content: '\E876';
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.overlay {
+    top: 0;
+    right: 0;
+    height: 100vh;
+    width: 100vw;
+    background-color: rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    animation: fadeIn 0.3s forwards;
+    z-index: 2;
+    position: fixed;
+    transition: opacity 0.4s ease;
+}
+
+.side-bar-right.hide {
+    animation: slideOut 0.4s forwards;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(100%);
+    }
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+    }
+}
+
+.overlay.hide {
+    animation: fadeOut 0.4s forwards;
+}

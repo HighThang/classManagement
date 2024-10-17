@@ -1,0 +1,172 @@
+.side-bar-left {
+    width: 222px;
+    background-color: #fff;
+    height: calc(100vh - 51px);
+    display: flex;
+    flex-direction: column;
+    color: #1a1a1a;
+    box-shadow: 0 1px 5px rgb(128, 125, 125);
+
+    z-index: 2;
+    position: relative;
+}
+
+// .side-bar-header {
+//     gap: 12px;
+//     color: white;
+//     text-shadow: 0px 0px 3px white;
+//     height: 88px;
+//     width: 100%;
+//     background-image: url('/assets/ani_pic(7).jpg');
+//     background-size: cover;
+//     background-position: center center;
+//     display: flex;
+//     align-items: center;
+//     justify-content: flex-start;
+
+//     .avatar {
+//         width: 60px;
+//         height: 60px;
+//         border-radius: 50%;
+//         overflow: hidden;
+//         margin-left: 15px;
+
+//         img {
+//             height: 100%;
+//             width: auto;
+//             object-fit: cover;
+//         }
+//     }
+
+//     .p-relative {
+//         position: relative;
+//         cursor: pointer;
+//     }
+// }
+
+.side-bar-body {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+
+    .content {
+        overflow-y: scroll;
+        overflow-x: hidden;
+    }
+
+    .content::-webkit-scrollbar {
+        width: 7px;
+    }
+
+    .content::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+
+    .content::-webkit-scrollbar-thumb {
+        background-color: #888;
+        border-radius: 10px;
+        border: 2px solid #f1f1f1;
+    }
+
+    .content {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        width: 100%;
+        box-sizing: border-box;
+
+        .menu-item {
+            display: flex;
+            width: 100%;
+            height: 40px;
+            cursor: pointer;
+            align-items: center;
+            text-decoration: none;
+            padding: 28px 16px;
+            box-sizing: border-box;
+            gap: 8px;
+            font-weight: 500;
+            text-decoration: none;
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s, transform 0.3s;
+            border-radius: 4px;
+
+            &:hover {
+                background-color: var(--theme-background);
+                color: #fff;
+                transform: scale(1.05);
+            }
+
+            app-icon {
+                .mat-icon-no-color {
+                    color: #fff;
+                }
+            }
+        }
+    }
+}
+
+.side-bar-footer {
+    display: flex;
+    padding: 20px;
+    justify-content: center;
+    box-sizing: border-box;
+    flex-direction: column;
+    width: 100%;
+    border-top: 1px solid #e0e0e0;
+    background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);
+
+    .text {
+        font-size: 14px;
+
+        span {
+            font-weight: 500;
+        }
+    }
+
+    :nth-child(1) {
+        span {
+            color: var(--theme-background);
+            cursor: pointer;
+        }
+    }
+}
+
+.active-link {
+    background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);
+    border-left: 4px solid var(--theme-background);
+    color: var(--theme-background);
+
+    span {
+        font-weight: 650;
+    }
+
+    .mat-icon-no-color {
+        color: var(--theme-background);
+    }
+}
+
+.underline-animation {
+    position: relative;
+    text-decoration: none;
+}
+
+.underline-animation::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -6px;
+    width: 100%;
+    height: 3px;
+    background: var(--theme-background);
+    border-radius: 5px;
+    transform-origin: right;
+    transform: scaleX(0);
+    transition: transform .5s;
+}
+
+.underline-animation:hover::after {
+    transform-origin: left;
+    transform: scaleX(1);
+}

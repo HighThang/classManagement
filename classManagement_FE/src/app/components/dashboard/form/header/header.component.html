@@ -1,0 +1,33 @@
+<div class="header">
+    <div class="box1">
+        <mat-icon (click)="handleToggleSidebar()">menu</mat-icon>
+        <div class="icon">
+            <img src="/school2.png" routerLink="/home">
+        </div>
+        <p class="underline-animation" routerLink="/home">Classroom Management</p>
+    </div>
+    <div class="box2">
+        <mat-icon *ngIf="!check; else hide" (click)="handleShowSidebarRight()">more_vert</mat-icon>
+        <ng-template #hide>
+            <mat-icon (click)="handleHideSidebarRight()">keyboard_arrow_right</mat-icon>
+        </ng-template>
+    </div>
+</div>
+
+<div class="container" *ngIf="showSidebarRight">
+    <div class="overlay" (click)="handleHideSidebarRight()"></div>
+    <mat-tab-group dynamicHeight class="side-bar-right">
+        <mat-tab label="Themes">
+            <mat-menu></mat-menu>
+            <ng-container *ngFor="let theme of themes">
+                <button mat-menu-item (click)="setTheme(theme)" class="color"
+                    [ngClass]="{ 'active': theme.color === currentTheme.color}">
+                    <div [ngClass]="'color-' + theme.color">
+                        <span class="theme-name">{{ theme.nameTheme }}</span>
+                    </div>
+                </button>
+            </ng-container>
+        </mat-tab>
+        <mat-tab label="Setting"></mat-tab>
+    </mat-tab-group>
+</div>
