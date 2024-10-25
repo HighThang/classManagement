@@ -1,4 +1,9 @@
 <mat-form-field appearance="outline">
     <mat-label>{{ label }}</mat-label>
-    <input matInput [type]="type" [(ngModel)]="value" [placeholder]="placeholder" [disabled]="disabled">
+    <input matInput [type]="type" [(ngModel)]="value" [placeholder]="placeholder" [disabled]="disabled"
+        [required]="required" #inputField="ngModel">
+
+    <mat-error *ngIf="inputField.invalid">
+        {{ label }} là <strong>bắt buộc</strong>
+    </mat-error>
 </mat-form-field>

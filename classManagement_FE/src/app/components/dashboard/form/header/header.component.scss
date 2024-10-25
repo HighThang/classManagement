@@ -30,7 +30,7 @@
     }
 
     mat-icon {
-        margin-left: 20px;
+        margin-left: 15px;
         cursor: pointer;
     }
 }
@@ -120,7 +120,7 @@
 }
 
 .color-cornflowerblue,
-.color-red,
+.color-orange,
 .color-lightgreen {
     margin-right: 10px;
     width: 25px;
@@ -132,8 +132,8 @@
     background-color: cornflowerblue;
 }
 
-.color-red {
-    background-color: #f24b50;
+.color-orange {
+    background-color: rgb(255, 170, 67);
 }
 
 .color-lightgreen {

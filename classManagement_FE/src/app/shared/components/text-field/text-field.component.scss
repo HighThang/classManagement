@@ -4,7 +4,7 @@ mat-form-field {
 
 :host ::ng-deep {
     .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mat-mdc-notch-piece {
-        border-color: var(--theme-primary) !important;
+        border-color: var(--theme-primary);
     }
 
     .mdc-text-field--outlined:not(.mdc-text-field--disabled).mdc-text-field--focused .mat-mdc-notch-piece {

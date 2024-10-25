@@ -23,6 +23,7 @@ export class TextFieldComponent implements ControlValueAccessor {
   @Input() type: string = 'text';
   @Input() placeholder: string = '';
   @Input() disabled: boolean = false;
+  @Input() required: boolean = false;
 
   private _value: string = '';
 
@@ -53,5 +54,9 @@ export class TextFieldComponent implements ControlValueAccessor {
 
   setDisabledState?(isDisabled: boolean): void {
     this.disabled = isDisabled;
+  }
+
+  setRequiredState?(isRequired: boolean): void {
+    this.required = isRequired;
   }
 }

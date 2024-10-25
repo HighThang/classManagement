@@ -17,8 +17,9 @@ app-header {
 
 app-side-bar-left {
     border-right: 1px solid #ddd;
-    z-index: 2;
     animation: slideIn 0.4s forwards;
+    z-index: 2;
+    position: relative;
 }
 
 app-side-bar-left.hide {

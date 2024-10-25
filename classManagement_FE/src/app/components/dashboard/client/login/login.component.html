@@ -1,6 +1,6 @@
 <div class="container">
-    <div class="slide-in">
-        <h3 class="centered-title">Classroom Management</h3>
+    <div class="content">
+        <h3 class="centered-title">Hệ thống quản lý lớp học</h3>
         <mat-card class="login-card">
             <mat-card-header>
                 <mat-card-title>Đăng nhập</mat-card-title>
@@ -9,15 +9,22 @@
                 <form [formGroup]="loginForm">
                     <div class="icon-grid">
                         <app-icon iconName="person"></app-icon>
-                        <app-text-field [label]="'Tên tài khoản hoặc Email'" formControlName="username"
-                            [placeholder]="'Điền tên tài khoản hoặc email'"></app-text-field>
+                        <mat-form-field appearance="outline">
+                            <mat-label>Email</mat-label>
+                            <input matInput formControlName="username" placeholder="Điền email của bạn" />
+                        </mat-form-field>
                     </div>
 
                     <div class="icon-grid">
                         <app-icon iconName="lock"></app-icon>
-                        <app-text-field [label]="'Mật khẩu'" formControlName="password"
-                            [placeholder]="'Điền mật khẩu của bạn'" [type]="passwordFieldType">
-                        </app-text-field>
+                        <mat-form-field appearance="outline">
+                            <mat-label>Mật khẩu</mat-label>
+                            <input matInput formControlName="password" placeholder="Điền mật khẩu của bạn"
+                                [type]="hide() ? 'password' : 'text'" />
+                            <mat-icon class="hide-pass-icon" matSuffix (click)="clickEvent($event)">
+                                {{hide() ? 'visibility_off' : 'visibility'}}
+                            </mat-icon>
+                        </mat-form-field>
                     </div>
 
                     <div class="actions-row">

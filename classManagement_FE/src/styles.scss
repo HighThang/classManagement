@@ -51,20 +51,20 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   );
 }
 
-.theme-red {
-  --theme-background: #f24b50;
-  --theme-primary: #f24b50;
-  --theme-accent: #f24b50;
-  --theme-warn: #f24b50;
+.theme-orange {
+  --theme-background: rgb(255, 170, 67);
+  --theme-primary: rgb(255, 170, 67);
+  --theme-accent: rgb(255, 170, 67);
+  --theme-warn: rgb(255, 170, 67);
 
-  --theme-color-sidebar: #f24b50;
-  --theme-color-icon: #f24b50;
-  --theme-background-hover: #f24b50;
-  --theme-checked:#f24b50;
-  --theme-border-input: #f24b50;
+  --theme-color-sidebar: #c8ca43;
+  --theme-color-icon: rgb(255, 170, 67);
+  --theme-background-hover: rgb(255, 170, 67);
+  --theme-checked:rgb(255, 170, 67);
+  --theme-border-input: rgb(255, 170, 67);
 
   @include custom-material-theme(
-    mat.m2-define-palette(mat.$m2-red-palette, 500),
+    mat.m2-define-palette(mat.$m2-orange-palette, 500),
     mat.m2-define-palette(mat.$m2-pink-palette, A200),
     mat.m2-define-palette(mat.$m2-red-palette)
   );

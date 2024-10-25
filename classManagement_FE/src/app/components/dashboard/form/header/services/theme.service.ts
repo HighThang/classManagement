@@ -8,7 +8,7 @@ export class ThemeService {
 
   themes: ITheme[] = [
     { nameTheme: EThemeNames.Cornflowerblue, color: EThemeColors.Cornflowerblue },
-    { nameTheme: EThemeNames.Red, color: EThemeColors.Red },
+    { nameTheme: EThemeNames.Orange, color: EThemeColors.Orange },
     { nameTheme: EThemeNames.LightGreen, color: EThemeColors.LightGreen }
   ];
   
@@ -44,7 +44,7 @@ export class ThemeService {
 
   private applyTheme(theme: ITheme): void {
     if (this.isBrowser()) {
-      document.documentElement.classList.remove('theme-cornflowerblue', 'theme-red', 'theme-lightgreen');
+      document.documentElement.classList.remove('theme-cornflowerblue', 'theme-orange', 'theme-lightgreen');
       document.documentElement.classList.add(`theme-${theme.nameTheme.toLowerCase()}`);
     }
   }

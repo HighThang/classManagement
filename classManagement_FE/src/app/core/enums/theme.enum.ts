@@ -1,11 +1,11 @@
 export enum EThemeNames {
   Cornflowerblue = 'Cornflowerblue',
-  Red = 'Red',
+  Orange = 'Orange',
   LightGreen = 'Lightgreen',
 }
 
 export enum EThemeColors {
   Cornflowerblue = 'cornflowerblue',
-  Red = 'red',
+  Orange = 'orange',
   LightGreen = 'lightgreen',
 }
