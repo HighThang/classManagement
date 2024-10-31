@@ -26,3 +26,8 @@ export enum client_EMenuLabels {
   Wish = 'Nguyện vọng học',
   Register = 'Đăng ký dạy học',
 }
+
+export enum admin_EMenuLabels {
+  ManageTeacher = 'Quản lý giáo viên',
+  ManageStudent = 'Quản lý học sinh',
+}

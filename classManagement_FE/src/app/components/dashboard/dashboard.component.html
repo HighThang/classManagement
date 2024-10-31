@@ -1,9 +1,0 @@
-<div id="app">
-  <app-header (toggleSidebar)="toggleSidebar()"></app-header>
-  <div class="layout-container">
-    <app-side-bar-left [ngStyle]="{'position': pos_isAbsolute ? 'absolute' : 'relative'}"></app-side-bar-left>
-    <div #layoutWrapper class="layout-wrapper">
-      <router-outlet></router-outlet>
-    </div>
-  </div>
-</div>

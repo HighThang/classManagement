@@ -1,0 +1,76 @@
+<div class="side-bar-left">
+    <!-- <div class="side-bar-header">
+        <div class="avatar">
+            <img src="{{user?.avatarFullPath}}">
+        </div>
+        <div class="link_profile">
+            <div class="name">
+                {{user?.name}} {{user?.surname}}
+            </div>
+            <div class="email">
+                {{user?.emailAddress}}
+            </div>
+        </div>
+        <div class="p-relative">
+            <span [matMenuTriggerFor]="menu">
+                <i class="material-icons left cursor p-absolute">keyboard_arrow_down</i>
+            </span>
+            <mat-menu #menu="matMenu">
+                <button mat-menu-item class="logout" (click)="logout()">
+                    <app-icon [iconName]="'input'"></app-icon>
+                    <span>Logout</span>
+                </button>
+            </mat-menu>
+        </div>
+    </div> -->
+
+    <div class="side-bar-body">
+        <div class="content">
+            <div *ngIf="currentUser === 'client'">
+                <div *ngFor="let item of client_menuItems" [routerLink]="item.routerLink"
+                    [routerLinkActiveOptions]="{exact: true}" routerLinkActive="active-link" class="menu-item">
+
+                    <app-icon [iconName]="item.icon"></app-icon>
+                    <span>{{ item.label }}</span>
+                </div>
+            </div>
+
+            <div *ngIf="currentUser === 'admin'">
+                <div *ngFor="let item of admin_menuItems" [routerLink]="item.routerLink"
+                    [routerLinkActiveOptions]="{exact: true}" routerLinkActive="active-link" class="menu-item">
+
+                    <app-icon [iconName]="item.icon"></app-icon>
+                    <span>{{ item.label }}</span>
+                </div>
+            </div>
+
+            <div *ngIf="currentUser === 'teacher'">
+                <div *ngFor="let item of teacher_menuItems" [routerLink]="item.routerLink"
+                    [routerLinkActiveOptions]="{exact: true}" routerLinkActive="active-link" class="menu-item">
+
+                    <app-icon [iconName]="item.icon"></app-icon>
+                    <span>{{ item.label }}</span>
+                </div>
+            </div>
+
+            <div *ngIf="currentUser === 'student'">
+                <div *ngFor="let item of student_menuItems" [routerLink]="item.routerLink"
+                    [routerLinkActiveOptions]="{exact: true}" routerLinkActive="active-link" class="menu-item">
+
+                    <app-icon [iconName]="item.icon"></app-icon>
+                    <span>{{ item.label }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="side-bar-footer">
+        <div class="text">
+            <span class="underline-animation" routerLink="/home">Hệ thống quản lý lớp học</span>
+        </div>
+        <div class="text">
+            <span>Phiên bản</span> 1.0.0
+        </div>
+        <img class="pic" src="ani2-removebg.png">
+    </div>
+</div>
