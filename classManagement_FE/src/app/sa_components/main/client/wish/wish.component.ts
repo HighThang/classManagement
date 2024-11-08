@@ -10,7 +10,6 @@ import { SharedModule } from '../../../../shared/shared.module';
 import { CommonModule, DatePipe } from '@angular/common';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
-import { AsyncPipe } from '@angular/common';
 import { CourseGroup } from '../../../../core/interfaces/list_course_teacher.interface';
 import { TeacherGroup } from '../../../../core/interfaces/list_course_teacher.interface';
 import { ChangeDetectionStrategy } from '@angular/core';
@@ -20,13 +19,8 @@ import { provideNativeDateAdapter } from '@angular/material/core';
 @Component({
   selector: 'app-wish',
   standalone: true,
-  imports: [MatIconModule, MatToolbarModule, CommonModule, MatStepperModule, FormsModule, ReactiveFormsModule,
-    MatFormFieldModule,MatInputModule, MatButtonModule, MatOptionModule, MatSelectModule, SharedModule, AsyncPipe, MatDatepickerModule],
-  providers: [
-    provideNativeDateAdapter(),
-    { provide: MAT_DATE_LOCALE, useValue: 'vi-VN'},
-    DatePipe
-  ],
+  imports: [MatIconModule, MatToolbarModule, CommonModule, MatStepperModule, FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatOptionModule, MatSelectModule, SharedModule, MatDatepickerModule],
+  providers: [provideNativeDateAdapter(), {provide: MAT_DATE_LOCALE, useValue: 'vi-VN'}, DatePipe],
   changeDetection: ChangeDetectionStrategy.Default,
   templateUrl: './wish.component.html',
   styleUrl: './wish.component.scss'

@@ -1,5 +1,5 @@
 .side-bar-left {
-    width: 222px;
+    width: 244px;
     background-color: #fff;
     height: calc(100vh - 51px);
     display: flex;
@@ -8,38 +8,51 @@
     box-shadow: 0 1px 5px rgb(128, 125, 125);
 }
 
-// .side-bar-header {
-//     gap: 12px;
-//     color: white;
-//     text-shadow: 0px 0px 3px white;
-//     height: 88px;
-//     width: 100%;
-//     background-image: url('/assets/ani_pic(7).jpg');
-//     background-size: cover;
-//     background-position: center center;
-//     display: flex;
-//     align-items: center;
-//     justify-content: flex-start;
+.side-bar-header {
+    color: white;
+    text-shadow: 0px 0px 3px white;
+    height: 99px;
+    width: 100%;
+    background-image: url('/ani_pic(7).jpg');
+    background-size: cover;
+    background-position: center center;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
-//     .avatar {
-//         width: 60px;
-//         height: 60px;
-//         border-radius: 50%;
-//         overflow: hidden;
-//         margin-left: 15px;
+    .avatar {
+        width: 55px;
+        height: 55px;
+        border-radius: 55%;
+        overflow: hidden;
+        margin-left: 5px;
 
-//         img {
-//             height: 100%;
-//             width: auto;
-//             object-fit: cover;
-//         }
-//     }
+        img {
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
+        }
+    }
 
-//     .p-relative {
-//         position: relative;
-//         cursor: pointer;
-//     }
-// }
+    .p-relative {
+        position: relative;
+        cursor: pointer;
+
+        .logout{
+            &:hover {
+                background-color: var(--theme-background);
+                color: #fff;
+                transform: scale(1.05);
+            }
+            
+            app-icon {
+                .mat-icon-no-color {
+                    color: #fff;
+                }
+            }
+        }
+    }
+}
 
 .side-bar-body {
     flex: 1;
@@ -173,7 +186,7 @@
         width: auto;
         height: 222px;
         bottom: 85px;
-        right: 0;
+        right: 10px;
         z-index: 0;
         opacity: 44%;
     }

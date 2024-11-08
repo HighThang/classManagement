@@ -7,12 +7,12 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
 import { RouterModule } from '@angular/router';
+import { AuthService } from '../../../../core/services/auth/auth.service';
 
 @Component({
   selector: 'app-header',
   standalone: true,
   imports: [MatIconModule, CommonModule, MatTabsModule, MatMenuModule, MatButtonModule, RouterModule],
-  providers: [ThemeService],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })
@@ -28,11 +28,12 @@ export class HeaderComponent implements OnInit {
     this.toggleSidebar.emit();
   }
 
-  constructor(private themeService: ThemeService) {}
+  constructor(private themeService: ThemeService, private authService: AuthService) {}
 
   ngOnInit(): void {
     this.themes = this.themeService.getThemes();
     this.currentTheme = this.themeService.getTheme();
+    this.setTheme(this.currentTheme);
   }
 
   setTheme(theme: ITheme) {

@@ -24,13 +24,8 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatCardModule, MatIconModule, MatButtonModule, SharedModule, 
-    MatInputModule, MatFormFieldModule, MatInputModule, MatDatepickerModule],
-  providers: [
-    provideNativeDateAdapter(),
-    { provide: MAT_DATE_LOCALE, useValue: 'vi-VN'},
-    DatePipe
-  ],
+  imports: [CommonModule, ReactiveFormsModule, MatCardModule, MatIconModule, MatButtonModule, SharedModule, MatInputModule, MatFormFieldModule, MatInputModule, MatDatepickerModule],
+  providers: [provideNativeDateAdapter(), {provide: MAT_DATE_LOCALE, useValue: 'vi-VN'}, DatePipe],
   changeDetection: ChangeDetectionStrategy.Default,
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss'

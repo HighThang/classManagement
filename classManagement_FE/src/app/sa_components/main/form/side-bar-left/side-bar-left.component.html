@@ -1,14 +1,14 @@
 <div class="side-bar-left">
-    <!-- <div class="side-bar-header">
+    <div class="side-bar-header" *ngIf="isAdminLoggedIn || isStudentLoggedIn || isTeacherLoggedIn">
         <div class="avatar">
-            <img src="{{user?.avatarFullPath}}">
+            <img src="1.jpg">
         </div>
         <div class="link_profile">
             <div class="name">
-                {{user?.name}} {{user?.surname}}
+                {{user?.lastName}} {{user?.firstName}} {{user?.surname}}
             </div>
             <div class="email">
-                {{user?.emailAddress}}
+                {{user?.email}}
             </div>
         </div>
         <div class="p-relative">
@@ -16,17 +16,32 @@
                 <i class="material-icons left cursor p-absolute">keyboard_arrow_down</i>
             </span>
             <mat-menu #menu="matMenu">
-                <button mat-menu-item class="logout" (click)="logout()">
+                <button *ngIf="isTeacherLoggedIn" mat-menu-item class="info" [routerLink]="'/teacher/info'">
+                    <app-icon [iconName]="'person'"></app-icon>
+                    <span>Thông tin cá nhân</span>
+                </button>
+                <button *ngIf="isStudentLoggedIn" mat-menu-item class="info" [routerLink]="'/student/info'">
+                    <app-icon [iconName]="'person'"></app-icon>
+                    <span>Thông tin cá nhân</span>
+                </button>
+                <!-- <button mat-menu-item class="logout" (click)="logout()">
                     <app-icon [iconName]="'input'"></app-icon>
-                    <span>Logout</span>
+                    <span>Đăng xuất</span>
+                </button> -->
+
+                <button mat-menu-item class="logout" (click)="logout()" 
+                    [ngStyle]="{'background-color': isHovering ? 'color-mix(in srgb, var(--theme-background) 50%, white 80%)' : 'transparent', 
+                    'transition': 'color 0.3s ease, background-color 0.3s ease'}" (mouseenter)="isHovering = true" (mouseleave)="isHovering = false">
+                    <app-icon [iconName]="'input'"></app-icon>
+                    <span>Đăng xuất</span>
                 </button>
             </mat-menu>
         </div>
-    </div> -->
+    </div>
 
     <div class="side-bar-body">
         <div class="content">
-            <div *ngIf="currentUser === 'client'">
+            <div *ngIf="!isAdminLoggedIn && !isStudentLoggedIn && !isTeacherLoggedIn">
                 <div *ngFor="let item of client_menuItems" [routerLink]="item.routerLink"
                     [routerLinkActiveOptions]="{exact: true}" routerLinkActive="active-link" class="menu-item">
 
@@ -35,7 +50,7 @@
                 </div>
             </div>
 
-            <div *ngIf="currentUser === 'admin'">
+            <div *ngIf="isAdminLoggedIn">
                 <div *ngFor="let item of admin_menuItems" [routerLink]="item.routerLink"
                     [routerLinkActiveOptions]="{exact: true}" routerLinkActive="active-link" class="menu-item">
 
@@ -44,7 +59,7 @@
                 </div>
             </div>
 
-            <div *ngIf="currentUser === 'teacher'">
+            <div *ngIf="isTeacherLoggedIn">
                 <div *ngFor="let item of teacher_menuItems" [routerLink]="item.routerLink"
                     [routerLinkActiveOptions]="{exact: true}" routerLinkActive="active-link" class="menu-item">
 
@@ -53,7 +68,7 @@
                 </div>
             </div>
 
-            <div *ngIf="currentUser === 'student'">
+            <div *ngIf="isStudentLoggedIn">
                 <div *ngFor="let item of student_menuItems" [routerLink]="item.routerLink"
                     [routerLinkActiveOptions]="{exact: true}" routerLinkActive="active-link" class="menu-item">
 

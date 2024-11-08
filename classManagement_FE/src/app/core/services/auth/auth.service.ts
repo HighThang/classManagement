@@ -2,12 +2,14 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, Observable, tap, throwError } from 'rxjs';
+import { AuthResponse, UserResponse } from '../../interfaces/response.interface';
 import Swal from 'sweetalert2';
-import { AuthResponse } from '../../interfaces/auth_response.interface';
 
 const default_url = ['http://localhost:8081/api/'];
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class AuthService {
   private loginUrl = default_url + 'auth/login';
   private loginUserInformations = default_url + 'user';
@@ -17,12 +19,12 @@ export class AuthService {
   authenticate(username: string, password: string): Observable<AuthResponse> {
     const data = {
       username,
-      password
+      password,
     };
 
     return this.http.post<AuthResponse>(this.loginUrl, data).pipe(
-      tap(response => this.setToken(response.accessToken)),
-      catchError(error => {
+      tap((response) => this.setToken(response.accessToken)),
+      catchError((error) => {
         this.showLoginFailedDialog();
         return throwError(error);
       })
@@ -33,24 +35,69 @@ export class AuthService {
     localStorage.setItem('accessToken', token);
   }
 
-  isLoggedIn() {        
+  getToken(): string | null {
+      return localStorage.getItem('accessToken');
+  }
+
+  isLoggedIn() {
     return localStorage.getItem('accessToken') !== null;
   }
-  
+
   logout() {
     localStorage.removeItem('accessToken');
+    sessionStorage.removeItem('currentUser');
     this.router.navigate(['/login']);
   }
 
   showLoginFailedDialog(): void {
-    Swal.fire({
-      icon: "error",
-      title: "Login failed!",
-      text: "Invalid user name or password"
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'bottom-end',
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+    });
+    Toast.fire({
+      icon: 'error',
+      title: 'Email hoặc mật khẩu không chính xác',
     });
   }
 
-  getCurrentLoginInfor() {
-    return this.http.get<Response>(this.loginUserInformations);
+  // setCurrentUser() {
+  //   this.http.get<UserResponse>(this.loginUserInformations).subscribe((res) => sessionStorage.setItem('currentUser', JSON.stringify(res)));
+  // }
+
+  setCurrentUser(): Observable<UserResponse> {
+    return this.http.get<UserResponse>(this.loginUserInformations).pipe(
+      tap((res) => {
+        sessionStorage.setItem('currentUser', JSON.stringify(res));
+      })
+    );
+  }  
+
+  getCurrentUser() {
+      const currentUser = sessionStorage.getItem('currentUser');
+      return currentUser ? JSON.parse(currentUser) : null;
+  }
+
+  getUserRole() {
+    const user = this.getCurrentUser();
+    if (user === null) return '';
+    return user.role;
+  }
+
+  isAdminLoggedIn() {
+    const role = this.getUserRole();
+    return role === 'ADMIN';
+  }
+
+  isTeacherLoggedIn() {
+    const role = this.getUserRole();
+    return role === 'TEACHER';
+  }
+
+  isStudentLoggedIn() {
+    const role = this.getUserRole();
+    return role === 'STUDENT';
   }
 }

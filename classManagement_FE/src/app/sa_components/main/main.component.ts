@@ -16,6 +16,7 @@ export class MainComponent implements AfterViewInit {
   pos_isAbsolute: boolean = false; 
 
   @ViewChild('layoutWrapper') layoutWrapper!: ElementRef;
+  @ViewChild('app') app!: ElementRef;
 
   constructor(private renderer: Renderer2, private cdr: ChangeDetectorRef) {}
 
@@ -40,17 +41,21 @@ export class MainComponent implements AfterViewInit {
       sidebarFooter.style.display = 'flex';
     }
 
-    if (this.layoutWrapper.nativeElement.offsetHeight <= 500 && this.pos_isAbsolute === false) {
-      this.pos_isAbsolute = true;
-      if (this.sidebarVisible === true) {
-        this.toggleSidebar();
+    if (this.layoutWrapper.nativeElement.offsetHeight <= 500 || this.app.nativeElement.offsetWidth <= 900) {
+      if (this.pos_isAbsolute === false) {
+        this.pos_isAbsolute = true;
+        if (this.sidebarVisible === true) {
+          this.toggleSidebar();
+        }
       }
     } 
-    else if (this.layoutWrapper.nativeElement.offsetHeight > 500 && this.pos_isAbsolute === true) {
-      if (this.sidebarVisible === false) {
-        this.toggleSidebar();
+    else if (this.layoutWrapper.nativeElement.offsetHeight > 500 || this.app.nativeElement.offsetWidth > 900) {
+      if (this.pos_isAbsolute === true) {
+        if (this.sidebarVisible === false) {
+          this.toggleSidebar();
+        }
+        this.pos_isAbsolute = false;
       }
-      this.pos_isAbsolute = false;
     }
   }
 

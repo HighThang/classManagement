@@ -4,19 +4,19 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { SharedModule } from '../../../../shared/shared.module';
 import { MatCardModule } from '@angular/material/card';
-import { ReactiveFormsModule, FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormGroup, FormBuilder, Validators, FormsModule } from '@angular/forms';
 import { ITheme } from '../../../../core/interfaces/theme.interface';
 import { MatInputModule } from '@angular/material/input';
 import { AuthService } from '../../../../core/services/auth/auth.service';
 import { Router } from '@angular/router';
 import { catchError, of } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatCardModule, MatIconModule, MatButtonModule, SharedModule, MatInputModule],
-  providers: [AuthService],
+  imports: [CommonModule, ReactiveFormsModule, MatCardModule, MatIconModule, MatButtonModule, SharedModule, MatInputModule, FormsModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
 })
@@ -32,14 +32,10 @@ export class LoginComponent {
     event.stopPropagation();
   }
 
-  constructor(
-    private fb: FormBuilder,
-    private authService: AuthService,
-    private router: Router,
-  ) {
+  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router, private http: HttpClient) {
     this.loginForm = this.fb.group({
-      username: ['', Validators.required],
-      password: ['', Validators.required],
+      username: ['thang', Validators.required],
+      password: ['2952002', Validators.required],
       rememberMe: false,
     });
   }
@@ -57,21 +53,26 @@ export class LoginComponent {
         )
         .subscribe((response) => {
           if (response) {
-            this.router.navigate(['/dashboard']);
+            this.authService.setCurrentUser().subscribe(() => {
+              if (this.authService.isAdminLoggedIn()) {
+                this.router.navigateByUrl('admin');
+              } else if (this.authService.isTeacherLoggedIn()) {
+                this.router.navigateByUrl('teacher');
+              } else if (this.authService.isStudentLoggedIn()) {
+                this.router.navigateByUrl('student');
+              }
+            });
+
             const Toast = Swal.mixin({
               toast: true,
               position: 'bottom-end',
               showConfirmButton: false,
               timer: 3000,
               timerProgressBar: true,
-              didOpen: (toast) => {
-                toast.onmouseenter = Swal.stopTimer;
-                toast.onmouseleave = Swal.resumeTimer;
-              },
             });
             Toast.fire({
               icon: 'success',
-              title: 'Login successfully!',
+              title: 'Đăng nhập thành công!',
             });
           }
         });
