@@ -2,8 +2,7 @@ import { Component } from '@angular/core';
 import { IconComponent } from "../../../../shared/components/icon/icon.component";
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { admin_EMenuLabels, client_EMenuLabels, teacher_EMenuLabels } from '../../../../core/enums/menuLabels.enum';
-import { EMenuLabels } from '../../../../core/enums/menuLabels.enum';
+import { admin_EMenuLabels, client_EMenuLabels, student_EMenuLabels, teacher_EMenuLabels } from '../../../../core/enums/menuLabels.enum';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../../../core/services/auth/auth.service';
 import { UserResponse } from '../../../../core/interfaces/response.interface';
@@ -27,14 +26,32 @@ export class SideBarLeftComponent {
   
   isHovering = false;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService) {}
 
   ngOnInit() {
-    if (this.authService.getToken()) {
-      this.authService.setCurrentUser().subscribe((res) => {
-        this.user = res;
+    const userData = sessionStorage.getItem('currentUser');
+
+    if (localStorage.getItem('accessToken')) {
+      if (userData) {
+        this.user = JSON.parse(userData) as UserResponse;
         this.updateUserLoggedStatus();
-      })
+      }
+  
+      else {
+        this.authService.setCurrentUser().subscribe({
+          next: (res) => {
+            this.user = res;
+            this.updateUserLoggedStatus();
+          },
+          error: () => {
+            localStorage.removeItem('accessToken');
+          }
+        })
+      }
+
+      this.authService.userUpdated$.subscribe((updatedUser) => {
+        this.user = updatedUser;
+      });
     }
   }
 
@@ -53,10 +70,6 @@ export class SideBarLeftComponent {
       showConfirmButton: false,
       timer: 3000,
       timerProgressBar: true,
-      didOpen: (toast) => {
-        toast.onmouseenter = Swal.stopTimer;
-        toast.onmouseleave = Swal.resumeTimer;
-      },
     });
     Toast.fire({
       icon: 'success',
@@ -88,6 +101,16 @@ export class SideBarLeftComponent {
   ];
 
   admin_menuItems = [
+    {
+      icon: 'class',
+      label: admin_EMenuLabels.ManageClass,
+      routerLink: '/admin/manage_class',
+    },
+    {
+      icon: 'library_books',
+      label: admin_EMenuLabels.ManageCourse,
+      routerLink: '/admin/manage_course',
+    },
     {
       icon: 'school',
       label: admin_EMenuLabels.ManageTeacher,
@@ -145,39 +168,39 @@ export class SideBarLeftComponent {
 
   student_menuItems = [
     {
-      icon: 'home',
-      label: client_EMenuLabels.Home,
-      routerLink: '/home',
+      icon: 'date_range',
+      label: student_EMenuLabels.Schedule,
+      routerLink: '/student/schedule',
     },
     {
       icon: 'playlist_add',
-      label: client_EMenuLabels.Wish,
-      routerLink: '/wish',
+      label: student_EMenuLabels.Course,
+      routerLink: '/student/course',
     },
     {
-      icon: 'groups',
-      label: EMenuLabels.TeamWorking,
-      routerLink: 'off-day-project-for-user',
+      icon: 'class',
+      label: student_EMenuLabels.ClassList,
+      routerLink: '/student/class',
     },
     {
-      icon: 'supervised_user_circle',
-      label: EMenuLabels.TimesheetsMonitoring,
-      routerLink: 'timesheets-supervisior',
+      icon: 'assignment_turned_in',
+      label: student_EMenuLabels.Attendance,
+      routerLink: '/student/attendance',
     },
     { 
-      icon: 'event_note', 
-      label: EMenuLabels.Retro, 
-      routerLink: 'retro' 
+      icon: 'grade', 
+      label: student_EMenuLabels.Score, 
+      routerLink: '/student/score' 
     },
     {
-      icon: 'rate_review',
-      label: EMenuLabels.ReviewInterns,
-      routerLink: 'review',
+      icon: 'payment',
+      label: student_EMenuLabels.Fee,
+      routerLink: '/student/fee',
     },
     { 
-      icon: 'description', 
-      label: EMenuLabels.Report, 
-      routerLink: 'report' 
+      icon: 'person', 
+      label: student_EMenuLabels.Info, 
+      routerLink: '/student/info' 
     },
   ];
 }

@@ -13,27 +13,29 @@
                             <div class="icon-grid-1">
                                 <app-icon iconName="person"></app-icon>
                                 <mat-form-field appearance="outline" style="margin-bottom: 10px;">
-                                    <mat-label>Họ và tên</mat-label>
-                                    <input matInput formControlName="fullName" [placeholder]="'Điền họ và tên'">
-                                    <mat-error *ngIf="registerForm.get('fullName')?.hasError('required')">
-                                        Họ và tên là <strong>bắt buộc</strong>
+                                    <mat-label>Tên</mat-label>
+                                    <input matInput formControlName="firstName" [placeholder]="'Điền tên'">
+                                    <mat-error *ngIf="registerForm.get('firstName')?.hasError('required')">
+                                        Tên là <strong>bắt buộc</strong>
                                     </mat-error>
                                 </mat-form-field>
                             </div>
-        
+
                             <div class="icon-grid-1">
-                                <app-icon iconName="lock"></app-icon>
+                                <app-icon iconName="person"></app-icon>
                                 <mat-form-field appearance="outline" style="margin-bottom: 10px;">
-                                    <mat-label>Mật khẩu</mat-label>
-                                    <input matInput formControlName="password" placeholder="Điền mật khẩu của bạn"
-                                        [type]="hide() ? 'password' : 'text'" />
-                                    <mat-icon class="hide-pass-icon" matSuffix (click)="clickEvent($event)">{{hide() ?
-                                        'visibility_off' : 'visibility'}}</mat-icon>
-                                    <mat-error *ngIf="registerForm.get('password')?.hasError('required')">
-                                        Mật khẩu là <strong>bắt buộc</strong>
-                                    </mat-error>
-                                    <mat-error *ngIf="registerForm.get('password')?.hasError('minlength')">
-                                        Mật khẩu phải ít nhất 6 ký tự
+                                    <mat-label>Tên đệm</mat-label>
+                                    <input matInput formControlName="surname" [placeholder]="'Điền tên đệm'">
+                                </mat-form-field>
+                            </div>
+
+                            <div class="icon-grid-1">
+                                <app-icon iconName="person"></app-icon>
+                                <mat-form-field appearance="outline" style="margin-bottom: 10px;">
+                                    <mat-label>Họ</mat-label>
+                                    <input matInput formControlName="lastName" [placeholder]="'Điền họ'">
+                                    <mat-error *ngIf="registerForm.get('lastName')?.hasError('required')">
+                                        Họ là <strong>bắt buộc</strong>
                                     </mat-error>
                                 </mat-form-field>
                             </div>
@@ -84,6 +86,23 @@
                                 <app-icon iconName="email"></app-icon>
                             </div>
 
+                            <div class="icon-grid-2">
+                                <mat-form-field appearance="outline" style="margin-bottom: 10px;">
+                                    <mat-label>Mật khẩu</mat-label>
+                                    <input matInput formControlName="password" placeholder="Điền mật khẩu của bạn"
+                                        [type]="hide() ? 'password' : 'text'" />
+                                    <mat-icon class="hide-pass-icon" matSuffix (click)="clickEvent($event)">{{hide() ?
+                                        'visibility_off' : 'visibility'}}</mat-icon>
+                                    <mat-error *ngIf="registerForm.get('password')?.hasError('required')">
+                                        Mật khẩu là <strong>bắt buộc</strong>
+                                    </mat-error>
+                                    <mat-error *ngIf="registerForm.get('password')?.hasError('minlength')">
+                                        Mật khẩu phải ít nhất 6 ký tự
+                                    </mat-error>
+                                </mat-form-field>
+                                <app-icon iconName="lock"></app-icon>
+                            </div>
+                            
                             <div class="icon-grid-2">
                                 <mat-form-field appearance="outline" style="margin-bottom: 10px;">
                                     <mat-label>Xác nhận mật khẩu</mat-label>

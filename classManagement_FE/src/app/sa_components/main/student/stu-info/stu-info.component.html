@@ -6,7 +6,7 @@
             <mat-card-content>
                 <form [formGroup]="registerForm">
                     <mat-card-header>
-                        <mat-card-title>Chức vụ: <u>Giáo viên</u></mat-card-title>
+                        <mat-card-title>Chức vụ: <u>Học sinh</u></mat-card-title>
                         <app-button *ngIf="!isEditing" [type]="'primary'" class="edit-button" (click)="enableEdit()">
                             <mat-icon>edit</mat-icon>Sửa thông tin
                         </app-button>
@@ -121,24 +121,13 @@
 
                             <div class="icon-grid-2">
                                 <mat-form-field appearance="outline" style="margin-bottom: 10px;">
-                                    <mat-label>Địa chỉ giảng dạy</mat-label>
+                                    <mat-label>Địa chỉ</mat-label>
                                     <input matInput formControlName="address" [placeholder]="'Điền địa chỉ'">
                                     <mat-error *ngIf="registerForm.get('address')?.hasError('required')">
                                         Địa chỉ là <strong>bắt buộc</strong>
                                     </mat-error>
                                 </mat-form-field>
                                 <app-icon iconName="home"></app-icon>
-                            </div>
-        
-                            <div class="icon-grid-2">
-                                <mat-form-field appearance="outline" style="margin-bottom: 10px;">
-                                    <mat-label>Nghề nghiệp / Chức vụ / Trình độ học vấn</mat-label>
-                                    <input matInput formControlName="business" [placeholder]="'Vd: ThS/TS/PSG ...; Giáo viên môn ... trường ...'">
-                                    <mat-error *ngIf="registerForm.get('business')?.hasError('required')">
-                                        Nghề nghiệp / Chức vụ / Trình độ học vấn là <strong>bắt buộc</strong>
-                                    </mat-error>
-                                </mat-form-field>
-                                <app-icon iconName="business"></app-icon>
                             </div>
                         </div>
                     </div>

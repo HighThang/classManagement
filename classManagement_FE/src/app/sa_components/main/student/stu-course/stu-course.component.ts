@@ -17,21 +17,21 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { provideNativeDateAdapter } from '@angular/material/core';
 
 @Component({
-  selector: 'app-wish',
+  selector: 'app-stu-course',
   standalone: true,
   imports: [MatIconModule, MatToolbarModule, CommonModule, MatStepperModule, FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatOptionModule, MatSelectModule, SharedModule, MatDatepickerModule],
   providers: [provideNativeDateAdapter(), {provide: MAT_DATE_LOCALE, useValue: 'vi-VN'}, DatePipe],
   changeDetection: ChangeDetectionStrategy.Default,
-  templateUrl: './wish.component.html',
-  styleUrl: './wish.component.scss'
+  templateUrl: './stu-course.component.html',
+  styleUrl: './stu-course.component.scss'
 })
 
-export class WishComponent {
+export class StuCourseComponent {
   private _formBuilder = inject(FormBuilder);
 
   firstFormGroup: FormGroup = this._formBuilder.group({
-    firstName: ['', Validators.required],
-    middleName: [''],
+    // firstName: ['', Validators.required],
+    // middleName: [''],
     lastName: ['', Validators.required],
     email: ['', [Validators.required, Validators.email]],
     dob: ['', Validators.required],

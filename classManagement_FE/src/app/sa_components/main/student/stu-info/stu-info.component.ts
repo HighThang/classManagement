@@ -17,15 +17,15 @@ import { UserResponse } from '../../../../core/interfaces/response.interface';
 import { AuthService } from '../../../../core/services/auth/auth.service';
 
 @Component({
-  selector: 'app-tea-info',
+  selector: 'app-stu-info',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, MatCardModule, MatIconModule, MatButtonModule, SharedModule, MatFormFieldModule, MatInputModule, MatDatepickerModule],
   providers: [provideNativeDateAdapter(), {provide: MAT_DATE_LOCALE, useValue: 'vi-VN'}, DatePipe],
   changeDetection: ChangeDetectionStrategy.Default,
-  templateUrl: './tea-info.component.html',
-  styleUrl: './tea-info.component.scss'
+  templateUrl: './stu-info.component.html',
+  styleUrl: './stu-info.component.scss'
 })
-export class TeaInfoComponent implements OnInit {
+export class StuInfoComponent implements OnInit {
   registerForm!: FormGroup;
   isEditing = false;
 
@@ -39,8 +39,7 @@ export class TeaInfoComponent implements OnInit {
       role: [{value: '', disabled: true}],
       dob: [{value: '', disabled: true}, Validators.required],
       address: [{value: 'test', disabled: true}, Validators.required],
-      business: [{value: 'test', disabled: true}, Validators.required],
-      image: [{value: '', disabled: true}],
+      image: [{value: '', disabled: true}, Validators.required],
     })
   }
 

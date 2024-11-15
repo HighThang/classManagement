@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { catchError, Observable, tap, throwError } from 'rxjs';
+import { catchError, Observable, Subject, tap, throwError } from 'rxjs';
 import { AuthResponse, UserResponse } from '../../interfaces/response.interface';
 import Swal from 'sweetalert2';
 
@@ -13,7 +13,10 @@ const default_url = ['http://localhost:8081/api/'];
 export class AuthService {
   private loginUrl = default_url + 'auth/login';
   private loginUserInformations = default_url + 'user';
+  private userUpdated = new Subject<UserResponse>();
 
+  userUpdated$ = this.userUpdated.asObservable();
+  
   constructor(private http: HttpClient, private router: Router) {}
 
   authenticate(username: string, password: string): Observable<AuthResponse> {
@@ -36,10 +39,10 @@ export class AuthService {
   }
 
   getToken(): string | null {
-      return localStorage.getItem('accessToken');
+    return localStorage.getItem('accessToken');
   }
 
-  isLoggedIn() {
+  hasToken() {
     return localStorage.getItem('accessToken') !== null;
   }
 
@@ -63,21 +66,22 @@ export class AuthService {
     });
   }
 
-  // setCurrentUser() {
-  //   this.http.get<UserResponse>(this.loginUserInformations).subscribe((res) => sessionStorage.setItem('currentUser', JSON.stringify(res)));
-  // }
-
   setCurrentUser(): Observable<UserResponse> {
     return this.http.get<UserResponse>(this.loginUserInformations).pipe(
       tap((res) => {
         sessionStorage.setItem('currentUser', JSON.stringify(res));
+        this.userUpdated.next(res);
       })
     );
   }  
 
+  updateUser(user: UserResponse) {
+    this.userUpdated.next(user);
+  }
+
   getCurrentUser() {
-      const currentUser = sessionStorage.getItem('currentUser');
-      return currentUser ? JSON.parse(currentUser) : null;
+    const currentUser = sessionStorage.getItem('currentUser');
+    return currentUser ? JSON.parse(currentUser) : null;
   }
 
   getUserRole() {

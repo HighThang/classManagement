@@ -17,13 +17,25 @@ import { TeaAttendanceComponent } from './sa_components/main/teacher/tea-attenda
 import { TeaManageClassComponent } from './sa_components/main/teacher/tea-manage-class/tea-manage-class.component';
 import { TeaScheduleComponent } from './sa_components/main/teacher/tea-schedule/tea-schedule.component';
 import { TeaCourseComponent } from './sa_components/main/teacher/tea-course/tea-course.component';
+import { StuScheduleComponent } from './sa_components/main/student/stu-schedule/stu-schedule.component';
+import { StuCourseComponent } from './sa_components/main/student/stu-course/stu-course.component';
+import { StuClassListComponent } from './sa_components/main/student/stu-class-list/stu-class-list.component';
+import { StuAttendanceComponent } from './sa_components/main/student/stu-attendance/stu-attendance.component';
+import { StuScoreComponent } from './sa_components/main/student/stu-score/stu-score.component';
+import { StuFeeComponent } from './sa_components/main/student/stu-fee/stu-fee.component';
+import { StuInfoComponent } from './sa_components/main/student/stu-info/stu-info.component';
+import { ManageClassComponent } from './sa_components/main/admin/manage-class/manage-class.component';
+import { ManageCourseComponent } from './sa_components/main/admin/manage-course/manage-course.component';
+import { adminGuard } from './core/guards/admin-guard/admin.guard';
+import { teacherGuard } from './core/guards/teacher-guard/teacher.guard';
+import { studentGuard } from './core/guards/student-guard/student.guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: '/home', pathMatch: 'full' },
   {
     path: '',
     component: MainComponent,
     children: [
+      { path: '', redirectTo: '/home', pathMatch: 'full' },
       {
         path: 'home',
         component: HomeComponent,
@@ -52,9 +64,20 @@ export const routes: Routes = [
   },
   {
     path: 'admin',
-    canActivate: [],
+    canActivate: [adminGuard],
     component: MainComponent,
     children: [
+      { path: '', redirectTo: 'manage_class', pathMatch: 'full' },
+      {
+        path: 'manage_class',
+        component: ManageClassComponent,
+        title: 'Quản lý lớp học',
+      },
+      {
+        path: 'manage_course',
+        component: ManageCourseComponent,
+        title: 'Quản lý môn học',
+      },
       {
         path: 'manage_stu',
         component: ManageStuComponent,
@@ -69,9 +92,10 @@ export const routes: Routes = [
   },
   {
     path: 'teacher',
-    canActivate: [],
+    canActivate: [teacherGuard],
     component: MainComponent,
     children: [
+      { path: '', redirectTo: 'schedule', pathMatch: 'full' },
       {
         path: 'schedule',
         component: TeaScheduleComponent,
@@ -116,9 +140,46 @@ export const routes: Routes = [
   },
   {
     path: 'student',
-    canActivate: [],
+    canActivate: [studentGuard],
     component: MainComponent,
-    children: [],
+    children: [
+      { path: '', redirectTo: 'schedule', pathMatch: 'full' },
+      {
+        path: 'schedule',
+        component: StuScheduleComponent,
+        title: 'Lịch trình học tập',
+      },
+      {
+        path: 'course',
+        component: StuCourseComponent,
+        title: 'Đăng ký môn học',
+      },
+      {
+        path: 'class',
+        component: StuClassListComponent,
+        title: 'Danh sách lớp học',
+      },
+      {
+        path: 'attendance',
+        component: StuAttendanceComponent,
+        title: 'Theo dõi điểm danh',
+      },
+      {
+        path: 'score',
+        component: StuScoreComponent,
+        title: 'Xem điểm',
+      },
+      {
+        path: 'fee',
+        component: StuFeeComponent,
+        title: 'Xem học phí',
+      },
+      {
+        path: 'info',
+        component: StuInfoComponent,
+        title: 'Thông tin cá nhân',
+      },
+    ],
   },
   { path: '**', component: NotFoundComponent, title: 'Trang không tồn tại' },
 ];

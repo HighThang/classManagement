@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, Renderer2, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Renderer2, ViewChild } from '@angular/core';
 import { HeaderComponent } from './form/header/header.component';
 import { SideBarLeftComponent } from './form/side-bar-left/side-bar-left.component';
 import { CommonModule } from '@angular/common';
@@ -18,30 +18,26 @@ export class MainComponent implements AfterViewInit {
   @ViewChild('layoutWrapper') layoutWrapper!: ElementRef;
   @ViewChild('app') app!: ElementRef;
 
-  constructor(private renderer: Renderer2, private cdr: ChangeDetectorRef) {}
+  constructor(private renderer: Renderer2) {}
 
   ngAfterViewInit() {
-    if (typeof document !== 'undefined') {
+    this.toggleMenuVisibility();
+    this.renderer.listen('window', 'resize', () => {
       this.toggleMenuVisibility();
-
-      this.renderer.listen('window', 'resize', () => {
-        this.toggleMenuVisibility();
-      });
-    }
-    this.cdr.detectChanges();
+    });
   }
   
   toggleMenuVisibility() {
     const sidebarFooter = document.querySelector('.side-bar-footer') as HTMLElement;
 
-    if (this.layoutWrapper.nativeElement.offsetHeight <= 300) {
+    if (this.layoutWrapper.nativeElement.offsetHeight !== 0 && this.layoutWrapper.nativeElement.offsetHeight <= 444) {
       sidebarFooter.style.display = 'none';
     }
     else {
       sidebarFooter.style.display = 'flex';
     }
 
-    if (this.layoutWrapper.nativeElement.offsetHeight <= 500 || this.app.nativeElement.offsetWidth <= 900) {
+    if (this.layoutWrapper.nativeElement.offsetHeight * this.app.nativeElement.offsetWidth !== 0 && this.layoutWrapper.nativeElement.offsetHeight * this.app.nativeElement.offsetWidth <= 460000) {
       if (this.pos_isAbsolute === false) {
         this.pos_isAbsolute = true;
         if (this.sidebarVisible === true) {
@@ -49,7 +45,7 @@ export class MainComponent implements AfterViewInit {
         }
       }
     } 
-    else if (this.layoutWrapper.nativeElement.offsetHeight > 500 || this.app.nativeElement.offsetWidth > 900) {
+    else if (this.layoutWrapper.nativeElement.offsetHeight * this.app.nativeElement.offsetWidth !== 0 && this.layoutWrapper.nativeElement.offsetHeight * this.app.nativeElement.offsetWidth > 460000) {
       if (this.pos_isAbsolute === true) {
         if (this.sidebarVisible === false) {
           this.toggleSidebar();

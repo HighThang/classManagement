@@ -9,7 +9,7 @@
                     <div class="box">
                         <p class="name">Họ tên:</p>
 
-                        <!-- <mat-form-field class="firstname" appearance="outline">
+                        <mat-form-field class="firstname" appearance="outline">
                             <mat-label>Họ</mat-label>
                             <input matInput formControlName="firstName" [placeholder]="'Điền họ'">
                             <mat-error *ngIf="firstFormGroup.get('firstName')?.hasError('required')">
@@ -20,13 +20,13 @@
                         <mat-form-field class="surname" appearance="outline">
                             <mat-label>Tên đệm</mat-label>
                             <input matInput [placeholder]="'Điền tên đệm'">
-                        </mat-form-field> -->
+                        </mat-form-field>
 
                         <mat-form-field class="lastname" appearance="outline">
-                            <mat-label>Họ tên</mat-label>
-                            <input matInput formControlName="lastName" [placeholder]="'Điền họ và tên'">
+                            <mat-label>Tên</mat-label>
+                            <input matInput formControlName="lastName" [placeholder]="'Điền tên'">
                             <mat-error *ngIf="firstFormGroup.get('lastName')?.hasError('required')">
-                                Họ tên là <strong>bắt buộc</strong>
+                                Tên là <strong>bắt buộc</strong>
                             </mat-error>
                         </mat-form-field>
                     </div>
