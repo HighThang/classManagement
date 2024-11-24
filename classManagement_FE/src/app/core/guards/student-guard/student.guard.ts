@@ -7,7 +7,7 @@ import { catchError, map, of } from 'rxjs';
 export const studentGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);
   const router = inject(Router)
-debugger
+
   if (authService.hasToken()) {
     return authService.setCurrentUser().pipe(
       map(() => {

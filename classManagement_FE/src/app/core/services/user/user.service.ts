@@ -13,6 +13,10 @@ export class UserService {
 
   constructor(private http: HttpClient) {}
 
+  getUserInfo(): Observable<UserResponse> {
+    return this.http.get<UserResponse>(this.userApiUrl);
+  }
+
   updateUserInfo(user: UserResponse): Observable<UserResponse> {
     return this.http.put<UserResponse>(this.userApiUrl, user).pipe(
       tap((res) => {

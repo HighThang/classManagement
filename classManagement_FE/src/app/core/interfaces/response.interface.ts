@@ -12,3 +12,8 @@ export interface UserResponse {
   lastName: string,
   phone: string
 }
+
+export interface DashboardResponse {
+  numberOfClass: string,
+  numberOfStudent: string
+}
