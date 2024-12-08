@@ -8,7 +8,7 @@
         <version>2.5.5</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>utc.k61.cntt2</groupId>
+    <groupId>ptit.d20.do_an</groupId>
     <artifactId>class_management</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>class_management</name>
