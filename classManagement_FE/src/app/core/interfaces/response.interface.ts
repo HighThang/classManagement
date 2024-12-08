@@ -10,7 +10,10 @@ export interface UserResponse {
   firstName: string,
   surname: string,
   lastName: string,
-  phone: string
+  phone: string,
+  business: string,
+  address: string,
+  imageURL: string
 }
 
 export interface DashboardResponse {

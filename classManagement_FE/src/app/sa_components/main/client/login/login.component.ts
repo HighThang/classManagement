@@ -34,7 +34,7 @@ export class LoginComponent {
 
   constructor(private fb: FormBuilder, private authService: AuthService, private router: Router, private http: HttpClient) {
     this.loginForm = this.fb.group({
-      username: ['thang', Validators.required],
+      username: ['admin', Validators.required],
       password: ['2952002', Validators.required],
       rememberMe: false,
     });

@@ -4,44 +4,75 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { SharedModule } from '../../../../shared/shared.module';
 import { MatCardModule } from '@angular/material/card';
-import { ReactiveFormsModule, FormGroup, FormBuilder, Validators } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormGroup,
+  FormBuilder,
+  Validators,
+} from '@angular/forms';
 import { ChangeDetectionStrategy } from '@angular/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core';
+import {
+  MAT_DATE_LOCALE,
+  provideNativeDateAdapter,
+} from '@angular/material/core';
 import { DatePipe } from '@angular/common';
 import { UserService } from '../../../../core/services/user/user.service';
 import Swal from 'sweetalert2';
 import { UserResponse } from '../../../../core/interfaces/response.interface';
 import { AuthService } from '../../../../core/services/auth/auth.service';
+import { ImageService } from '../../../../core/services/image/image.service';
 
 @Component({
   selector: 'app-tea-info',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatCardModule, MatIconModule, MatButtonModule, SharedModule, MatFormFieldModule, MatInputModule, MatDatepickerModule],
-  providers: [provideNativeDateAdapter(), {provide: MAT_DATE_LOCALE, useValue: 'vi-VN'}, DatePipe],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatCardModule,
+    MatIconModule,
+    MatButtonModule,
+    SharedModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDatepickerModule,
+  ],
+  providers: [
+    provideNativeDateAdapter(),
+    { provide: MAT_DATE_LOCALE, useValue: 'vi-VN' },
+    DatePipe,
+  ],
   changeDetection: ChangeDetectionStrategy.Default,
   templateUrl: './tea-info.component.html',
-  styleUrl: './tea-info.component.scss'
+  styleUrl: './tea-info.component.scss',
 })
 export class TeaInfoComponent implements OnInit {
   registerForm!: FormGroup;
   isEditing = false;
+  selectedImage: string | null = null;
+  file_store: FileList | null = null;
 
-  constructor(private fb: FormBuilder, private datePipe: DatePipe, private userService: UserService, private authService: AuthService) {
+  constructor(
+    private fb: FormBuilder,
+    private datePipe: DatePipe,
+    private userService: UserService,
+    private authService: AuthService,
+    private imageService: ImageService
+  ) {
     this.registerForm = this.fb.group({
-      firstName: [{value: '', disabled: true}, [Validators.required]],
-      surname: [{value: '', disabled: true}],
-      lastName: [{value: '', disabled: true}, [Validators.required]],
-      email: [{value: '', disabled: true}],
-      phone: [{value: '', disabled: true}, [Validators.required, Validators.pattern('[- +()0-9]+')]],
-      role: [{value: '', disabled: true}],
-      dob: [{value: '', disabled: true}, Validators.required],
-      address: [{value: 'test', disabled: true}, Validators.required],
-      business: [{value: 'test', disabled: true}, Validators.required],
-      image: [{value: '', disabled: true}],
-    })
+      firstName: [{ value: '', disabled: true }, [Validators.required]],
+      surname: [{ value: '', disabled: true }],
+      lastName: [{ value: '', disabled: true }, [Validators.required]],
+      email: [{ value: '', disabled: true }],
+      phone: [{ value: '', disabled: true }, [Validators.required, Validators.pattern('[- +()0-9]+')]],
+      role: [{ value: '', disabled: true }],
+      dob: [{ value: '', disabled: true }, Validators.required],
+      address: [{ value: '', disabled: true }, Validators.required],
+      business: [{ value: '', disabled: true }, Validators.required],
+      imageURL: [{ value: '', disabled: true }],
+    });
   }
 
   ngOnInit(): void {
@@ -49,23 +80,32 @@ export class TeaInfoComponent implements OnInit {
   }
 
   getUserInfo(): void {
-    const userData = sessionStorage.getItem('currentUser');
+    this.authService.setCurrentUser().subscribe(
+      (response: UserResponse) => {
+        this.registerForm.patchValue(response);
+        this.loadImage(response.imageURL);
+      },
+      () => {
+        localStorage.removeItem('accessToken');
+      }
+    );
+  }
 
-    if (userData) 
-      this.registerForm.patchValue(JSON.parse(userData) as UserResponse);
-    else {
-      this.authService.setCurrentUser().subscribe(
-        (response: UserResponse) => {
-          this.registerForm.patchValue(response);
+  loadImage(imagePath: string | null): void {
+    if (imagePath) {
+      this.imageService.getImage().subscribe(
+        (imageBlob: Blob) => {
+          const imageUrl = URL.createObjectURL(imageBlob);
+          this.selectedImage = imageUrl;
         },
-        (error) => {
-          localStorage.removeItem('accessToken');
+        () => {
+          this.selectedImage = null;
         }
       );
     }
   }
 
-  enableEdit() {
+  enableEdit(): void {
     this.isEditing = true;
     this.registerForm.enable();
     this.registerForm.get('role')?.disable();
@@ -79,53 +119,100 @@ export class TeaInfoComponent implements OnInit {
   }
 
   saveInfo(): void {
-    if (this.registerForm.valid) {      
+    if (this.registerForm.valid) {
       const formData = this.registerForm.getRawValue();
 
       if (formData.dob) {
         formData.dob = this.datePipe.transform(formData.dob, 'yyyy-MM-dd');
       }
 
-      this.userService.updateUserInfo(formData).subscribe(
-        (response) => {
-          this.registerForm.patchValue(response);
-          this.isEditing = false;
-          this.registerForm.disable();
+      if (this.file_store && this.file_store[0]) this.uploadImage();
+      this.updateUserInfo(formData);
+    }
+  }
 
-          this.authService.updateUser(this.registerForm.value);
+  private updateUserInfo(formData: any): void {
+    this.userService.updateUserInfo(formData).subscribe(
+      (response) => {
+        this.registerForm.patchValue(response);
+        this.isEditing = false;
+        this.registerForm.disable();
 
-          const Toast = Swal.mixin({
-            toast: true,
-            position: 'bottom-end',
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-          });
-          Toast.fire({
-            icon: 'success',
-            title: 'Cập nhật thông tin thành công',
-          });
+        this.authService.updateUser(this.registerForm.value);
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Cập nhật thông tin thành công',
+          position: 'bottom-end',
+          toast: true,
+          timer: 3000,
+          timerProgressBar: true,
+          showConfirmButton: false,
+        });
+      },
+      () => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Không thể cập nhật thông tin',
+          position: 'bottom-end',
+          toast: true,
+          timer: 3000,
+          timerProgressBar: true,
+          showConfirmButton: false,
+        });
+      }
+    );
+  }
+
+  uploadImage(): void {
+    if (this.file_store && this.file_store[0]) {
+      const formData: FormData = new FormData();
+      formData.append('file', this.file_store[0]);
+
+      this.userService.uploadImageToUser(formData).subscribe(
+        (response: boolean) => {
+          this.getUserInfo();
+          if (!response) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Không thể tải ảnh lên',
+              position: 'bottom-end',
+              toast: true,
+              timer: 3000,
+              timerProgressBar: true,
+              showConfirmButton: false,
+            });
+          }
         },
-        (error) => {
-          console.error(error);
-          const Toast = Swal.mixin({
-            toast: true,
+        () => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Có lỗi xảy ra khi tải ảnh',
             position: 'bottom-end',
-            showConfirmButton: false,
+            toast: true,
             timer: 3000,
             timerProgressBar: true,
-          });
-          Toast.fire({
-            icon: 'error',
-            title: 'Không thể cập nhật thông tin',
+            showConfirmButton: false,
           });
         }
       );
     }
   }
 
-  // Nhập ảnh
-  selectedImage: string | ArrayBuffer | null = null;
+  handleFileInputChange(files: FileList | null): void {
+    this.file_store = files;
+    if (files && files[0]) {
+      const file = files[0];
+      const count = files.length > 1 ? `(+${files.length - 1} files)` : '';
+      this.registerForm.patchValue({
+        imageURL: `${file.name}${count}`,
+      });
+    } else {
+      this.registerForm.patchValue({
+        imageURL: '',
+      });
+    }
+  }
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -135,27 +222,11 @@ export class TeaInfoComponent implements OnInit {
       const reader = new FileReader();
 
       reader.onload = () => {
-        this.selectedImage = reader.result;
+        this.selectedImage = reader.result as string;
       };
 
       reader.readAsDataURL(file);
-    }
-  }
-
-  file_store: FileList | null = null;
-
-  handleFileInputChange(l: FileList | null): void {
-    this.file_store = l;
-    if (l) {
-      const f = l[0];
-      const count = l.length > 1 ? `(+${l.length - 1} files)` : "";
-      this.registerForm.patchValue({
-        image: `${f.name}${count}`
-      });
-    } else {
-      this.registerForm.patchValue({
-        image: ''
-      });
+      this.file_store = input.files;
     }
   }
 }

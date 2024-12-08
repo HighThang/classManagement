@@ -1,13 +1,17 @@
 <div class="side-bar-left">
     <div class="side-bar-header" *ngIf="isAdminLoggedIn || isStudentLoggedIn || isTeacherLoggedIn">
         <div class="avatar">
-            <img src="1.jpg">
+            <img *ngIf="user?.imageURL; else defaultImage" [src]="selectedImage" alt="User Image" />
+            <ng-template #defaultImage>
+                <img src="1.jpg" alt="Default Image" />
+            </ng-template>
         </div>
-        <div class="link_profile">
+
+        <div class="link_profile" style="width: 135px;">
             <div class="name">
                 {{user?.lastName}} {{user?.surname}} {{user?.firstName}}
             </div>
-            <div class="email">
+            <div class="email" style="display: flex; overflow: hidden;">
                 {{user?.email}}
             </div>
         </div>
@@ -24,14 +28,10 @@
                     <app-icon [iconName]="'person'"></app-icon>
                     <span>Thông tin cá nhân</span>
                 </button>
-                <!-- <button mat-menu-item class="logout" (click)="logout()">
-                    <app-icon [iconName]="'input'"></app-icon>
-                    <span>Đăng xuất</span>
-                </button> -->
 
-                <button mat-menu-item class="logout" (click)="logout()" 
-                    [ngStyle]="{'background-color': isHovering ? 'color-mix(in srgb, var(--theme-background) 50%, white 80%)' : 'transparent', 
-                    'transition': 'color 0.3s ease, background-color 0.3s ease'}" (mouseenter)="isHovering = true" (mouseleave)="isHovering = false">
+                <button mat-menu-item class="logout" (click)="logout()" [ngStyle]="{'background-color': isHovering ? 'color-mix(in srgb, var(--theme-background) 50%, white 80%)' : 'transparent', 
+                    'transition': 'color 0.3s ease, background-color 0.3s ease'}" (mouseenter)="isHovering = true"
+                    (mouseleave)="isHovering = false">
                     <app-icon [iconName]="'input'"></app-icon>
                     <span>Đăng xuất</span>
                 </button>

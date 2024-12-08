@@ -101,7 +101,7 @@
                                         [ngClass]="{ 'disabled-icon': !isEditing }"
                                         (click)="isEditing ? f_input.click() : null"
                                         style="padding: 5px; margin-left: 5px;">attach_file</mat-icon>
-                                    <input type="text" readonly matInput formControlName="image" />
+                                    <input type="text" readonly matInput formControlName="imageURL" />
                                     <input type="file" multiple hidden #f_input (change)="handleFileInputChange(f_input.files)"
                                         (change)="onFileSelected($event)" accept="image/*" />
                                     <img *ngIf="selectedImage" [src]="selectedImage" class="preview-image">

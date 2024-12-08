@@ -6,7 +6,6 @@ export enum client_EMenuLabels {
 }
 
 export enum admin_EMenuLabels {
-  ManageClass = 'Quản lý lớp học',
   ManageCourse = 'Quản lý môn học',
   ManageTeacher = 'Quản lý giáo viên',
   ManageStudent = 'Quản lý học sinh',
@@ -14,7 +13,7 @@ export enum admin_EMenuLabels {
 
 export enum teacher_EMenuLabels {
   Schedule = 'Lịch trình giảng dạy',
-  Course = 'Đăng ký môn giảng dạy',
+  Course = 'Danh sách & Đăng ký môn giảng dạy',
   ManageClass = 'Quản lý lớp dạy',
   Attendance = 'Quản lý điểm danh',
   Score = 'Quản lý điểm',

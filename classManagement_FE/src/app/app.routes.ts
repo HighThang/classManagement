@@ -24,11 +24,11 @@ import { StuAttendanceComponent } from './sa_components/main/student/stu-attenda
 import { StuScoreComponent } from './sa_components/main/student/stu-score/stu-score.component';
 import { StuFeeComponent } from './sa_components/main/student/stu-fee/stu-fee.component';
 import { StuInfoComponent } from './sa_components/main/student/stu-info/stu-info.component';
-import { ManageClassComponent } from './sa_components/main/admin/manage-class/manage-class.component';
 import { ManageCourseComponent } from './sa_components/main/admin/manage-course/manage-course.component';
 import { adminGuard } from './core/guards/admin-guard/admin.guard';
 import { teacherGuard } from './core/guards/teacher-guard/teacher.guard';
 import { studentGuard } from './core/guards/student-guard/student.guard';
+import { TeaClassDetailsComponent } from './sa_components/main/teacher/tea-class-details/tea-class-details.component';
 
 export const routes: Routes = [
   {
@@ -67,12 +67,7 @@ export const routes: Routes = [
     canActivate: [adminGuard],
     component: MainComponent,
     children: [
-      { path: '', redirectTo: 'manage_class', pathMatch: 'full' },
-      {
-        path: 'manage_class',
-        component: ManageClassComponent,
-        title: 'Quản lý lớp học',
-      },
+      { path: '', redirectTo: 'manage_course', pathMatch: 'full' },
       {
         path: 'manage_course',
         component: ManageCourseComponent,
@@ -110,6 +105,11 @@ export const routes: Routes = [
         path: 'manage_class',
         component: TeaManageClassComponent,
         title: 'Quản lý lớp dạy',
+      },
+      {
+        path: 'manage_class/:id',
+        component: TeaClassDetailsComponent,
+        title: 'Chi tiết lớp',
       },
       {
         path: 'attendance',

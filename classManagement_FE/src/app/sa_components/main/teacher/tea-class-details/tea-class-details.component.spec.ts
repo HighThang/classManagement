@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ManageClassComponent } from './manage-class.component';
+import { TeaClassDetailsComponent } from './tea-class-details.component';
 
-describe('ManageClassComponent', () => {
-  let component: ManageClassComponent;
-  let fixture: ComponentFixture<ManageClassComponent>;
+describe('TeaClassDetailsComponent', () => {
+  let component: TeaClassDetailsComponent;
+  let fixture: ComponentFixture<TeaClassDetailsComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ManageClassComponent]
+      imports: [TeaClassDetailsComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(ManageClassComponent);
+    fixture = TestBed.createComponent(TeaClassDetailsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
