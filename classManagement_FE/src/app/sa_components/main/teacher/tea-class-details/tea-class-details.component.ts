@@ -232,7 +232,7 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
 
   openWaitingListDialog() {
     const dialog2 = this.dialog.open(this.dialogTemplate1, {
-      width: '77%',
+      width: '77%',  maxHeight: '77vh'
     });
 
     dialog2.afterOpened().subscribe(() => {
@@ -315,8 +315,9 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
           day: item.day,
           periodInDay: this.mapPeriodInDay(item.periodInDay),
           dayInWeek: this.mapDayInWeek(item.dayInWeek),
-          createdDate: new Date(item.createdDate).toLocaleDateString('vi-VN'), 
+          createdDate: item.createdDate, 
         }));
+        console.log(mappedData)
         this.dataSource2.data = mappedData;
       },
       error: (err) => {
@@ -327,7 +328,7 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
 
   openAddScheduleDialog() {
     this.dialog.open(this.dialogTemplate2, {
-      width: '77%',
+      width: '77%',  maxHeight: '77vh'
     });
   }
 

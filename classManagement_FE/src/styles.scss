@@ -22,6 +22,18 @@ mat.$theme-ignore-duplication-warnings: true;
   display: none;
 }
 
+.mdc-text-field--outlined.mdc-text-field--disabled .mdc-text-field__input {
+  color: rgba(0, 0, 0, 0.55) !important;
+}
+
+.mdc-text-field--outlined.mdc-text-field--disabled .mdc-floating-label {
+  color: rgba(0, 0, 0, 0.55) !important;
+}
+
+.mdc-text-field--outlined.mdc-text-field--disabled .mat-mdc-notch-piece {
+  border-color: rgba(0, 0, 0, 0.11) !important;
+}
+
 html,
 body {
   height: 100%;
@@ -39,16 +51,15 @@ body {
   --color-danger: #F56C6C;
   --text-button-color: white;
   --text-disable-color: rgb(167, 167, 167);
+
 }
 
 @mixin custom-material-theme($primary, $accent, $warn) {
-  $theme: mat.m2-define-light-theme((
-    color: (
-      primary: $primary,
-      accent: $accent,
-      warn: $warn,
-    ),
-  ));
+  $theme: mat.m2-define-light-theme((color: (primary: $primary,
+          accent: $accent,
+          warn: $warn,
+        ),
+      ));
 
   @include mat.all-component-themes($theme);
 }
@@ -65,11 +76,9 @@ body {
   --theme-checked: cornflowerblue;
   --theme-border-input: cornflowerblue;
 
-  @include custom-material-theme(
-    mat.m2-define-palette(mat.$m2-indigo-palette, 500),
+  @include custom-material-theme(mat.m2-define-palette(mat.$m2-indigo-palette, 500),
     mat.m2-define-palette(mat.$m2-pink-palette, A200),
-    mat.m2-define-palette(mat.$m2-red-palette)
-  );
+    mat.m2-define-palette(mat.$m2-red-palette));
 }
 
 .theme-orange {
@@ -84,11 +93,9 @@ body {
   --theme-checked: rgb(255, 170, 67);
   --theme-border-input: rgb(255, 170, 67);
 
-  @include custom-material-theme(
-    mat.m2-define-palette(mat.$m2-orange-palette, 500),
+  @include custom-material-theme(mat.m2-define-palette(mat.$m2-orange-palette, 500),
     mat.m2-define-palette(mat.$m2-pink-palette, A200),
-    mat.m2-define-palette(mat.$m2-red-palette)
-  );
+    mat.m2-define-palette(mat.$m2-red-palette));
 }
 
 .theme-lightgreen {
@@ -103,9 +110,7 @@ body {
   --theme-checked: #8bc34a;
   --theme-border-input: #8bc34a;
 
-  @include custom-material-theme(
-    mat.m2-define-palette(mat.$m2-light-green-palette, 500),
+  @include custom-material-theme(mat.m2-define-palette(mat.$m2-light-green-palette, 500),
     mat.m2-define-palette(mat.$m2-pink-palette, A200),
-    mat.m2-define-palette(mat.$m2-red-palette)
-  );
+    mat.m2-define-palette(mat.$m2-red-palette));
 }
