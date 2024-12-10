@@ -8,6 +8,7 @@ import { AuthService } from '../../../../core/services/auth/auth.service';
 import { UserResponse } from '../../../../core/interfaces/response.interface';
 import { MatMenuModule } from '@angular/material/menu';
 import Swal from 'sweetalert2';
+import { ImageService } from '../../../../core/services/image/image.service';
 
 @Component({
   selector: 'app-side-bar-left',
@@ -19,6 +20,7 @@ import Swal from 'sweetalert2';
 export class SideBarLeftComponent {
   user!: UserResponse | null;
   currentUser: string = 'client'; 
+  selectedImage: string | null = null;
 
   isAdminLoggedIn!: boolean;
   isTeacherLoggedIn!: boolean;
@@ -26,7 +28,7 @@ export class SideBarLeftComponent {
   
   isHovering = false;
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private imageService: ImageService) {}
 
   ngOnInit() {
     const userData = sessionStorage.getItem('currentUser');
@@ -51,7 +53,10 @@ export class SideBarLeftComponent {
 
       this.authService.userUpdated$.subscribe((updatedUser) => {
         this.user = updatedUser;
+        this.loadImage(this.user?.imageURL!);
       });
+
+      this.loadImage(this.user?.imageURL!);
     }
   }
 
@@ -75,6 +80,20 @@ export class SideBarLeftComponent {
       icon: 'success',
       title: 'Đăng xuất thành công!',
     });
+  }
+
+  loadImage(imagePath: string | null): void {
+    if (imagePath) {
+      this.imageService.getImage().subscribe(
+        (imageBlob: Blob) => {
+          const imageUrl = URL.createObjectURL(imageBlob);
+          this.selectedImage = imageUrl;
+        },
+        () => {
+          this.selectedImage = null;
+        }
+      );
+    }
   }
 
   client_menuItems = [
@@ -101,11 +120,6 @@ export class SideBarLeftComponent {
   ];
 
   admin_menuItems = [
-    {
-      icon: 'class',
-      label: admin_EMenuLabels.ManageClass,
-      routerLink: '/admin/manage_class',
-    },
     {
       icon: 'library_books',
       label: admin_EMenuLabels.ManageCourse,

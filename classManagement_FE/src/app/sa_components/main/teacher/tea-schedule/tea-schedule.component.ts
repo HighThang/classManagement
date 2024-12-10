@@ -48,7 +48,6 @@ export class TeaScheduleComponent {
   constructor(private dashboardService: DashboardService) {}
 
   ngOnInit(): void {
-    console.log(this.view)
     this.fetchWeeklySchedule();
   }
 

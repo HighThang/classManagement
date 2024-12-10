@@ -30,11 +30,28 @@
             text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
         }
 
-        .search {
-            background-color: white;
-            max-width: 100%;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            border-radius: 8px;
+        .classManagement {
+            border-radius: 15px;
+
+            .header {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+
+                app-button {
+                    display: flex;
+                    align-self: center;
+                    padding-right: 10px;
+                }
+            }
+
+            .table {
+                background-color: white;
+                width: 99%;
+                justify-self: center;
+                padding: 4px;
+                border-radius: 10px;
+            }
         }
     }
 
@@ -68,5 +85,19 @@
 }
 
 :host ::ng-deep {
+    .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mat-mdc-notch-piece {
+        border-color: var(--theme-primary);
+    }
 
+    .mdc-text-field--outlined:not(.mdc-text-field--disabled).mdc-text-field--invalid .mat-mdc-notch-piece {
+        border-color: #f44336;
+    }
+
+    .mat-step-icon-selected {
+        background-color: var(--theme-background) !important;
+    }
+
+    .mat-step-icon-state-edit {
+        background-color: var(--theme-background) !important;
+    }
 }

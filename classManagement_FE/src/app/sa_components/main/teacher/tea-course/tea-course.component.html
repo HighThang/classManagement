@@ -1,1 +1,78 @@
-<p>tea-course works!</p>
+<div class="container">
+    <div class="content">
+        <div class="subject">
+            <h3 class="centered-title">Danh sách môn học</h3>
+
+            <div class="table">
+                <div class="header">
+                    <div class="icon-grid-1" style="padding-top: 20px">
+                        <app-icon iconName="search" style="padding: 10px;"></app-icon>
+                        <mat-form-field appearance="outline" style="width: 55vh;">
+                            <mat-label>Tìm kiếm môn học</mat-label>
+                            <input matInput (input)="applyFilter($event)">
+                        </mat-form-field>
+                    </div>
+                    <app-button (click)="openDialog(dialogTemplate)">Đăng ký môn giảng dạy</app-button>
+                </div>
+
+                <ng-template #dialogTemplate>
+                    <div class="dialog-container">
+                        <h2 mat-dialog-title style="color: var(--theme-background); font-weight: bold;">Đăng ký môn
+                            giảng dạy</h2>
+                        <hr>
+                        <mat-form-field appearance="outline" class="input-field"
+                            style="width: 92%; padding-top: 15px; display: flex; justify-self: center;">
+                            <mat-label>Tên môn học</mat-label>
+                            <input matInput [(ngModel)]="subjectName" name="subjectName" #subjectNameCtrl="ngModel"
+                                placeholder="Nhập tên môn học" required>
+                            <mat-error *ngIf="subjectNameCtrl.invalid">Tên môn học không được
+                                để trống</mat-error>
+                        </mat-form-field>
+                        <hr>
+                        <mat-dialog-actions align="end" class="dialog-footer">
+                            <button mat-button mat-dialog-close style="background-color: gainsboro;">Hủy</button>
+                            <button mat-raised-button color="primary" (click)="submitRequest(subjectNameCtrl)">Gửi yêu
+                                cầu</button>
+                        </mat-dialog-actions>
+                    </div>
+                </ng-template>
+
+                <hr>
+
+                <table mat-table [dataSource]="dataSource" matSort matSortActive="id" matSortDirection="asc"
+                    class="example-table">
+                    <ng-container matColumnDef="id">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header
+                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">ID
+                        </th>
+                        <td mat-cell *matCellDef="let row">{{ row.id }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="subName">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header
+                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">Tên
+                            môn học</th>
+                        <td mat-cell *matCellDef="let row">{{ row.subName }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="teacherName">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header
+                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">Giáo
+                            viên tạo môn</th>
+                        <td mat-cell *matCellDef="let row">{{ row.teacherName }}</td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+                    <tr class="mat-row" *matNoDataRow>
+                        <td class="mat-cell" colspan="3">Không có dữ liệu</td>
+                    </tr>
+                </table>
+
+                <mat-paginator [length]="resultsLength" [pageSizeOptions]="[5, 25, 50, 100]"
+                    aria-label="Select page"></mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>

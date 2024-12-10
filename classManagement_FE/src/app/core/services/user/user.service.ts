@@ -24,4 +24,9 @@ export class UserService {
       })
     );
   }
+
+  uploadImageToUser(formData: FormData): Observable<boolean> {
+    const url = `${this.userApiUrl}/update-image`;
+    return this.http.put<boolean>(url, formData);
+  }
 }

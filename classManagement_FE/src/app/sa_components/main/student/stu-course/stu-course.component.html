@@ -11,26 +11,22 @@
                         <p class="name">Môn học:</p>
                         <mat-form-field class="course" appearance="outline">
                             <mat-label>Môn/Khóa học</mat-label>
-                            <mat-select formControlName="courseGroup">
-                                <mat-option>-- None --</mat-option>
-                                @for (group of courseGroup; track group) {
-                                <mat-optgroup [label]="group.name" [disabled]="group.disabled">
-                                    @for (course of group.course; track course) {
-                                    <mat-option [value]="course.value">{{course.viewValue}}</mat-option>
-                                    }
-                                </mat-optgroup>
-                                }
+                            <mat-select formControlName="subjects">
+                                <mat-option value="">-- None --</mat-option>
+                                <mat-option *ngFor="let subject of subjects" [value]="subject">
+                                    {{ subject }}
+                                </mat-option>
                             </mat-select>
                             <mat-error>Môn/Khóa học là <strong>bắt buộc</strong></mat-error>
                         </mat-form-field>
                     </div>
 
                     <div class="btn">
-                        <button class="next" mat-button matStepperNext style="color: white;">Tiếp tục</button>
+                        <button class="next" mat-button matStepperNext style="color: white;">Tiếp
+                            tục</button>
                     </div>
                 </form>
             </mat-step>
-            
             <mat-step [stepControl]="thirdFormGroup">
                 <form [formGroup]="thirdFormGroup">
                     <ng-template matStepLabel>Chọn giáo viên</ng-template>
@@ -39,19 +35,20 @@
                         <p class="name">Giáo viên giảng dạy:</p>
                         <mat-form-field class="teacher" appearance="outline">
                             <mat-label>Giáo viên</mat-label>
-                            <mat-select formControlName="teacherGroup">
-                                <mat-option>-- None --</mat-option>
-                                @for (teacher of teacherGroup; track teacher) {
-                                <mat-option [value]="teacher.value">{{teacher.viewValue}}</mat-option>
-                                }
+                            <mat-select formControlName="teachers">
+                                <mat-option value="">-- None --</mat-option>
+                                <mat-option *ngFor="let teacher of teachers" [value]="teacher">
+                                    {{ teacher }}
+                                </mat-option>
                             </mat-select>
                             <mat-error>Giáo viên là <strong>bắt buộc</strong></mat-error>
                         </mat-form-field>
                     </div>
 
                     <div class="btn">
-                        <button class="back" mat-button matStepperPrevious style="color: white; margin-right: 5px;">Quay lại</button>
-                        <app-button class="submit">Xác nhận gửi đăng ký</app-button>
+                        <button class="back" mat-button matStepperPrevious style="color: white; margin-right: 5px;">Quay
+                            lại</button>
+                        <app-button class="submit" (click)="submitRegistration()">Xác nhận gửi đăng ký</app-button>
                     </div>
                 </form>
             </mat-step>

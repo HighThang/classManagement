@@ -1,1 +1,212 @@
-<p>manage-course works!</p>
+<div class="container">
+    <div class="content">
+        <div class="classManagement">
+            <h3 class="centered-title">Danh sách môn học</h3>
+
+            <mat-tab-group mat-stretch-tabs class="example-stretched-tabs mat-elevation-z4"
+                style="background-color: white; border-radius: 10px;">
+                <mat-tab label="Môn học chờ duyệt">
+                    <div class="table">
+                        <div class="header">
+                            <div class="icon-grid-1" style="padding-top: 20px">
+                                <app-icon iconName="search" style="padding: 10px;"></app-icon>
+                                <mat-form-field appearance="outline" style="width: 55vh;">
+                                    <mat-label>Tìm kiếm</mat-label>
+                                    <input matInput (input)="applyFilter1($event)" #input1 placeholder="Nhập từ khóa tìm kiếm">
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <hr>
+                        <table mat-table [dataSource]="dataSource1" matSort #sort1="matSort" matSortActive="id"
+                            matSortDirection="asc" class="example-table">
+                            <ng-container matColumnDef="id">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                    style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                                    ID</th>
+                                <td mat-cell *matCellDef="let row" style="height: 70px;">{{ row.id }}</td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="subName">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                    style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                                    Tên môn học</th>
+                                <td mat-cell *matCellDef="let row">{{ row.subName }}</td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="teacherName">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                    style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                                    Giáo viên tạo môn</th>
+                                <td mat-cell *matCellDef="let row">{{ row.teacherName }}</td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="active">
+                                <th mat-header-cell *matHeaderCellDef
+                                    style="text-align: center; background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                                    Kích hoạt
+                                </th>
+                                <td mat-cell *matCellDef="let row" style="text-align: center;">
+                                    <button mat-mini-fab
+                                        style="border-radius: 15%; color: white; background-color: rgb(34, 153, 84);"
+                                        (click)="activateSubject(row.id)">
+                                        <mat-icon>done</mat-icon>
+                                    </button>
+                                </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="deleted">
+                                <th mat-header-cell *matHeaderCellDef
+                                    style="text-align: center; background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                                    Từ chối
+                                </th>
+                                <td mat-cell *matCellDef="let row" style="text-align: center;">
+                                    <button mat-mini-fab
+                                        style="background-color: rgb(231, 76, 60); border-radius: 15%; color: white;"
+                                        (click)="deleteSubject(row.id)">
+                                        <mat-icon>clear</mat-icon>
+                                    </button>
+                                </td>
+                            </ng-container>
+
+                            <tr mat-header-row *matHeaderRowDef="displayedColumns1"></tr>
+                            <tr mat-row *matRowDef="let row; columns: displayedColumns1;"></tr>
+
+                            <tr class="mat-row" *matNoDataRow>
+                                <td class="mat-cell" colspan="3">Không có dữ liệu</td>
+                            </tr>
+                        </table>
+
+                        <mat-paginator #paginator1 [length]="resultsLength" [pageSizeOptions]="[5, 10, 25, 100]"
+                            aria-label="Select page">
+                        </mat-paginator>
+                    </div>
+
+                </mat-tab>
+                <mat-tab label="Môn học đang hoạt động">
+                    <div class="table">
+                        <div class="header">
+                            <div class="icon-grid-1" style="padding-top: 20px">
+                                <app-icon iconName="search" style="padding: 10px;"></app-icon>
+                                <mat-form-field appearance="outline" style="width: 55vh;">
+                                    <mat-label>Tìm kiếm</mat-label>
+                                    <input matInput (input)="applyFilter2($event)" #input2 placeholder="Nhập từ khóa tìm kiếm">
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <hr>
+                        <table mat-table [dataSource]="dataSource2" matSort #sort2="matSort" matSortActive="id"
+                            matSortDirection="asc" class="example-table">
+                            <ng-container matColumnDef="id">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                    style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                                    ID</th>
+                                <td mat-cell *matCellDef="let row" style="height: 70px;">{{ row.id }}</td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="subName">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                    style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                                    Tên môn học</th>
+                                <td mat-cell *matCellDef="let row">{{ row.subName }}</td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="teacherName">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                    style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                                    Giáo viên tạo môn</th>
+                                <td mat-cell *matCellDef="let row">{{ row.teacherName }}</td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="disable">
+                                <th mat-header-cell *matHeaderCellDef
+                                    style="text-align: center; background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                                    Hủy kích hoạt</th>
+                                <td mat-cell *matCellDef="let row" style="text-align: center;">
+                                    <button mat-mini-fab
+                                        style="background-color: rgb(231, 76, 60); border-radius: 15%; color: white;"
+                                        (click)="deleteSubject(row.id)">
+                                        <mat-icon>clear</mat-icon>
+                                    </button>
+                                </td>
+                            </ng-container>
+
+                            <tr mat-header-row *matHeaderRowDef="displayedColumns2"></tr>
+                            <tr mat-row *matRowDef="let row; columns: displayedColumns2;"></tr>
+
+                            <tr class="mat-row" *matNoDataRow>
+                                <td class="mat-cell" colspan="3">Không có dữ liệu</td>
+                            </tr>
+                        </table>
+
+                        <mat-paginator #paginator2 [length]="resultsLength" [pageSizeOptions]="[5, 10, 25, 100]"
+                            aria-label="Select page">
+                        </mat-paginator>
+                    </div>
+
+                </mat-tab>
+
+                <mat-tab label="Môn học ngừng hoạt động">
+                    <div class="table">
+                        <div class="header">
+                            <div class="icon-grid-1" style="padding-top: 20px">
+                                <app-icon iconName="search" style="padding: 10px;"></app-icon>
+                                <mat-form-field appearance="outline" style="width: 55vh;">
+                                    <mat-label>Tìm kiếm</mat-label>
+                                    <input matInput (input)="applyFilter3($event)" #input3 placeholder="Nhập từ khóa tìm kiếm">
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <hr>
+                        <table mat-table [dataSource]="dataSource3" matSort #sort3="matSort" matSortActive="id"
+                            matSortDirection="asc" class="example-table">
+                            <ng-container matColumnDef="id">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                    style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                                    ID</th>
+                                <td mat-cell *matCellDef="let row" style="height: 70px;">{{ row.id }}</td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="subName">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                    style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                                    Tên môn học</th>
+                                <td mat-cell *matCellDef="let row">{{ row.subName }}</td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="teacherName">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                    style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                                    Giáo viên tạo môn</th>
+                                <td mat-cell *matCellDef="let row">{{ row.teacherName }}</td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="active">
+                                <th mat-header-cell *matHeaderCellDef
+                                    style="text-align: center; background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                                    Kích hoạt</th>
+                                <td mat-cell *matCellDef="let row" style="text-align: center;">
+                                    <button mat-mini-fab
+                                        style="border-radius: 15%; color: white; background-color: rgb(34, 153, 84);"
+                                        (click)="activateSubject(row.id)">
+                                        <mat-icon>done</mat-icon>
+                                    </button>
+                                </td>
+                            </ng-container>
+
+                            <tr mat-header-row *matHeaderRowDef="displayedColumns3"></tr>
+                            <tr mat-row *matRowDef="let row; columns: displayedColumns3;"></tr>
+
+                            <tr class="mat-row" *matNoDataRow>
+                                <td class="mat-cell" colspan="3">Không có dữ liệu</td>
+                            </tr>
+                        </table>
+
+                        <mat-paginator #paginator3 [length]="resultsLength" [pageSizeOptions]="[5, 10, 25, 100]"
+                            aria-label="Select page">
+                        </mat-paginator>
+                    </div>
+                </mat-tab>
+            </mat-tab-group>
+        </div>
+    </div>
+</div>

@@ -1,100 +1,145 @@
-import { AfterViewInit, Component, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, inject, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { IconComponent } from '../../../../shared/components/icon/icon.component';
-
-export interface UserData {
-  id: string;
-  name: string;
-  progress: string;
-  fruit: string;
-}
-
-const FRUITS: string[] = [
-  'blueberry',
-  'lychee',
-  'kiwi',
-  'mango',
-  'peach',
-  'lime',
-  'pomegranate',
-  'pineapple',
-];
-const NAMES: string[] = [
-  'Maia',
-  'Asher',
-  'Olivia',
-  'Atticus',
-  'Amelia',
-  'Jack',
-  'Charlotte',
-  'Theodore',
-  'Isla',
-  'Oliver',
-  'Isabella',
-  'Jasper',
-  'Cora',
-  'Levi',
-  'Violet',
-  'Arthur',
-  'Mia',
-  'Thomas',
-  'Elizabeth',
-];
+import { SharedModule } from '../../../../shared/shared.module';
+import { CommonModule, DatePipe } from '@angular/common';
+import { Router } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatOptionModule } from '@angular/material/core';
+import { Course, CourseService } from '../../../../core/services/course/course.service';
+import { MatSelectModule } from '@angular/material/select';
+import { Classroom, ClassroomService } from '../../../../core/services/classroom/classroom.service';
+import { Validators } from '@angular/forms';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-tea-manage-class',
   standalone: true,
-  imports: [MatFormFieldModule, MatInputModule, MatTableModule, MatSortModule, MatPaginatorModule, MatIconModule, IconComponent],
+  imports: [ MatFormFieldModule, MatInputModule, MatTableModule, MatSortModule, MatPaginatorModule, MatIconModule, SharedModule, DatePipe,
+    MatButtonModule, MatDialogModule, FormsModule, MatOptionModule, ReactiveFormsModule, CommonModule, MatInputModule, MatSelectModule, MatOptionModule ],
   templateUrl: './tea-manage-class.component.html',
   styleUrl: './tea-manage-class.component.scss',
 })
-export class TeaManageClassComponent implements AfterViewInit {
-  displayedColumns: string[] = ['id', 'name', 'progress', 'fruit'];
-  dataSource: MatTableDataSource<UserData>;
+export class TeaManageClassComponent implements OnInit, AfterViewInit {
+  private router = inject(Router);
+
+  displayedColumns: string[] = ['id','className','subjectName','note','createdDate','attendance','score','fee','details'];
+  dataSource = new MatTableDataSource<Classroom>();
+  resultsLength = 0;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild('dialogTemplate') dialogTemplate: any;
 
-  constructor() {
-    // Create 100 users
-    const users = Array.from({length: 100}, (_, k) => createNewUser(k + 1));
+  formGroup!: FormGroup;
 
-    // Assign the data to the data source for the table to render
-    this.dataSource = new MatTableDataSource(users);
+  subjects: Course[] = [];
+
+  constructor(
+    private classroomService: ClassroomService,
+    private courseService: CourseService,
+    private dialog: MatDialog,
+    private fb: FormBuilder
+  ) {}
+
+  ngOnInit(): void {
+    this.initForm();
+    this.fetchSubjects();
   }
 
-  ngAfterViewInit() {
+  ngAfterViewInit(): void {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
+    this.loadData();
   }
 
-  applyFilter(event: Event) {
+  private initForm(): void {
+    this.formGroup = this.fb.group({
+      className: ['', [Validators.required]],
+      selectedSubject: ['', [Validators.required]],
+      notes: [''],
+    });
+  }
+
+  loadData(): void {
+    this.classroomService.getClassrooms().subscribe((data) => {
+      this.dataSource.data = data;
+      this.resultsLength = data.length;
+    });
+  }
+
+  applyFilter(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
-
-    if (this.dataSource.paginator) {
-      this.dataSource.paginator.firstPage();
-    }
   }
-}
 
-/** Builds and returns a new User. */
-function createNewUser(id: number): UserData {
-  const name =
-    NAMES[Math.round(Math.random() * (NAMES.length - 1))] +
-    ' ' +
-    NAMES[Math.round(Math.random() * (NAMES.length - 1))].charAt(0) +
-    '.';
+  navigateTo(path: string, id: number): void {
+    this.router.navigate([path]);
+    sessionStorage.setItem('currentClassId', id.toString());
+  }
 
-  return {
-    id: id.toString(),
-    name: name,
-    progress: Math.round(Math.random() * 100).toString(),
-    fruit: FRUITS[Math.round(Math.random() * (FRUITS.length - 1))],
-  };
+  saveClass(): void {
+    if (this.formGroup.invalid) {
+      return;
+    }
+
+    const formValues = this.formGroup.value;
+    const classData: Classroom = {
+      className: formValues.className,
+      subjectName:
+        this.subjects.find((s) => s.id === +formValues.selectedSubject)
+          ?.subName || '',
+      note: formValues.notes || '',
+    };
+
+    this.classroomService.createClassroom(classData).subscribe({
+      next: () => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Tạo lớp học thành công!',
+          toast: true,
+          position: 'bottom-end',
+          timer: 2000,
+          timerProgressBar: true,
+          showConfirmButton: false,
+        });
+        this.loadData();
+        this.dialog.closeAll();
+        this.formGroup.reset();
+      },
+      error: () => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Tạo lớp học thất bại!',
+          text: 'Vui lòng thử lại.',
+          toast: true,
+          position: 'bottom-end',
+          timer: 3000,
+          timerProgressBar: true,
+          showConfirmButton: false,
+        });
+      },
+    });
+  }
+
+  openDialog(): void {
+    this.dialog.open(this.dialogTemplate);
+  }
+
+  private fetchSubjects(): void {
+    this.courseService.getCourses().subscribe({
+      next: (courses) => {
+        this.subjects = courses;
+      },
+      error: (err) => {
+        console.error('Error fetching subjects:', err);
+      },
+    });
+  }
 }

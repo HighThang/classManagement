@@ -11,12 +11,13 @@ import { AuthService } from '../../../../core/services/auth/auth.service';
 import { Router } from '@angular/router';
 import { catchError, of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatCardModule, MatIconModule, MatButtonModule, SharedModule, MatInputModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule, MatCardModule, MatIconModule, MatButtonModule, SharedModule, MatInputModule, FormsModule, MatCheckboxModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
 })
@@ -34,9 +35,9 @@ export class LoginComponent {
 
   constructor(private fb: FormBuilder, private authService: AuthService, private router: Router, private http: HttpClient) {
     this.loginForm = this.fb.group({
-      username: ['thang', Validators.required],
-      password: ['2952002', Validators.required],
-      rememberMe: false,
+      username: ['admin', Validators.required],
+      password: ['123456', Validators.required],
+      rememberMe: true,
     });
   }
 
