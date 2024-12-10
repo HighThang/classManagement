@@ -62,6 +62,10 @@ public class ClassAttendanceService {
         List<ClassRegistration> classRegistrations = classroom.getClassRegistrations();
         List<ClassAttendance> classAttendances = new ArrayList<>();
         for (ClassRegistration classRegistration : classRegistrations) {
+            if (classRegistration.getActive() == false) {
+                continue; // Bỏ qua bản ghi này
+            }
+
             Optional<ClassAttendance> existOne = exisits.stream()
                     .filter(exitOne -> StringUtils.equalsIgnoreCase(exitOne.getClassRegistration().getEmail(),
                             classRegistration.getEmail()))
@@ -83,7 +87,7 @@ public class ClassAttendanceService {
             ClassAttendanceDto classAttendanceDto = new ClassAttendanceDto();
             classAttendanceDto.setId(classAttendance.getId());
             ClassRegistration student = classAttendance.getClassRegistration();
-            classAttendanceDto.setName(student.getFirstName() + " " + student.getSurname() + " " + student.getLastName());
+            classAttendanceDto.setName(student.getLastName() + " " + student.getSurname() + " " + student.getFirstName());
             classAttendanceDto.setIsAttended(classAttendance.getIsAttended());
             classAttendanceDto.setEmail(classAttendance.getClassRegistration().getEmail());
 
