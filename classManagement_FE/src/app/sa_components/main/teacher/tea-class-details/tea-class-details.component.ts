@@ -317,7 +317,6 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
           dayInWeek: this.mapDayInWeek(item.dayInWeek),
           createdDate: item.createdDate, 
         }));
-        console.log(mappedData)
         this.dataSource2.data = mappedData;
       },
       error: (err) => {

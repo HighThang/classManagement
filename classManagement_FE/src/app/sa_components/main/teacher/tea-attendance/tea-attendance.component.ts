@@ -89,7 +89,7 @@ export type ChartOptions = {
     MatFormFieldModule,
     MatSelectModule,
     ChartComponent,
-    MatCheckboxModule
+    MatCheckboxModule,
   ],
   templateUrl: './tea-attendance.component.html',
   styleUrl: './tea-attendance.component.scss',
@@ -110,7 +110,9 @@ export class TeaAttendanceComponent implements OnInit, AfterViewInit {
   classrooms: Classroom[] = [];
   showDetails: boolean = false;
 
+  activeBtn = true;
   isEditing = false;
+  isEditing2 = false;
 
   selectedImage: string | null = null;
   file_store: FileList | null = null;
@@ -118,8 +120,16 @@ export class TeaAttendanceComponent implements OnInit, AfterViewInit {
   classId!: number;
   scheduleId!: number;
   classDetails!: ClassDetails;
+  scheduleDetails!: ScheduleData;
 
-  displayedColumns1: string[] = ['id', 'day', 'periodInDay', 'dayInWeek', 'createdDate', 'edit'];
+  displayedColumns1: string[] = [
+    'id',
+    'day',
+    'periodInDay',
+    'dayInWeek',
+    'createdDate',
+    'edit',
+  ];
   dataSource1 = new MatTableDataSource<ScheduleData>();
 
   displayedColumns11: string[] = ['id', 'email', 'name', 'attend'];
@@ -132,28 +142,29 @@ export class TeaAttendanceComponent implements OnInit, AfterViewInit {
 
   @ViewChild('dialogTemplate1') dialogTemplate1: any;
 
-  chartOptions: Partial<ChartOptions> = { 
+  chartOptions: Partial<ChartOptions> = {
     chart: {
-      type: 'pie'
+      width: 333,
+      type: 'pie',
     },
     labels: ['Đi học', 'Vắng học'],
     colors: ['rgb(0, 227, 150)', 'rgb(255, 69, 96)'],
     legend: {
-      position: 'bottom'
+      position: 'bottom',
     },
     dataLabels: {
-      enabled: true
+      enabled: true,
     },
     responsive: [
       {
         breakpoint: 480,
         options: {
           legend: {
-            position: 'bottom'
-          }
-        }
-      }
-    ]
+            position: 'bottom',
+          },
+        },
+      },
+    ],
   };
   chartSeries: number[] = [0, 0];
   totalCount: number = 0;
@@ -197,13 +208,15 @@ export class TeaAttendanceComponent implements OnInit, AfterViewInit {
       this.checkPermissionAndLoadData(teacherId, this.classId);
     }
 
-    this.formGroup.get('classroomId')?.valueChanges.subscribe((selectedClassId) => {
-      if (selectedClassId) {
-        sessionStorage.setItem('currentClassId', selectedClassId.toString());
-        this.classId = selectedClassId;
-        this.checkPermissionAndLoadData(teacherId, this.classId);
-      }
-    });
+    this.formGroup
+      .get('classroomId')
+      ?.valueChanges.subscribe((selectedClassId) => {
+        if (selectedClassId) {
+          sessionStorage.setItem('currentClassId', selectedClassId.toString());
+          this.classId = selectedClassId;
+          this.checkPermissionAndLoadData(teacherId, this.classId);
+        }
+      });
   }
 
   ngAfterViewInit(): void {
@@ -289,8 +302,8 @@ export class TeaAttendanceComponent implements OnInit, AfterViewInit {
         }));
         this.dataSource1.data = mappedData;
       },
-      error: (err) => {
-        console.error('Error fetching schedules:', err);
+      error: () => {
+        this.showToast('error', 'Tải lịch học không thành công');
       },
     });
   }
@@ -334,6 +347,18 @@ export class TeaAttendanceComponent implements OnInit, AfterViewInit {
 
     this.loadStudents(scheduleId);
 
+    const selectedSchedule = this.dataSource1.data
+      .filter((item: any) => item.id === scheduleId)
+      .map((item) => ({
+        id: item.id,
+        day: new Date(item.day).toLocaleDateString('vi-VN'),
+        periodInDay: item.periodInDay,
+        dayInWeek: item.dayInWeek,
+        createdDate: item.createdDate,
+      }));
+
+    this.scheduleDetails = selectedSchedule[0];
+
     dialog1.afterClosed().subscribe(() => {
       this.isEditing = false;
     });
@@ -349,9 +374,15 @@ export class TeaAttendanceComponent implements OnInit, AfterViewInit {
           isAttended: item.isAttended,
         }));
 
-        this.dataSource11.data = activeData;
-        this.totalCount = response.content.length;
-        this.updateChartData();
+        if (!activeData) {
+          this.activeBtn = false;
+        }
+
+        else {
+          this.dataSource11.data = activeData;
+          this.totalCount = response.content.length;
+          this.updateChartData();
+        }
       },
       error: (err) => {
         console.error('Error fetching students:', err);
@@ -360,13 +391,20 @@ export class TeaAttendanceComponent implements OnInit, AfterViewInit {
   }
 
   updateChartData() {
-    const attendedCount = this.dataSource11.data.filter((row) => row.isAttended).length;
+    const attendedCount = this.dataSource11.data.filter(
+      (row) => row.isAttended
+    ).length;
     const absentCount = this.totalCount - attendedCount;
     this.chartSeries = [attendedCount, absentCount];
   }
 
   enableEditing() {
     this.isEditing = true;
+  }
+
+  enableEditing2() {
+    this.isEditing2 = true;
+    this.registerForm.enable();
   }
 
   markAllAttended() {
@@ -378,17 +416,26 @@ export class TeaAttendanceComponent implements OnInit, AfterViewInit {
     this.classAttendance.updateAttendance(this.dataSource11.data).subscribe(
       () => {
         this.isEditing = false;
+        this.isEditing2 = false;
         this.showToast('success', 'Điểm danh thành công');
       },
       () => {
         this.showToast('error', 'Điểm danh thất bại');
         this.cancelEditing();
+        this.cancelEditing2();
       }
     );
   }
 
   cancelEditing() {
     this.isEditing = false;
+    this.loadStudents(this.scheduleId);
+    this.updateChartData();
+  }
+
+  cancelEditing2() {
+    this.isEditing2 = false;
+    this.registerForm.disable();
     this.loadStudents(this.scheduleId);
     this.updateChartData();
   }
