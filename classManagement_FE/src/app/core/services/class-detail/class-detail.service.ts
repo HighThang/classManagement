@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 
 export interface ClassDetails {
   id: number;
@@ -36,6 +36,11 @@ export class ClassDetailsService {
     return this.http.get<boolean>(url);
   }
 
+  checkPermissionForStudent(studentId: number, classId: number): Observable<boolean> {
+    const url = `${this.baseUrl}/classroom/isStudentsClassroom?studentId=${studentId}&classroomId=${classId}&active=true`;
+    return this.http.get<boolean>(url);
+  }
+
   updateClassDetails(classDetails: ClassDetails): Observable<any> {
     return this.http.put(`http://localhost:8081/api/classroom`, classDetails);
   }
@@ -52,6 +57,33 @@ export class ClassDetailsService {
 
   deleteStudent(studentId: number): Observable<any> {
     return this.http.put(`${this.baseUrl}/student/delete/${studentId}`, null);
+  }
+
+  downloadStudentResults(classId: number): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/student/${classId}/download`, {
+      responseType: 'blob',
+      observe: 'response',
+    }).pipe(
+      map((response) => {
+        const contentDisposition = response.headers.get('content-disposition');
+        const filename = this.extractFilename(contentDisposition) || 'downloaded_file.xlsx';
+        Object.assign(response.body as Blob, { name: filename });
+        return response.body as Blob;
+      })
+    );
+  }
+
+  private extractFilename(contentDisposition: string | null): string | null {
+    if (!contentDisposition) return null;
+  
+    const parts = contentDisposition.split(';');
+    for (let part of parts) {
+      if (part.trim().startsWith('filename=')) {
+        let filename = part.split('=')[1].trim();
+        return decodeURIComponent(filename.replace(/['"]/g, ''));
+      }
+    }
+    return null;
   }
 
   getSchedules(classId: number): Observable<any> {

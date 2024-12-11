@@ -4,6 +4,7 @@ import {
   FormBuilder,
   FormGroup,
   FormsModule,
+  NgModel,
   ReactiveFormsModule,
 } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -48,15 +49,8 @@ import {
   ClassAttendanceService,
 } from '../../../../core/services/class-attendance/class-attendance.service';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-
-export type ChartOptions = {
-  chart: ApexChart;
-  labels: string[];
-  colors: string[];
-  legend: ApexLegend;
-  dataLabels: ApexDataLabels;
-  responsive: ApexResponsive[];
-};
+import { Exam, ExamScoreService, ScoreDetail } from '../../../../core/services/exam-score/exam-score.service';
+import { saveAs } from 'file-saver'
 
 @Component({
   selector: 'app-tea-score',
@@ -88,7 +82,7 @@ export type ChartOptions = {
     MatNativeDateModule,
     MatFormFieldModule,
     MatSelectModule,
-    // ChartComponent,
+    ChartComponent,
     MatCheckboxModule,
   ],
   templateUrl: './tea-score.component.html',
@@ -112,28 +106,18 @@ export class TeaScoreComponent implements OnInit, AfterViewInit {
 
   activeBtn = true;
   isEditing = false;
-  isEditing2 = false;
-
-  selectedImage: string | null = null;
-  file_store: FileList | null = null;
 
   classId!: number;
-  scheduleId!: number;
+  examName!: string;
+  examId!: number;
   classDetails!: ClassDetails;
-  scheduleDetails!: ScheduleData;
+  examDetail!: Exam;
 
-  displayedColumns1: string[] = [
-    'id',
-    'day',
-    'periodInDay',
-    'dayInWeek',
-    'createdDate',
-    'edit',
-  ];
-  dataSource1 = new MatTableDataSource<ScheduleData>();
+  displayedColumns1: string[] = ['id', 'examName', 'createdDate', 'edit'];
+  dataSource1 = new MatTableDataSource<Exam>();
 
-  displayedColumns11: string[] = ['id', 'email', 'name', 'attend'];
-  dataSource11 = new MatTableDataSource<Attendance>();
+  displayedColumns11: string[] = ['id', 'email', 'name', 'score'];
+  dataSource11 = new MatTableDataSource<ScoreDetail>();
 
   @ViewChild('paginator1') paginator1!: MatPaginator;
   @ViewChild('sort1') sort1!: MatSort;
@@ -142,32 +126,13 @@ export class TeaScoreComponent implements OnInit, AfterViewInit {
 
   @ViewChild('dialogTemplate1') dialogTemplate1: any;
 
-  chartOptions: Partial<ChartOptions> = {
-    chart: {
-      width: 333,
-      type: 'pie',
-    },
-    labels: ['Đi học', 'Vắng học'],
-    colors: ['rgb(0, 227, 150)', 'rgb(255, 69, 96)'],
-    legend: {
-      position: 'bottom',
-    },
-    dataLabels: {
-      enabled: true,
-    },
-    responsive: [
-      {
-        breakpoint: 480,
-        options: {
-          legend: {
-            position: 'bottom',
-          },
-        },
-      },
-    ],
+  chartOptions!: {
+    series: ApexAxisChartSeries;
+    chart: ApexChart;
+    colors: string[];
+    xaxis: ApexXAxis;
+    plotOptions: ApexPlotOptions;
   };
-  chartSeries: number[] = [0, 0];
-  totalCount: number = 0;
 
   constructor(
     private classDetailsService: ClassDetailsService,
@@ -175,11 +140,38 @@ export class TeaScoreComponent implements OnInit, AfterViewInit {
     public dialog: MatDialog,
     private fb: FormBuilder,
     private router: Router,
-    private classAttendance: ClassAttendanceService
+    private examScoreService: ExamScoreService
   ) {
-    this.registerForm = this.fb.group({
-      imageURL: [{ value: '', disabled: true }],
-    });
+    this.chartOptions = {
+      series: [
+        {
+          name: 'Số lượng học sinh',
+          data: [],
+        },
+      ],
+      chart: {
+        type: 'bar',
+        height: 350,
+      },
+      colors: [
+        'rgba(255, 69, 96, 0.85)', 'rgba(255, 69, 96, 0.85)', 'rgba(255, 69, 96, 0.85)', 'rgba(255, 69, 96, 0.85)',
+        'rgba(254, 176, 25, 0.85)', 'rgba(254, 176, 25, 0.85)', 'rgba(254, 176, 25, 0.85)', 
+        'rgba(0, 143, 251, 0.85)', 'rgba(0, 143, 251, 0.85)', 
+        'rgba(0, 227, 150, 0.85)', 'rgba(0, 227, 150, 0.85)'
+      ],
+      xaxis: {
+        categories: [
+          '0', '1', '2', '3', '4', '5',
+          '6', '7', '8', '9', '10',
+        ],
+      },
+      plotOptions: {
+        bar: {
+          distributed: true,
+          columnWidth: '50%',
+        },
+      },
+    };
   }
 
   ngOnInit(): void {
@@ -194,29 +186,19 @@ export class TeaScoreComponent implements OnInit, AfterViewInit {
       classroomId: [this.classId || null],
     });
 
-    this.classDetails = {
-      id: 0,
-      subjectName: '',
-      createdDate: '',
-      note: '',
-      className: '',
-    };
-
     this.loadClassrooms();
 
     if (this.classId) {
       this.checkPermissionAndLoadData(teacherId, this.classId);
     }
 
-    this.formGroup
-      .get('classroomId')
-      ?.valueChanges.subscribe((selectedClassId) => {
-        if (selectedClassId) {
-          sessionStorage.setItem('currentClassId', selectedClassId.toString());
-          this.classId = selectedClassId;
-          this.checkPermissionAndLoadData(teacherId, this.classId);
-        }
-      });
+    this.formGroup.get('classroomId')?.valueChanges.subscribe((selectedClassId) => {
+      if (selectedClassId) {
+        sessionStorage.setItem('currentClassId', selectedClassId.toString());
+        this.classId = selectedClassId;
+        this.checkPermissionAndLoadData(teacherId, this.classId);
+      }
+    });
   }
 
   ngAfterViewInit(): void {
@@ -237,7 +219,7 @@ export class TeaScoreComponent implements OnInit, AfterViewInit {
           sessionStorage.setItem('currentClassId', classId.toString());
           this.showDetails = true;
           this.loadClassDetails(classId);
-          this.loadSchedules(classId);
+          this.loadClassExam(classId);
         } else {
           this.showToast('error', 'Bạn không có quyền truy cập lớp này');
           sessionStorage.removeItem('currentClassId');
@@ -269,72 +251,70 @@ export class TeaScoreComponent implements OnInit, AfterViewInit {
     this.dataSource11.filter = filterValue.trim().toLowerCase();
   }
 
-  downloadAttendanceTable() {}
+  openDialogCreateExam(templateRef: any): void {
+    this.dialog.open(templateRef, {
+      width: '33%',
+      maxHeight: '55vh',    
+    });
+  }
 
-  periods = [
-    { value: 'PERIOD_1', viewValue: 'Ca học 1' },
-    { value: 'PERIOD_2', viewValue: 'Ca học 2' },
-    { value: 'PERIOD_3', viewValue: 'Ca học 3' },
-    { value: 'PERIOD_4', viewValue: 'Ca học 4' },
-    { value: 'PERIOD_5', viewValue: 'Ca học 5' },
-    { value: 'PERIOD_6', viewValue: 'Ca học 6' },
-  ];
+  submitRequest(examNameCtrl: NgModel): void {
+    if (examNameCtrl.invalid) {
+      return; 
+    }
+  
+    this.examScoreService.createExam(this.examName, this.classId).subscribe({
+      next: () => {
+        this.showToast('success', 'Tạo đầu điểm mới thành công')
+        this.dialog.closeAll();
+        this.loadClassExam(this.classId);
+        this.examName = '';  
+      },
+      error: () => {
+        this.showToast('error', 'Lỗi khi tạo đầu điểm mới')
+      },
+    });
+  }  
 
-  daysInWeek = [
-    { value: 'MONDAY', viewValue: 'Thứ Hai' },
-    { value: 'TUESDAY', viewValue: 'Thứ Ba' },
-    { value: 'WEDNESDAY', viewValue: 'Thứ Tư' },
-    { value: 'THURSDAY', viewValue: 'Thứ Năm' },
-    { value: 'FRIDAY', viewValue: 'Thứ Sáu' },
-    { value: 'SATURDAY', viewValue: 'Thứ Bảy' },
-    { value: 'SUNDAY', viewValue: 'Chủ Nhật' },
-  ];
+  downloadScoreTable() {
+    this.examScoreService.downloadExamResults(this.classId).subscribe({
+      next: (blob: Blob) => {
+        const filename = this.getFilenameFromBlob(blob) || 'downloaded_file.xlsx';
+        saveAs(blob, filename);
+        this.showToast('success', 'Tải bảng điểm thành công');
+      },
+      error: () => {
+        this.showToast('error', 'Lỗi khi tải bảng điểm');
+      },
+    });
+  }  
 
-  private loadSchedules(classId: number): void {
-    this.classDetailsService.getSchedules(classId).subscribe({
+  private getFilenameFromBlob(blob: Blob): string | null {
+    if ((blob as any).name) {
+      return (blob as any).name;
+    }
+  
+    return 'downloaded_file.xlsx';
+  }
+
+  private loadClassExam(classId: number): void {
+    this.examScoreService.getAllExams(classId).subscribe({
       next: (response: any) => {
         const mappedData = response.content.map((item: any) => ({
           id: item.id,
-          day: item.day,
-          periodInDay: this.mapPeriodInDay(item.periodInDay),
-          dayInWeek: this.mapDayInWeek(item.dayInWeek),
+          examName: item.name,
           createdDate: item.createdDate,
         }));
         this.dataSource1.data = mappedData;
       },
       error: () => {
-        this.showToast('error', 'Tải lịch học không thành công');
+        this.showToast('error', 'Lỗi khi tải danh sách kiểm tra');
       },
     });
   }
 
-  private mapPeriodInDay(periodInDay: string): string {
-    const periodMap: { [key: string]: string } = {
-      PERIOD_1: 'Ca học 1',
-      PERIOD_2: 'Ca học 2',
-      PERIOD_3: 'Ca học 3',
-      PERIOD_4: 'Ca học 4',
-      PERIOD_5: 'Ca học 5',
-      PERIOD_6: 'Ca học 6',
-    };
-    return periodMap[periodInDay] || periodInDay;
-  }
-
-  private mapDayInWeek(dayInWeek: string): string {
-    const dayMap: { [key: string]: string } = {
-      MONDAY: 'Thứ Hai',
-      TUESDAY: 'Thứ Ba',
-      WEDNESDAY: 'Thứ Tư',
-      THURSDAY: 'Thứ Năm',
-      FRIDAY: 'Thứ Sáu',
-      SATURDAY: 'Thứ Bảy',
-      SUNDAY: 'Chủ Nhật',
-    };
-    return dayMap[dayInWeek] || dayInWeek;
-  }
-
-  openStudentListDialog(scheduleId: number) {
-    this.scheduleId = scheduleId;
+  openStudentListDialog(examId: number) {
+    this.examId = examId;
     const dialog1 = this.dialog.open(this.dialogTemplate1, {
       width: '85%',
       maxHeight: '95vh',
@@ -345,132 +325,91 @@ export class TeaScoreComponent implements OnInit, AfterViewInit {
       this.dataSource11.sort = this.sort11;
     });
 
-    this.loadStudents(scheduleId);
+    this.loadStudents(examId);
 
-    const selectedSchedule = this.dataSource1.data
-      .filter((item: any) => item.id === scheduleId)
+    const selectedExam = this.dataSource1.data
+      .filter((item: any) => item.id === examId)
       .map((item) => ({
         id: item.id,
-        day: new Date(item.day).toLocaleDateString('vi-VN'),
-        periodInDay: item.periodInDay,
-        dayInWeek: item.dayInWeek,
-        createdDate: item.createdDate,
+        examName: item.examName,
+        createdDate: item.createdDate
       }));
 
-    this.scheduleDetails = selectedSchedule[0];
+    this.examDetail = selectedExam[0];
 
     dialog1.afterClosed().subscribe(() => {
       this.isEditing = false;
     });
   }
 
-  private loadStudents(scheduleId: number): void {
-    this.classAttendance.getClassAttendance(scheduleId).subscribe({
+  private loadStudents(examId: number): void {
+    this.examScoreService.getStudentsByExamId(examId).subscribe({
       next: (response: any) => {
         const activeData = response.content.map((item: any) => ({
           id: item.id,
           email: item.email,
           name: item.name,
-          isAttended: item.isAttended,
+          score: item.score,
         }));
 
-        if (!activeData) {
+        if (activeData.length === 0) {
           this.activeBtn = false;
         }
 
         else {
           this.dataSource11.data = activeData;
-          this.totalCount = response.content.length;
           this.updateChartData();
         }
       },
-      error: (err) => {
-        console.error('Error fetching students:', err);
+      error: () => {
+        this.showToast('error', 'Lỗi khi tải dữ liệu')
       },
     });
   }
 
   updateChartData() {
-    const attendedCount = this.dataSource11.data.filter(
-      (row) => row.isAttended
-    ).length;
-    const absentCount = this.totalCount - attendedCount;
-    this.chartSeries = [attendedCount, absentCount];
+    const distribution = Array(11).fill(0);
+  
+    this.dataSource11.data.forEach((student: any) => {
+      const score = student.score;
+  
+      if (score !== null && score >= 0 && score <= 10) {
+        const index = Math.round(score);
+        distribution[index]++;
+      }
+    });
+  
+    this.chartOptions.series = [
+      {
+        name: 'Số lượng học sinh',
+        data: distribution,
+      },
+    ];
   }
 
   enableEditing() {
     this.isEditing = true;
   }
 
-  enableEditing2() {
-    this.isEditing2 = true;
-    this.registerForm.enable();
-  }
-
-  markAllAttended() {
-    this.dataSource11.data.forEach((row) => (row.isAttended = true));
-    this.updateChartData();
-  }
-
   saveChanges() {
-    this.classAttendance.updateAttendance(this.dataSource11.data).subscribe(
+    this.examScoreService.editExamScores(this.dataSource11.data).subscribe(
       () => {
         this.isEditing = false;
-        this.isEditing2 = false;
-        this.showToast('success', 'Điểm danh thành công');
+        this.loadStudents(this.examId);
+        this.showToast('success', 'Đánh giá điểm thành công');
       },
       () => {
-        this.showToast('error', 'Điểm danh thất bại');
+        this.showToast('error', 'Đánh giá điểm thất bại');
         this.cancelEditing();
-        this.cancelEditing2();
       }
     );
   }
 
   cancelEditing() {
     this.isEditing = false;
-    this.loadStudents(this.scheduleId);
-    this.updateChartData();
+    this.loadStudents(this.examId);
   }
-
-  cancelEditing2() {
-    this.isEditing2 = false;
-    this.registerForm.disable();
-    this.loadStudents(this.scheduleId);
-    this.updateChartData();
-  }
-
-  handleFileInputChange(files: FileList | null): void {
-    this.file_store = files;
-    if (files && files[0]) {
-      const file = files[0];
-      const count = files.length > 1 ? `(+${files.length - 1} files)` : '';
-      this.registerForm.patchValue({
-        imageURL: `${file.name}${count}`,
-      });
-    } else {
-      this.registerForm.patchValue({
-        imageURL: '',
-      });
-    }
-  }
-
-  onFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-
-    if (input.files && input.files[0]) {
-      const file: File = input.files[0];
-      const reader = new FileReader();
-
-      reader.onload = () => {
-        this.selectedImage = reader.result as string;
-      };
-
-      reader.readAsDataURL(file);
-      this.file_store = input.files;
-    }
-  }
-
+  
   showToast(icon: 'success' | 'error' | 'info' | 'warning', title: string) {
     const Toast = Swal.mixin({
       toast: true,

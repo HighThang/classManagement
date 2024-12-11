@@ -26,7 +26,7 @@ import Swal from 'sweetalert2';
   templateUrl: './stu-class-list.component.html',
   styleUrl: './stu-class-list.component.scss'
 })
-export class StuClassListComponent implements OnInit, AfterViewInit {
+export class StuClassListComponent implements AfterViewInit {
   private router = inject(Router);
 
   displayedColumns: string[] = ['id','className','subjectName','note','createdDate','attendance','score','fee','details'];
@@ -35,23 +35,10 @@ export class StuClassListComponent implements OnInit, AfterViewInit {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
-  @ViewChild('dialogTemplate') dialogTemplate: any;
-
-  formGroup!: FormGroup;
-
-  subjects: Course[] = [];
 
   constructor(
     private classroomService: ClassroomService,
-    private courseService: CourseService,
-    private dialog: MatDialog,
-    private fb: FormBuilder
   ) {}
-
-  ngOnInit(): void {
-    this.initForm();
-    this.fetchSubjects();
-  }
 
   ngAfterViewInit(): void {
     this.dataSource.paginator = this.paginator;
@@ -59,19 +46,23 @@ export class StuClassListComponent implements OnInit, AfterViewInit {
     this.loadData();
   }
 
-  private initForm(): void {
-    this.formGroup = this.fb.group({
-      className: ['', [Validators.required]],
-      selectedSubject: ['', [Validators.required]],
-      notes: [''],
-    });
-  }
-
   loadData(): void {
-    this.classroomService.getClassrooms().subscribe((data) => {
-      this.dataSource.data = data;
-      this.resultsLength = data.length;
-    });
+    // const page = this.paginator?.pageIndex || 0;
+    // const size = this.paginator?.pageSize || 10;
+    // const sort = this.sort?.active
+    //   ? `${this.sort.active},${this.sort.direction || 'asc'}`
+    //   : 'id,asc';
+
+    this.classroomService
+      .getClassroomsForStudent({})
+      .subscribe({
+        next: (response) => {
+          this.dataSource.data = response; 
+        },
+        error: (error) => {
+          console.error('Error fetching classrooms:', error);
+        },
+      });
   }
 
   applyFilter(event: Event): void {
@@ -80,65 +71,7 @@ export class StuClassListComponent implements OnInit, AfterViewInit {
   }
 
   navigateTo(path: string, id: number): void {
-    this.router.navigate([path, id]);
-  }
-
-  saveClass(): void {
-    if (this.formGroup.invalid) {
-      return;
-    }
-
-    const formValues = this.formGroup.value;
-    const classData: Classroom = {
-      className: formValues.className,
-      subjectName:
-        this.subjects.find((s) => s.id === +formValues.selectedSubject)
-          ?.subName || '',
-      note: formValues.notes || '',
-    };
-
-    this.classroomService.createClassroom(classData).subscribe({
-      next: () => {
-        Swal.fire({
-          icon: 'success',
-          title: 'Tạo lớp học thành công!',
-          toast: true,
-          position: 'bottom-end',
-          timer: 2000,
-          timerProgressBar: true,
-          showConfirmButton: false,
-        });
-        this.loadData();
-        this.dialog.closeAll();
-        this.formGroup.reset();
-      },
-      error: () => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Tạo lớp học thất bại!',
-          text: 'Vui lòng thử lại.',
-          toast: true,
-          position: 'bottom-end',
-          timer: 3000,
-          timerProgressBar: true,
-          showConfirmButton: false,
-        });
-      },
-    });
-  }
-
-  openDialog(): void {
-    this.dialog.open(this.dialogTemplate);
-  }
-
-  private fetchSubjects(): void {
-    this.courseService.getCourses().subscribe({
-      next: (courses) => {
-        this.subjects = courses;
-      },
-      error: (err) => {
-        console.error('Error fetching subjects:', err);
-      },
-    });
+    this.router.navigate([path]);
+    sessionStorage.setItem('currentClassId', id.toString());
   }
 }

@@ -68,7 +68,7 @@
         </div>
         <br>
         <div class="more-detail">
-            <div class="table" *ngIf="classDetails && showDetails" [@fadeInOut]>
+            <div class="table">
                 <div class="header">
                     <div class="icon-grid-1" style="padding-top: 10px">
                         <app-icon iconName="search" style="padding: 10px; margin-bottom: 0px;"></app-icon>
@@ -121,8 +121,7 @@
                         <th mat-header-cell *matHeaderCellDef mat-sort-header
                             style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
                             Ngày Tạo</th>
-                        <td mat-cell *matCellDef="let row">{{ row.createdDate | date: 'dd/MM/yyyy' }}
-                        </td>
+                        <td mat-cell *matCellDef="let row">{{ row.createdDate | date: 'dd/MM/yyyy' }}</td>
                     </ng-container>
 
                     <ng-container matColumnDef="edit">
@@ -138,7 +137,10 @@
                     </ng-container>
 
                     <tr mat-header-row *matHeaderRowDef="displayedColumns1"></tr>
-                    <tr mat-row *matRowDef="let row; columns: displayedColumns1;"></tr>
+                    <!-- <tr mat-row *matRowDef="let row; columns: displayedColumns1;"></tr> -->
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns1;"
+                        [class.highlight-row]="isToday(row.day)">
+                    </tr>
 
                     <tr class="mat-row" *matNoDataRow>
                         <td class="mat-cell" colspan="5">Không có dữ liệu</td>
@@ -236,7 +238,7 @@
         <div class="actions"
             style="display: flex; justify-content: space-between; padding-left: 10px; padding-right: 10px; padding-top: 5px; padding-bottom: 5px;">
             <div class="attendance-by-image">
-                <button mat-raised-button disabled="activeBtn" (click)="enableEditing2()"
+                <button mat-raised-button [disabled]="!activeBtn || isEditing" *ngIf="!isEditing2" (click)="enableEditing2()"
                     style="background-color: var(--theme-background); color: white;"> Điểm danh bằng ảnh</button>
                 <div *ngIf="isEditing2" class="editing-controls">
                     <button mat-raised-button (click)="cancelEditing2()"
@@ -251,7 +253,7 @@
             </div>
 
             <div class="attendance">
-                <button mat-raised-button disabled="activeBtn" (click)="enableEditing()"
+                <button mat-raised-button [disabled]="!activeBtn || isEditing2" *ngIf="!isEditing" (click)="enableEditing()"
                     style="background-color: var(--theme-background); color: white;">
                     Điểm danh thủ công
                 </button>

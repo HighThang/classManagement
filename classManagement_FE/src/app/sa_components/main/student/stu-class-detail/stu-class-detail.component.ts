@@ -23,11 +23,10 @@ import { MatNativeDateModule, MatOptionModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
-import { UserResponse } from '../../../../core/interfaces/response.interface';
 import saveAs from 'file-saver';
 
 @Component({
-  selector: 'app-tea-class-details',
+  selector: 'app-stu-class-detail',
   standalone: true,
   imports: [
     MatTabsModule,
@@ -57,56 +56,39 @@ import saveAs from 'file-saver';
     MatFormFieldModule,
     MatSelectModule,
   ],
-  templateUrl: './tea-class-details.component.html',
-  styleUrls: ['./tea-class-details.component.scss'],
+  templateUrl: './stu-class-detail.component.html',
+  styleUrl: './stu-class-detail.component.scss'
 })
-export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
+export class StuClassDetailComponent implements OnInit, AfterViewInit {
   classId!: number;
   classDetails!: ClassDetails;
-  editedClassName: string = '';
-  editedNote: string = '';
-  isEditing: boolean = false;
-  formGroup: FormGroup;
+  isEditing = false;
 
-  displayedColumns1: string[] = ['id', 'email', 'lastName', 'surname', 'firstName', 'phone', 'dob', 'deleted'];
+  displayedColumns1: string[] = ['id', 'email', 'lastName', 'surname', 'firstName', 'phone', 'dob'];
   dataSource1 = new MatTableDataSource<Student>();
-  displayedColumns11: string[] = ['id', 'email', 'lastName', 'surname', 'firstName', 'phone', 'dob', 'active', 'deleted'];
-  dataSource11 = new MatTableDataSource<Student>();
 
-  displayedColumns2: string[] = ['id', 'day', 'periodInDay', 'dayInWeek', 'createdDate', 'deleted'];
+  displayedColumns2: string[] = ['id', 'day', 'periodInDay', 'dayInWeek', 'createdDate'];
   dataSource2 = new MatTableDataSource<ScheduleData>();
 
   @ViewChild('paginator1') paginator1!: MatPaginator;
   @ViewChild('sort1') sort1!: MatSort;
-  @ViewChild('paginator11') paginator11!: MatPaginator;
-  @ViewChild('sort11') sort11!: MatSort;
   @ViewChild('paginator2') paginator2!: MatPaginator;
   @ViewChild('sort2') sort2!: MatSort;
-  @ViewChild('dialogTemplate1') dialogTemplate1: any;
-  @ViewChild('dialogTemplate2') dialogTemplate2: any;
 
   constructor(
     private classDetailsService: ClassDetailsService,
     private route: ActivatedRoute,
     public dialog: MatDialog,
-    private fb: FormBuilder,
     private http: HttpClient,
     private router: Router
-  ) {
-    this.formGroup = this.fb.group({
-      startDate: [null, Validators.required],
-      endDate: [null, Validators.required],
-      periodInDay: [null, Validators.required],
-      dayInWeek: [null, Validators.required],
-    });
-  }
+  ) {}
 
   ngOnInit(): void {
     this.classId = this.route.snapshot.params['id'];
 
     const userData = sessionStorage.getItem('currentUser');
     const user = JSON.parse(userData!);
-    const teacherId = user.id;
+    const studentId = user.id;
 
     this.classDetails = {
       id: 0,
@@ -116,7 +98,7 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
       className: '',
     };
 
-    this.classDetailsService.checkPermission(teacherId, this.classId).subscribe({
+    this.classDetailsService.checkPermissionForStudent(studentId, this.classId).subscribe({
       next: (hasPermission) => {
         if (hasPermission) {
           sessionStorage.setItem('currentClassId', this.classId.toString());
@@ -124,14 +106,15 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
           this.loadClassDetails();
           this.loadStudents();
           this.loadSchedules();
+          //
         } else {
           this.showToast('error', 'Bạn không có quyền truy cập lớp này');
-          this.router.navigate(['teacher/manage_class']);
+          this.router.navigate(['student/class']);
         }
       },
       error: () => {
         this.showToast('error', 'Có lỗi xảy ra khi kiểm tra quyền');
-        this.router.navigate(['teacher/manage_class']);
+        this.router.navigate(['student/class']);
       },
     });
   }
@@ -147,40 +130,6 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
   loadClassDetails(): void {
     this.classDetailsService.getClassDetails(this.classId).subscribe((data) => {
       this.classDetails = data;
-      this.editedClassName = data.className;
-      this.editedNote = data.note;
-    });
-  }
-
-  enableEdit(): void {
-    this.isEditing = true;
-  }
-
-  cancelEdit(): void {
-    this.isEditing = false;
-    this.loadClassDetails();
-  }
-
-  saveChanges(classNameCtrl: NgModel): void {
-    if (classNameCtrl.invalid) {
-      return;
-    }
-
-    const updatedClassDetails: ClassDetails = {
-      ...this.classDetails,
-      className: this.editedClassName,
-      note: this.editedNote,
-    };
-
-    this.classDetailsService.updateClassDetails(updatedClassDetails).subscribe({
-      next: () => {
-        this.isEditing = false;
-        this.showToast('success', 'Chỉnh sửa thành công!');
-        this.loadClassDetails();
-      },
-      error: () => {
-        this.showToast('error', 'Đã có lỗi xảy ra khi lưu!');
-      },
     });
   }
 
@@ -188,11 +137,6 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
   applyFilter1(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource1.filter = filterValue.trim().toLowerCase();
-  }
-
-  applyFilter11(event: Event): void {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource11.filter = filterValue.trim().toLowerCase();
   }
 
   private loadStudents(): void {
@@ -210,20 +154,7 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
             dob: new Date(item.student.dob).toLocaleDateString('vi-VN'),
           }));
   
-        const inactiveData = response.content
-          .filter((item: any) => item.student === null || item.active === false)
-          .map((item: any) => ({
-            id: item.id,
-            email: item.email,
-            firstName: item.firstName,
-            surname: item.surname,
-            lastName: item.lastName,
-            phone: item.phone,
-            dob: new Date(item.dob).toLocaleDateString('vi-VN'),
-          }));
-  
         this.dataSource1.data = activeData; 
-        this.dataSource11.data = inactiveData;
       },
       error: (err) => {
         console.error('Error fetching students:', err);
@@ -231,75 +162,6 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
     });
   }
 
-  openWaitingListDialog() {
-    const dialog2 = this.dialog.open(this.dialogTemplate1, {
-      width: '77%',  maxHeight: '77vh'
-    });
-
-    dialog2.afterOpened().subscribe(() => {
-      this.dataSource11.paginator = this.paginator11;
-      this.dataSource11.sort = this.sort11;
-    });
-  }
-
-  activateStudent(studentId: number) {
-    this.classDetailsService.activateStudent(studentId).subscribe({
-      next: () => {
-        this.showToast('success', 'Kích hoạt học sinh thành công!');
-        this.loadStudents();
-      },
-      error: () => {
-        Swal.fire('Lỗi', 'Không thể kích hoạt học sinh.', 'error');
-      },
-    });
-  }
-
-  deleteStudent(studentId: number): void {
-    Swal.fire({
-      title: 'Xác nhận',
-      text: 'Bạn có chắc chắn muốn xóa học sinh này?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Xóa',
-      cancelButtonText: 'Hủy',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.classDetailsService.deleteStudent(studentId).subscribe({
-          next: () => {
-            Swal.fire('Thành công', 'Đã xóa học sinh.', 'success');
-            this.loadStudents();
-          },
-          error: () => {
-            Swal.fire('Lỗi', 'Không thể xóa học sinh.', 'error');
-          },
-        });
-      }
-    });
-  }  
-
-  downloadStudentList() {
-    this.classDetailsService.downloadStudentResults(this.classId).subscribe({
-      next: (blob: Blob) => {
-        const filename = this.getFilenameFromBlob(blob) || 'downloaded_file.xlsx';
-        saveAs(blob, filename);
-        this.showToast('success', 'Tải bảng điểm thành công');
-      },
-      error: () => {
-        this.showToast('error', 'Lỗi khi tải bảng điểm');
-      },
-    });
-  }  
-
-  private getFilenameFromBlob(blob: Blob): string | null {
-    if ((blob as any).name) {
-      return (blob as any).name;
-    }
-  
-    return 'downloaded_file.xlsx';
-  }
-  
   // Schedules
   periods = [
     { value: 'PERIOD_1', viewValue: 'Ca học 1' },
@@ -340,60 +202,6 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
       error: (err) => {
         console.error('Error fetching schedules:', err);
       },
-    });
-  }
-
-  openAddScheduleDialog() {
-    this.dialog.open(this.dialogTemplate2, {
-      width: '77%',  maxHeight: '77vh'
-    });
-  }
-
-  saveSchedule() {
-    if (this.formGroup.invalid) return;
-  
-    const payload = {
-      startDate: this.formGroup.value.startDate,
-      endDate: this.formGroup.value.endDate,
-      periodInDay: this.formGroup.value.periodInDay,
-      dayInWeek: this.formGroup.value.dayInWeek,
-      classId: this.classId,
-    };
-  
-    this.http.post('http://localhost:8081/api/class-schedule', payload).subscribe({
-      next: () => {
-        this.showToast('success', 'Tạo lịch học thành công!');
-        this.dialog.closeAll();
-        this.loadSchedules(); 
-      },
-      error: () => {
-        this.showToast('error', 'Có lỗi xảy ra khi tạo lịch học!');
-      },
-    });
-  }
-  
-  deleteSchedule(scheduleId: number) {
-    Swal.fire({
-      title: 'Xác nhận',
-      text: 'Bạn có chắc chắn muốn xóa lịch học này?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Xóa',
-      cancelButtonText: 'Hủy',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.classDetailsService.deleteSchdule(scheduleId).subscribe({
-          next: () => {
-            Swal.fire('Thành công', 'Đã xóa lịch học.', 'success');
-            this.loadSchedules();
-          },
-          error: () => {
-            Swal.fire('Lỗi', 'Không thể xóa lịch học.', 'error');
-          },
-        });
-      }
     });
   }
 

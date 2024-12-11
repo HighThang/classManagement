@@ -29,6 +29,7 @@ import { adminGuard } from './core/guards/admin-guard/admin.guard';
 import { teacherGuard } from './core/guards/teacher-guard/teacher.guard';
 import { studentGuard } from './core/guards/student-guard/student.guard';
 import { TeaClassDetailsComponent } from './sa_components/main/teacher/tea-class-details/tea-class-details.component';
+import { StuClassDetailComponent } from './sa_components/main/student/stu-class-detail/stu-class-detail.component';
 
 export const routes: Routes = [
   {
@@ -158,6 +159,11 @@ export const routes: Routes = [
         path: 'class',
         component: StuClassListComponent,
         title: 'Danh sách lớp học',
+      },
+      {
+        path: 'class/:id',
+        component: StuClassDetailComponent,
+        title: 'Chi tiết lớp',
       },
       {
         path: 'attendance',

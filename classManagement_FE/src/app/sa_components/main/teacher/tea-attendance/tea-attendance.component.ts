@@ -48,6 +48,7 @@ import {
   ClassAttendanceService,
 } from '../../../../core/services/class-attendance/class-attendance.service';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import saveAs from 'file-saver';
 
 export type ChartOptions = {
   chart: ApexChart;
@@ -194,14 +195,6 @@ export class TeaAttendanceComponent implements OnInit, AfterViewInit {
       classroomId: [this.classId || null],
     });
 
-    this.classDetails = {
-      id: 0,
-      subjectName: '',
-      createdDate: '',
-      note: '',
-      className: '',
-    };
-
     this.loadClassrooms();
 
     if (this.classId) {
@@ -269,7 +262,26 @@ export class TeaAttendanceComponent implements OnInit, AfterViewInit {
     this.dataSource11.filter = filterValue.trim().toLowerCase();
   }
 
-  downloadAttendanceTable() {}
+  downloadAttendanceTable() {
+    this.classAttendance.downloadAttendanceResults(this.classId).subscribe({
+      next: (blob: Blob) => {
+        const filename = this.getFilenameFromBlob(blob) || 'downloaded_file.xlsx';
+        saveAs(blob, filename);
+        this.showToast('success', 'Tải bảng điểm thành công');
+      },
+      error: () => {
+        this.showToast('error', 'Lỗi khi tải bảng điểm');
+      },
+    });
+  }  
+
+  private getFilenameFromBlob(blob: Blob): string | null {
+    if ((blob as any).name) {
+      return (blob as any).name;
+    }
+  
+    return 'downloaded_file.xlsx';
+  }
 
   periods = [
     { value: 'PERIOD_1', viewValue: 'Ca học 1' },
@@ -333,6 +345,18 @@ export class TeaAttendanceComponent implements OnInit, AfterViewInit {
     return dayMap[dayInWeek] || dayInWeek;
   }
 
+  isToday(date: string | Date): boolean {
+    if (!date) return false;
+    const today = new Date();
+    const rowDate = new Date(date);
+  
+    return (
+      rowDate.getDate() === today.getDate() &&
+      rowDate.getMonth() === today.getMonth() &&
+      rowDate.getFullYear() === today.getFullYear()
+    );
+  }
+
   openStudentListDialog(scheduleId: number) {
     this.scheduleId = scheduleId;
     const dialog1 = this.dialog.open(this.dialogTemplate1, {
@@ -374,7 +398,7 @@ export class TeaAttendanceComponent implements OnInit, AfterViewInit {
           isAttended: item.isAttended,
         }));
 
-        if (!activeData) {
+        if (activeData.length === 0) {
           this.activeBtn = false;
         }
 

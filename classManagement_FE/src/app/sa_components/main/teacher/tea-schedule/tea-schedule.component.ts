@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CalendarEvent, CalendarModule, CalendarView, DAYS_OF_WEEK } from 'angular-calendar';
-import { addDays, startOfWeek, setHours, setMinutes } from 'date-fns';
+import { setHours, setMinutes } from 'date-fns';
 import { Subject } from 'rxjs';
 
 import { ViewChild, TemplateRef } from '@angular/core';
@@ -8,11 +8,11 @@ import { isSameDay, isSameMonth } from 'date-fns';
 import { CommonModule, registerLocaleData } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { DashboardService } from '../../../../core/services/dashboard/dashboard.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 
 import localeVi from '@angular/common/locales/vi';
+import { ClassScheduleService } from '../../../../core/services/class-schedule/class-schedule.service';
 registerLocaleData(localeVi);
 
 @Component({
@@ -45,10 +45,10 @@ export class TeaScheduleComponent {
 
   activeDayIsOpen: boolean = false;
 
-  constructor(private dashboardService: DashboardService) {}
+  constructor(private classScheduleService: ClassScheduleService) {}
 
   ngOnInit(): void {
-    this.fetchWeeklySchedule();
+    this.fetchAllSchedules();
   }
 
   private mapPeriodToTime(period: 'PERIOD_1' | 'PERIOD_2' | 'PERIOD_3' | 'PERIOD_4' | 'PERIOD_5' | 'PERIOD_6'): { startHour: number; endHour: number } {
@@ -64,36 +64,24 @@ export class TeaScheduleComponent {
     return periods[period] || { startHour: 0, endHour: 0 };
   }
   
-  // Lấy lịch tuần từ API
-  private fetchWeeklySchedule(): void {
-    this.dashboardService.getClassInWeek().subscribe((response) => {
-      const startOfCurrentWeek = startOfWeek(new Date(), { weekStartsOn: 1 }); // Bắt đầu tuần là Thứ Hai
-
-      this.events = response.content.flatMap((item: any) => {
-        const { startHour, endHour } = this.mapPeriodToTime(item.classPeriod);
-
-        // Duyệt qua các ngày trong tuần
-        return [
-          { dayKey: 'mondayClass', dayOffset: 0 },
-          { dayKey: 'tuesdayClass', dayOffset: 1 },
-          { dayKey: 'wednesdayClass', dayOffset: 2 },
-          { dayKey: 'thursdayClass', dayOffset: 3 },
-          { dayKey: 'fridayClass', dayOffset: 4 },
-          { dayKey: 'saturdayClass', dayOffset: 5 },
-          { dayKey: 'sundayClass', dayOffset: 6 },
-        ]
-          .filter(({ dayKey }) => item[dayKey] !== null) // Lọc ra các ngày có lớp học
-          .map(({ dayKey, dayOffset }) => {
-            const start = addDays(startOfCurrentWeek, dayOffset);
-            return {
-              title: item[dayKey], // Tên lớp học
-              start: setMinutes(setHours(start, startHour), 0),
-              end: setMinutes(setHours(start, endHour), 0),
-              color: { primary: '#1e90ff', secondary: '#D1E8FF' },
-              allDay: false,
-            };
-          });
+  private fetchAllSchedules(): void {
+    this.classScheduleService.getAllClass().subscribe((response) => {
+      this.events = response.content.map((item: any) => {
+        const { startHour, endHour } = this.mapPeriodToTime(item.periodInDay);
+  
+        const start = setMinutes(setHours(new Date(item.day), startHour), 0);
+        const end = setMinutes(setHours(new Date(item.day), endHour), 0);
+  
+        return {
+          title: item.className,
+          start: start,
+          end: end,
+          color: { primary: '#1e90ff', secondary: '#D1E8FF' },
+          allDay: false,
+        };
       });
+  
+      this.refresh.next();
     });
   }
 
@@ -116,83 +104,3 @@ export class TeaScheduleComponent {
     this.activeDayIsOpen = false;
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// export class TeaScheduleComponent implements OnInit {
-//   @Input() username!: string;
-
-//   tableClassInWeekConfig: any = null;
-//   userRole: string | null = null;
-//   statistic: any = null;
-
-//   constructor(
-//     private dashboardService: DashboardService,
-//     private userService: UserService
-//   ) {}
-
-//   ngOnInit(): void {
-//     this.getUserInfo();
-//     this.getClassInWeek();
-//   }
-
-//   getClassInWeek(): void {
-//     this.dashboardService.getClassInWeek().subscribe(
-//       (response) => {
-//         const data = {
-//           recordsTotal: response.totalElements,
-//           recordsFiltered: response.totalElements,
-//           data: response.content,
-//         };
-//         console.log(data)
-//       },
-//       (error) => {
-//         console.error(error);
-//       }
-//     );
-//   }
-
-//   getUserInfo(): void {
-//     this.userService.getUserInfo().subscribe(
-//       (response) => {
-//         this.userRole = response.role;
-//         if (this.userRole === 'TEACHER') {
-//           this.getDashboardData();
-//         }
-//       },
-//       (error) => {
-//         console.error(error);
-//         alert(error);
-//       }
-//     );
-//   }
-
-//   getDashboardData(): void {
-//     this.dashboardService.getDashboardData().subscribe(
-//       (response) => {
-//         this.statistic = response;
-//       },
-//       (error) => {
-//         console.error(error);
-//       }
-//     );
-//   }
-// }

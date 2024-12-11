@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -24,5 +24,9 @@ export class ClassroomService {
 
   createClassroom(classroom: Classroom): Observable<any> {
     return this.httpClient.post(this.apiUrl, classroom);
+  }
+
+  getClassroomsForStudent(params: any): Observable<any> {
+    return this.httpClient.get<any>(`${this.apiUrl}/class-for-student`, { params });
   }
 }

@@ -2,32 +2,38 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 
-export interface Attendance {
+export interface Exam {
+  id: number;
+  examName: string;
+  createdDate: string;
+}
+
+export interface ScoreDetail {
   id: number;
   name: string;
   email: string;
-  dob: string | null;
-  isAttended: boolean;
+  score: number;
 }
 
 @Injectable({
   providedIn: 'root',
 })
-export class ClassAttendanceService {
-  private readonly apiUrl = 'http://localhost:8081/api/class-attendance';
+export class ExamScoreService {
+  private baseUrl = 'http://localhost:8081/api/exam-score';
 
   constructor(private http: HttpClient) {}
 
-  getClassAttendance(classId: number): Observable<Attendance[]> {
-    return this.http.get<Attendance[]>(`${this.apiUrl}/${classId}`);
+  getAllExams(classId: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/${classId}/exam`);
   }
 
-  updateAttendance(data: any): Observable<any> {
-    return this.http.put(this.apiUrl, data);
+  createExam(examName: string, classId: number): Observable<any> {
+    const payload = { examName, classId };
+    return this.http.post(this.baseUrl, payload);
   }
 
-  downloadAttendanceResults(classId: number): Observable<Blob> {
-    return this.http.get(`${this.apiUrl}/${classId}/result`, {
+  downloadExamResults(classId: number): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/${classId}/result`, {
       responseType: 'blob',
       observe: 'response',
     }).pipe(
@@ -51,5 +57,13 @@ export class ClassAttendanceService {
       }
     }
     return null;
+  }
+  
+  getStudentsByExamId(examId: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/${examId}`);
+  }
+
+  editExamScores(data: any): Observable<any> {
+    return this.http.put(this.baseUrl, data);
   }
 }
