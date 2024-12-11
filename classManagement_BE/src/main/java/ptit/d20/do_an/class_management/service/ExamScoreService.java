@@ -75,6 +75,10 @@ public class ExamScoreService {
         List<ExamScore> examScoreListExist = exam.getExamScoreList();
         List<ExamScore> examScoreList = new ArrayList<>();
         for (ClassRegistration classRegistration : classRegistrations) {
+            if (classRegistration.getActive() == false) {
+                continue; // Bỏ qua bản ghi này
+            }
+
             Optional<ExamScore> existOne = examScoreListExist.stream()
                     .filter(exitOne -> StringUtils.equalsIgnoreCase(exitOne.getClassRegistration().getEmail(),
                             classRegistration.getEmail()))
@@ -95,7 +99,7 @@ public class ExamScoreService {
             ExamScoreDto examScoreDto = new ExamScoreDto();
             examScoreDto.setId(examScore.getId());
             ClassRegistration student = examScore.getClassRegistration();
-            examScoreDto.setName(student.getFirstName() + " " + student.getSurname() + " " + student.getLastName());
+            examScoreDto.setName(student.getLastName() + " " + student.getSurname() + " " + student.getFirstName());
             examScoreDto.setEmail(student.getEmail());
             examScoreDto.setScore(examScore.getScore());
 
@@ -166,7 +170,7 @@ public class ExamScoreService {
             // Create header row
             Row headerRow = sheet.createRow(0);
             headerRow.createCell(0).setCellValue("ID");
-            headerRow.createCell(1).setCellValue("Tên Họ");
+            headerRow.createCell(1).setCellValue("Họ");
             headerRow.createCell(2).setCellValue("Tên Đệm");
             headerRow.createCell(3).setCellValue("Tên");
             headerRow.createCell(4).setCellValue("Email");
@@ -180,11 +184,15 @@ public class ExamScoreService {
             // Create data rows
             int rowIndex = 1;
             for (ClassRegistration student : students) {
+                if (student.getActive() == false) {
+                    continue; // Bỏ qua bản ghi này
+                }
+
                 Row row = sheet.createRow(rowIndex++);
                 row.createCell(0).setCellValue(student.getId());
-                row.createCell(1).setCellValue(student.getFirstName());
+                row.createCell(1).setCellValue(student.getLastName());
                 row.createCell(2).setCellValue(student.getSurname());
-                row.createCell(3).setCellValue(student.getLastName());
+                row.createCell(3).setCellValue(student.getFirstName());
                 row.createCell(4).setCellValue(student.getEmail());
                 row.createCell(5).setCellValue(student.getPhone());
                 row.createCell(6).setCellValue(student.getAddress());

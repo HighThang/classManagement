@@ -182,24 +182,30 @@ public class StudentService {
             // Create header row
             Row headerRow = sheet.createRow(0);
             headerRow.createCell(0).setCellValue("ID");
-            headerRow.createCell(1).setCellValue("Tên Họ");
+            headerRow.createCell(1).setCellValue("Họ");
             headerRow.createCell(2).setCellValue("Tên Đệm");
             headerRow.createCell(3).setCellValue("Tên");
             headerRow.createCell(4).setCellValue("Email");
-            headerRow.createCell(5).setCellValue("Số điện thoại");
-            headerRow.createCell(6).setCellValue("Địa chỉ");
+            headerRow.createCell(5).setCellValue("Ngày sinh");
+            headerRow.createCell(6).setCellValue("Số điện thoại");
+            headerRow.createCell(7).setCellValue("Địa chỉ");
 
             // Create data rows
             int rowIndex = 1;
             for (ClassRegistration student : students) {
+                if (student.getActive() == false) {
+                    continue; // Bỏ qua bản ghi này
+                }
+
                 Row row = sheet.createRow(rowIndex++);
                 row.createCell(0).setCellValue(student.getId());
-                row.createCell(1).setCellValue(student.getFirstName());
+                row.createCell(1).setCellValue(student.getLastName());
                 row.createCell(2).setCellValue(student.getSurname());
-                row.createCell(3).setCellValue(student.getLastName());
+                row.createCell(3).setCellValue(student.getFirstName());
                 row.createCell(4).setCellValue(student.getEmail());
-                row.createCell(5).setCellValue(student.getPhone());
-                row.createCell(6).setCellValue(student.getAddress());
+                row.createCell(5).setCellValue(student.getDob());
+                row.createCell(6).setCellValue(student.getPhone());
+                row.createCell(7).setCellValue(student.getAddress());
             }
 
             // Write the output to a file

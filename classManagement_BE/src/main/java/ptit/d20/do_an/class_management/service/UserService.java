@@ -39,6 +39,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -239,19 +240,43 @@ public class UserService {
         return new UserDetailDto(user);
     }
 
+    private Date convertToDate(LocalDate localDate) {
+        return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+    }
+
     public UserDetailDto updateUserInfo(UserDetailDto userDetailDto) {
         User user = getCurrentUserLogin();
         if (StringUtils.isNoneBlank(userDetailDto.getFirstName())) {
             user.setFirstName(userDetailDto.getFirstName());
+            List<ClassRegistration> classRegistrations = classRegistrationRepository.findAllByEmail(user.getEmail());
+            for (ClassRegistration classRegistration : classRegistrations) {
+                classRegistration.setFirstName(userDetailDto.getFirstName());
+            }
+            classRegistrationRepository.saveAll(classRegistrations);
         }
         if (StringUtils.isNoneBlank(userDetailDto.getSurname())) {
             user.setSurname(userDetailDto.getSurname());
+            List<ClassRegistration> classRegistrations = classRegistrationRepository.findAllByEmail(user.getEmail());
+            for (ClassRegistration classRegistration : classRegistrations) {
+                classRegistration.setSurname(userDetailDto.getSurname());
+            }
+            classRegistrationRepository.saveAll(classRegistrations);
         }
         if (StringUtils.isNoneBlank(userDetailDto.getLastName())) {
             user.setLastName(userDetailDto.getLastName());
+            List<ClassRegistration> classRegistrations = classRegistrationRepository.findAllByEmail(user.getEmail());
+            for (ClassRegistration classRegistration : classRegistrations) {
+                classRegistration.setLastName(userDetailDto.getLastName());
+            }
+            classRegistrationRepository.saveAll(classRegistrations);
         }
         if (userDetailDto.getDob() != null) {
             user.setDob(userDetailDto.getDob());
+            List<ClassRegistration> classRegistrations = classRegistrationRepository.findAllByEmail(user.getEmail());
+            for (ClassRegistration classRegistration : classRegistrations) {
+                classRegistration.setDob(convertToDate(userDetailDto.getDob()));
+            }
+            classRegistrationRepository.saveAll(classRegistrations);
         }
         if (StringUtils.isNoneBlank(userDetailDto.getPhone())) {
             user.setPhone(userDetailDto.getPhone());
@@ -266,6 +291,11 @@ public class UserService {
         }
         if (StringUtils.isNoneBlank(userDetailDto.getAddress())) {
             user.setAddress(userDetailDto.getAddress());
+            List<ClassRegistration> classRegistrations = classRegistrationRepository.findAllByEmail(user.getEmail());
+            for (ClassRegistration classRegistration : classRegistrations) {
+                classRegistration.setAddress(userDetailDto.getAddress());
+            }
+            classRegistrationRepository.saveAll(classRegistrations);
         }
         userRepository.save(user);
 
@@ -318,27 +348,16 @@ public class UserService {
         // Cập nhật đường dẫn ảnh trong thông tin sinh viên
         String imageUrl = finalPath + file.getOriginalFilename(); // Lưu đường dẫn relative vào DB
         user.setImageURL(imageUrl);
+        List<ClassRegistration> classRegistrations = classRegistrationRepository.findAllByEmail(user.getEmail());
+        for (ClassRegistration classRegistration : classRegistrations) {
+            classRegistration.setImgURLRequest(imageUrl);
+        }
+        classRegistrationRepository.saveAll(classRegistrations);
 
         // Lưu thay đổi và trả về true
         userRepository.save(user);
         return true;
     }
-
-
-//    public ApiResponse activeAccount(ActiveAccountRequest request) {
-//        User user = userRepository.findFirstByEmail(request.getEmail())
-//                .orElseThrow(() -> new BusinessException("Not found user for email: " + request.getEmail()));
-//
-//        boolean result = verifyEmail(request.getCode(), user);
-//
-//        if (result) {
-////            user.setActive(true);
-//            user.setActiveCode(null);
-//        }
-//        userRepository.save(user);
-//
-//        return result ? new ApiResponse(true, "Success") : new ApiResponse(false, "Failed");
-//    }
 
     private boolean verifyEmail(String code, User user) {
         Instant startOfToday = LocalDate.now().atStartOfDay(ZoneOffset.UTC).toInstant();

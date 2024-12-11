@@ -11,6 +11,7 @@ import ptit.d20.do_an.class_management.dto.classroom.ClassroomDto;
 import ptit.d20.do_an.class_management.dto.classroom.NewClassRequest;
 import ptit.d20.do_an.class_management.service.ClassroomService;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -54,15 +55,27 @@ public class ClassroomController {
         return ResponseEntity.ok(classroomService.getClassDetail(classId));
     }
 
+//    @GetMapping("/class-for-student")
+//    public ResponseEntity<?> searchClassForStudent(@RequestParam Map<String, String> params, Pageable pageable) throws Exception {
+//            Page<Classroom> page = classroomService.searchClassForStudent(params, pageable);
+//        return ResponseEntity.ok(page);
+//    }
+
     @GetMapping("/class-for-student")
-    public ResponseEntity<?> searchClassForStudent(@RequestParam Map<String, String> params, Pageable pageable) throws Exception {
-            Page<Classroom> page = classroomService.searchClassForStudent(params, pageable);
-        return ResponseEntity.ok(page);
+    public ResponseEntity<?> searchClassForStudent(@RequestParam Map<String, String> params) throws Exception {
+        List<Classroom> classrooms = classroomService.searchClassForStudent(params); // Gọi phương thức trả về danh sách
+        return ResponseEntity.ok(classrooms); // Trả về toàn bộ danh sách
     }
 
     @GetMapping("/isTeachersClassroom")
     public ResponseEntity<Boolean> isTeachersClassroom(@RequestParam Long teacherId, Long id) {
         boolean exists = classroomService.isTeachersClassroom(teacherId, id);
+        return ResponseEntity.ok(exists);
+    }
+
+    @GetMapping("/isStudentsClassroom")
+    public ResponseEntity<Boolean> isStudentsClassroom(@RequestParam Long studentId, Long classroomId, boolean active) {
+        boolean exists = classroomService.isStudentsClassroom(studentId, classroomId, active);
         return ResponseEntity.ok(exists);
     }
 }

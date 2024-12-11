@@ -156,4 +156,8 @@ public class ClassScheduleService {
 
         return new ApiResponse(true,"Success");
     }
+
+    public List<ClassSchedule> getSchedulesByTeacherEmail(String email) {
+        return classScheduleRepository.findByCreatedBy(email);
+    }
 }

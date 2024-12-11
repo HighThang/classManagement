@@ -16,8 +16,7 @@ public interface ClassRegistrationRepository extends JpaSpecificationExecutor<Cl
         JpaRepository<ClassRegistration, Long> {
     List<ClassRegistration> findAllByClassroomIdOrderByLastNameAsc(Long classId);
 
-    List<ClassRegistration> findAllByStudentId(Long id);
-
+    List<ClassRegistration> findAllByStudentIdAndActive(Long studentId, boolean active);
     List<ClassRegistration> findAllByEmail(String email);
 
     @Modifying
@@ -28,4 +27,6 @@ public interface ClassRegistrationRepository extends JpaSpecificationExecutor<Cl
     boolean existsByEmail(String email);
 
     boolean existsByStudentIdAndClassroomId(Long studentId, Long classroomId);
+
+    boolean existsByStudentIdAndClassroomIdAndActive(Long studentId, Long classroomId, boolean active);
 }

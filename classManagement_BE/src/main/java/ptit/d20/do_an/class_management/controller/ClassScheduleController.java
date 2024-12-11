@@ -23,6 +23,12 @@ public class ClassScheduleController {
         this.classScheduleService = classScheduleService;
     }
 
+    @GetMapping("/teacher")
+    public ResponseEntity<List<ClassSchedule>> getSchedulesByTeacherEmail(@RequestParam String email) {
+        List<ClassSchedule> schedules = classScheduleService.getSchedulesByTeacherEmail(email);
+        return ResponseEntity.ok(schedules);
+    }
+
     @GetMapping
     public ResponseEntity<?> getAllClassSchedule(@RequestParam Long classId) throws Exception {
         List<ClassSchedule> students = classScheduleService.getAllClassSchedule(classId);

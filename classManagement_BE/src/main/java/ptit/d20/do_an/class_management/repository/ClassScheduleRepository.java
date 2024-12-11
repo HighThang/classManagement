@@ -22,4 +22,10 @@ public interface ClassScheduleRepository extends JpaRepository<ClassSchedule, Lo
     @Transactional
     @Query(nativeQuery = true, value = "DELETE FROM class_schedule WHERE id = :scheduleId")
     void deleteById(@Param("scheduleId") Long scheduleId);
+
+    @Query("SELECT cs FROM ClassSchedule cs " + "WHERE cs.createdBy = :email")
+    List<ClassSchedule> findByCreatedBy(@Param("email") String email);
+
+    @Query("SELECT cs FROM ClassSchedule cs WHERE cs.classroom.id IN :classroomIds")
+    List<ClassSchedule> findAllByClassroomIds(@Param("classroomIds") List<Long> classroomIds);
 }

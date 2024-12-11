@@ -22,6 +22,11 @@ public class DashboardController {
         return ResponseEntity.ok(new PageImpl<>(dashboardService.fetchClassInCurrentWeek()));
     }
 
+    @GetMapping("/all-class-schedule")
+    public ResponseEntity<?> getAllClass() {
+        return ResponseEntity.ok(new PageImpl<>(dashboardService.fetchClass()));
+    }
+
     @GetMapping("/dashboard-data")
     public ResponseEntity<DashboardDataDto> getDashboardData() {
         return ResponseEntity.ok(dashboardService.getDashboardData());

@@ -4,6 +4,7 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ptit.d20.do_an.class_management.dto.AllScheduleDto;
 import ptit.d20.do_an.class_management.exception.BusinessException;
 import ptit.d20.do_an.class_management.repository.ClassRegistrationRepository;
 import ptit.d20.do_an.class_management.domain.ClassRegistration;
@@ -56,7 +57,7 @@ public class DashboardService {
         if (userCurrent.getRole().getName() == RoleName.TEACHER) {
             classrooms = classroomRepository.findAllByTeacherId(userCurrent.getId());
         } else if (userCurrent.getRole().getName() == RoleName.STUDENT) {
-            List<ClassRegistration> classRegistrations = classRegistrationRepository.findAllByStudentId(userCurrent.getId());
+            List<ClassRegistration> classRegistrations = classRegistrationRepository.findAllByStudentIdAndActive(userCurrent.getId(), true);
             classrooms = classRegistrations.stream().map(ClassRegistration::getClassroom).collect(Collectors.toList());
         } else {
             return new ArrayList<>();
@@ -156,6 +157,39 @@ public class DashboardService {
         dashboardDataDto.setNumberOfStudent(numberOfStudent);
 
         return dashboardDataDto;
+    }
+
+    public List<AllScheduleDto> fetchClass() {
+        User userCurrent = userService.getCurrentUserLogin();
+        LocalDate currentDate = LocalDate.now();
+        List<Classroom> classrooms;
+
+        // Lấy danh sách lớp học theo vai trò người dùng
+        if (userCurrent.getRole().getName() == RoleName.TEACHER) {
+            classrooms = classroomRepository.findAllByTeacherId(userCurrent.getId());
+        } else if (userCurrent.getRole().getName() == RoleName.STUDENT) {
+            List<ClassRegistration> classRegistrations = classRegistrationRepository.findAllByStudentIdAndActive(userCurrent.getId(), true);
+            classrooms = classRegistrations.stream()
+                    .map(ClassRegistration::getClassroom)
+                    .collect(Collectors.toList());
+        } else {
+            return new ArrayList<>();
+        }
+
+        // Lấy danh sách ID lớp học
+        List<Long> classIds = classrooms.stream().map(Classroom::getId).collect(Collectors.toList());
+
+        // Truy vấn danh sách lịch học từ classScheduleRepository
+        List<ClassSchedule> classSchedules = classScheduleRepository.findAllByClassroomIds(classIds);
+
+        // Map dữ liệu sang DTO
+        return classSchedules.stream()
+                .map(schedule -> new AllScheduleDto(
+                        schedule.getDay(),
+                        schedule.getPeriodInDay(),
+                        schedule.getClassroom().getClassName() // Lấy tên lớp học từ classroom
+                ))
+                .collect(Collectors.toList());
     }
 
 }

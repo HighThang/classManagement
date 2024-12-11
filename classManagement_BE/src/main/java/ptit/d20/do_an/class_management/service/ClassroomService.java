@@ -295,21 +295,38 @@ public class ClassroomService {
         });
     }
 
-    public Page<Classroom> searchClassForStudent(Map<String, String> params, Pageable pageable) {
+//    public Page<Classroom> searchClassForStudent(Map<String, String> params, Pageable pageable) {
+//        User currentLoginUser = SecurityUtils.getCurrentUserLogin()
+//                .flatMap(userRepository::findByUsername)
+//                .orElseThrow(() -> new BusinessException("Can not find current user login!"));
+//        if (currentLoginUser.getRole().getName() != RoleName.STUDENT) {
+//            throw new BusinessException("Require Role Student!");
+//        }
+//        List<ClassRegistration> classRegistrations = classRegistrationRepository.findAllByStudentIdAndActive(currentLoginUser.getId(), true);
+//        List<Classroom> classrooms = classRegistrations.stream().map(ClassRegistration::getClassroom).collect(Collectors.toList());
+//        List<Long> classIds = classrooms.stream().map(Classroom::getId).collect(Collectors.toList());
+//        if (classIds.isEmpty()) {
+//            return new PageImpl<>(new ArrayList<>());
+//        }
+//        Specification<Classroom> specs = getSpecificationForStudent(params, classIds);
+//        return classroomRepository.findAll(specs, pageable);
+//    }
+
+    public List<Classroom> searchClassForStudent(Map<String, String> params) {
         User currentLoginUser = SecurityUtils.getCurrentUserLogin()
                 .flatMap(userRepository::findByUsername)
                 .orElseThrow(() -> new BusinessException("Can not find current user login!"));
         if (currentLoginUser.getRole().getName() != RoleName.STUDENT) {
             throw new BusinessException("Require Role Student!");
         }
-        List<ClassRegistration> classRegistrations = classRegistrationRepository.findAllByStudentId(currentLoginUser.getId());
+        List<ClassRegistration> classRegistrations = classRegistrationRepository.findAllByStudentIdAndActive(currentLoginUser.getId(), true);
         List<Classroom> classrooms = classRegistrations.stream().map(ClassRegistration::getClassroom).collect(Collectors.toList());
         List<Long> classIds = classrooms.stream().map(Classroom::getId).collect(Collectors.toList());
         if (classIds.isEmpty()) {
-            return new PageImpl<>(new ArrayList<>());
+            return new ArrayList<>();
         }
         Specification<Classroom> specs = getSpecificationForStudent(params, classIds);
-        return classroomRepository.findAll(specs, pageable);
+        return classroomRepository.findAll(specs); // Không sử dụng Pageable ở đây
     }
 
     private Specification<Classroom> getSpecificationForStudent(Map<String, String> params, List<Long> classIds) {
@@ -506,5 +523,9 @@ public class ClassroomService {
 
     public boolean isTeachersClassroom(Long teacherId, Long id) {
         return classroomRepository.existsByTeacherIdAndId(teacherId, id);
+    }
+
+    public boolean isStudentsClassroom(Long studentId, Long classroomId, boolean active) {
+        return classRegistrationRepository.existsByStudentIdAndClassroomIdAndActive(studentId, classroomId, active);
     }
 }
