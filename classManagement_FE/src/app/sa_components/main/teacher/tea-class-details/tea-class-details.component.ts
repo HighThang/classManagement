@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ClassDetails, ClassDetailsService, ScheduleData } from '../../../../core/services/class-detail/class-detail.service';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -25,6 +25,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { UserResponse } from '../../../../core/interfaces/response.interface';
 import saveAs from 'file-saver';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
   selector: 'app-tea-class-details',
@@ -56,6 +57,7 @@ import saveAs from 'file-saver';
     MatNativeDateModule,
     MatFormFieldModule,
     MatSelectModule,
+    MatCardModule
   ],
   templateUrl: './tea-class-details.component.html',
   styleUrls: ['./tea-class-details.component.scss'],
@@ -76,6 +78,8 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
   displayedColumns2: string[] = ['id', 'day', 'periodInDay', 'dayInWeek', 'createdDate', 'deleted'];
   dataSource2 = new MatTableDataSource<ScheduleData>();
 
+  displayedColumns3: string[] = ['documentName', 'documentLink', 'actions'];
+
   @ViewChild('paginator1') paginator1!: MatPaginator;
   @ViewChild('sort1') sort1!: MatSort;
   @ViewChild('paginator11') paginator11!: MatPaginator;
@@ -84,6 +88,11 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
   @ViewChild('sort2') sort2!: MatSort;
   @ViewChild('dialogTemplate1') dialogTemplate1: any;
   @ViewChild('dialogTemplate2') dialogTemplate2: any;
+
+  @ViewChild('input11') searchInput!: ElementRef<HTMLInputElement>;
+  
+  documents: any[] = [];
+  selectedFile: File | null = null;
 
   constructor(
     private classDetailsService: ClassDetailsService,
@@ -114,6 +123,7 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
       createdDate: '',
       note: '',
       className: '',
+      teacherName: ''
     };
 
     this.classDetailsService.checkPermission(teacherId, this.classId).subscribe({
@@ -124,6 +134,7 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
           this.loadClassDetails();
           this.loadStudents();
           this.loadSchedules();
+          this.loadDocuments();
         } else {
           this.showToast('error', 'Bạn không có quyền truy cập lớp này');
           this.router.navigate(['teacher/manage_class']);
@@ -195,6 +206,13 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
     this.dataSource11.filter = filterValue.trim().toLowerCase();
   }
 
+  resetFilter(): void {
+    if (this.searchInput) {
+      this.searchInput.nativeElement.value = '';
+    }
+    this.applyFilter11({ target: { value: '' } } as unknown as Event);
+  }
+
   private loadStudents(): void {
     this.classDetailsService.getStudents(this.classId!).subscribe({
       next: (response: any) => {
@@ -226,7 +244,7 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
         this.dataSource11.data = inactiveData;
       },
       error: (err) => {
-        console.error('Error fetching students:', err);
+        this.showToast('error', 'Lỗi khi tải danh sách học sinh');
       },
     });
   }
@@ -240,16 +258,20 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
       this.dataSource11.paginator = this.paginator11;
       this.dataSource11.sort = this.sort11;
     });
+
+    dialog2.afterClosed().subscribe(() => {
+      this.resetFilter();
+    });
   }
 
   activateStudent(studentId: number) {
     this.classDetailsService.activateStudent(studentId).subscribe({
       next: () => {
-        this.showToast('success', 'Kích hoạt học sinh thành công!');
+        this.showToast('success', 'Kích hoạt học sinh thành công');
         this.loadStudents();
       },
       error: () => {
-        Swal.fire('Lỗi', 'Không thể kích hoạt học sinh.', 'error');
+        this.showToast('error', 'Lỗi khi kích hoạt học sinh này');
       },
     });
   }
@@ -260,19 +282,19 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
       text: 'Bạn có chắc chắn muốn xóa học sinh này?',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
       confirmButtonText: 'Xóa',
       cancelButtonText: 'Hủy',
     }).then((result) => {
       if (result.isConfirmed) {
         this.classDetailsService.deleteStudent(studentId).subscribe({
           next: () => {
-            Swal.fire('Thành công', 'Đã xóa học sinh.', 'success');
+            this.showToast('success', 'Xóa học sinh thành công')
             this.loadStudents();
           },
           error: () => {
-            Swal.fire('Lỗi', 'Không thể xóa học sinh.', 'error');
+            this.showToast('error', 'Không thể xóa học sinh này')
           },
         });
       }
@@ -282,7 +304,7 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
   downloadStudentList() {
     this.classDetailsService.downloadStudentResults(this.classId).subscribe({
       next: (blob: Blob) => {
-        const filename = this.getFilenameFromBlob(blob) || 'downloaded_file.xlsx';
+        const filename = this.getFilenameFromBlob(blob);
         saveAs(blob, filename);
         this.showToast('success', 'Tải bảng điểm thành công');
       },
@@ -292,7 +314,7 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
     });
   }  
 
-  private getFilenameFromBlob(blob: Blob): string | null {
+  private getFilenameFromBlob(blob: Blob): string {
     if ((blob as any).name) {
       return (blob as any).name;
     }
@@ -337,15 +359,31 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
         }));
         this.dataSource2.data = mappedData;
       },
-      error: (err) => {
-        console.error('Error fetching schedules:', err);
+      error: () => {
+        this.showToast('error', 'Lỗi khi tải danh sách lịch học');
       },
     });
   }
 
+  isToday(date: string | Date): boolean {
+    if (!date) return false;
+    const today = new Date();
+    const rowDate = new Date(date);
+  
+    return (
+      rowDate.getDate() === today.getDate() &&
+      rowDate.getMonth() === today.getMonth() &&
+      rowDate.getFullYear() === today.getFullYear()
+    );
+  }
+
   openAddScheduleDialog() {
-    this.dialog.open(this.dialogTemplate2, {
+    const dialogRef = this.dialog.open(this.dialogTemplate2, {
       width: '77%',  maxHeight: '77vh'
+    });
+
+    dialogRef.afterClosed().subscribe(() => {
+      this.formGroup.reset();
     });
   }
 
@@ -362,12 +400,12 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
   
     this.http.post('http://localhost:8081/api/class-schedule', payload).subscribe({
       next: () => {
-        this.showToast('success', 'Tạo lịch học thành công!');
+        this.showToast('success', 'Tạo lịch học thành công');
         this.dialog.closeAll();
         this.loadSchedules(); 
       },
       error: () => {
-        this.showToast('error', 'Có lỗi xảy ra khi tạo lịch học!');
+        this.showToast('error', 'Có lỗi xảy ra khi tạo lịch học');
       },
     });
   }
@@ -378,19 +416,19 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
       text: 'Bạn có chắc chắn muốn xóa lịch học này?',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
       confirmButtonText: 'Xóa',
       cancelButtonText: 'Hủy',
     }).then((result) => {
       if (result.isConfirmed) {
         this.classDetailsService.deleteSchdule(scheduleId).subscribe({
           next: () => {
-            Swal.fire('Thành công', 'Đã xóa lịch học.', 'success');
+            this.showToast('success', 'Xóa lịch học thành công');
             this.loadSchedules();
           },
           error: () => {
-            Swal.fire('Lỗi', 'Không thể xóa lịch học.', 'error');
+            this.showToast('error', 'Có lỗi xảy ra khi xóa lịch học');
           },
         });
       }
@@ -423,18 +461,78 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
   }
 
   // Documents
-  private loadDocuments() {
-    this.classDetailsService.getDocuments(this.classId!).subscribe((data) => {
-      // this.documents = data.content || [];
+  loadDocuments(): void {
+    this.classDetailsService.getDocuments(this.classId).subscribe({
+      next: (data: any) => {
+        this.documents = data.content;
+      },
+      error: (err) => {
+        console.error('Error fetching documents:', err);
+      },
     });
   }
 
-  openUploadDocumentDialog() {
-    // Open dialog to upload document
+  // openUploadDocumentDialog() {
+  //   // Open dialog to upload document
+  // }
+
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file && file.type === 'application/pdf') {
+      this.selectedFile = file;
+    } else {
+      alert('Vui lòng chọn tệp PDF.');
+    }
   }
 
-  deleteDocument(doc: any) {
-    // Handle deleting document
+  uploadDocument(): void {
+    if (this.selectedFile) {
+      this.classDetailsService.uploadDocumentPdf(this.classId, this.selectedFile).subscribe({
+        next: () => {
+          alert('Tải lên thành công!');
+          this.loadDocuments();
+          this.selectedFile = null;
+        },
+        error: (err) => {
+          console.error('Error uploading document:', err);
+        },
+      });
+    } else {
+      alert('Vui lòng chọn một file để tải lên.');
+    }
+  }
+
+  deleteDocument(documentId: number): void {
+    if (confirm('Bạn có chắc chắn muốn xóa tài liệu này không?')) {
+      this.classDetailsService.deleteDocument(documentId).subscribe({
+        next: () => {
+          alert('Xóa thành công!');
+          this.loadDocuments();
+        },
+        error: (err) => {
+          console.error('Error deleting document:', err);
+          alert('Không thể xóa tài liệu. Vui lòng thử lại sau.');
+        },
+      });
+    }
+  }
+  
+  downloadDocument(documentId: number): void {
+    this.classDetailsService.downloadDocument(documentId).subscribe({
+      next: (blob) => {
+        const filename = this.getFilenameFromBlob(blob);
+
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        link.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: () => {
+        this.showToast('error', 'Lỗi không thể tải tài liệu')
+      },
+    });
   }
 
   showToast(icon: 'success' | 'error' | 'info' | 'warning', title: string) {

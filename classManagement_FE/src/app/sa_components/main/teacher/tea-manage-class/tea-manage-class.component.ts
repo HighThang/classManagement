@@ -129,7 +129,11 @@ export class TeaManageClassComponent implements OnInit, AfterViewInit {
   }
 
   openDialog(): void {
-    this.dialog.open(this.dialogTemplate);
+    const dialogRef = this.dialog.open(this.dialogTemplate);
+
+    dialogRef.afterClosed().subscribe(() => {
+      this.formGroup.reset();
+    });
   }
 
   private fetchSubjects(): void {

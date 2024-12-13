@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -49,6 +49,8 @@ import {
 } from '../../../../core/services/class-attendance/class-attendance.service';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import saveAs from 'file-saver';
+import { ClassScheduleService } from '../../../../core/services/class-schedule/class-schedule.service';
+import { ImageService } from '../../../../core/services/image/image.service';
 
 export type ChartOptions = {
   chart: ApexChart;
@@ -142,6 +144,7 @@ export class TeaAttendanceComponent implements OnInit, AfterViewInit {
   @ViewChild('sort11') sort11!: MatSort;
 
   @ViewChild('dialogTemplate1') dialogTemplate1: any;
+  @ViewChild('input11') searchInput!: ElementRef<HTMLInputElement>;
 
   chartOptions: Partial<ChartOptions> = {
     chart: {
@@ -176,7 +179,8 @@ export class TeaAttendanceComponent implements OnInit, AfterViewInit {
     public dialog: MatDialog,
     private fb: FormBuilder,
     private router: Router,
-    private classAttendance: ClassAttendanceService
+    private classAttendance: ClassAttendanceService,
+    private imageSerive: ImageService
   ) {
     this.registerForm = this.fb.group({
       imageURL: [{ value: '', disabled: true }],
@@ -262,6 +266,13 @@ export class TeaAttendanceComponent implements OnInit, AfterViewInit {
     this.dataSource11.filter = filterValue.trim().toLowerCase();
   }
 
+  resetFilter(): void {
+    if (this.searchInput) {
+      this.searchInput.nativeElement.value = '';
+    }
+    this.applyFilter11({ target: { value: '' } } as unknown as Event);
+  }
+
   downloadAttendanceTable() {
     this.classAttendance.downloadAttendanceResults(this.classId).subscribe({
       next: (blob: Blob) => {
@@ -283,25 +294,6 @@ export class TeaAttendanceComponent implements OnInit, AfterViewInit {
     return 'downloaded_file.xlsx';
   }
 
-  periods = [
-    { value: 'PERIOD_1', viewValue: 'Ca học 1' },
-    { value: 'PERIOD_2', viewValue: 'Ca học 2' },
-    { value: 'PERIOD_3', viewValue: 'Ca học 3' },
-    { value: 'PERIOD_4', viewValue: 'Ca học 4' },
-    { value: 'PERIOD_5', viewValue: 'Ca học 5' },
-    { value: 'PERIOD_6', viewValue: 'Ca học 6' },
-  ];
-
-  daysInWeek = [
-    { value: 'MONDAY', viewValue: 'Thứ Hai' },
-    { value: 'TUESDAY', viewValue: 'Thứ Ba' },
-    { value: 'WEDNESDAY', viewValue: 'Thứ Tư' },
-    { value: 'THURSDAY', viewValue: 'Thứ Năm' },
-    { value: 'FRIDAY', viewValue: 'Thứ Sáu' },
-    { value: 'SATURDAY', viewValue: 'Thứ Bảy' },
-    { value: 'SUNDAY', viewValue: 'Chủ Nhật' },
-  ];
-
   private loadSchedules(classId: number): void {
     this.classDetailsService.getSchedules(classId).subscribe({
       next: (response: any) => {
@@ -311,6 +303,7 @@ export class TeaAttendanceComponent implements OnInit, AfterViewInit {
           periodInDay: this.mapPeriodInDay(item.periodInDay),
           dayInWeek: this.mapDayInWeek(item.dayInWeek),
           createdDate: item.createdDate,
+          imageClassAttendance: item.imageClassAttendance
         }));
         this.dataSource1.data = mappedData;
       },
@@ -359,6 +352,7 @@ export class TeaAttendanceComponent implements OnInit, AfterViewInit {
 
   openStudentListDialog(scheduleId: number) {
     this.scheduleId = scheduleId;
+
     const dialog1 = this.dialog.open(this.dialogTemplate1, {
       width: '85%',
       maxHeight: '95vh',
@@ -379,12 +373,19 @@ export class TeaAttendanceComponent implements OnInit, AfterViewInit {
         periodInDay: item.periodInDay,
         dayInWeek: item.dayInWeek,
         createdDate: item.createdDate,
-      }));
+        imageClassAttendance: item.imageClassAttendance
+      })
+    );
 
     this.scheduleDetails = selectedSchedule[0];
 
+    console.log(this.scheduleDetails)
+
     dialog1.afterClosed().subscribe(() => {
       this.isEditing = false;
+      this.resetFilter();
+      this.registerForm.reset();
+      this.selectedImage = null;
     });
   }
 
@@ -407,9 +408,14 @@ export class TeaAttendanceComponent implements OnInit, AfterViewInit {
           this.totalCount = response.content.length;
           this.updateChartData();
         }
+
+        if (this.scheduleDetails.imageClassAttendance !== null) {
+          this.registerForm.patchValue({ imageURL: this.scheduleDetails.imageClassAttendance });
+          this.loadImage(this.scheduleDetails.imageClassAttendance);
+        }
       },
-      error: (err) => {
-        console.error('Error fetching students:', err);
+      error: () => {
+        this.showToast('error', 'Lỗi khi tải dữ liệu');
       },
     });
   }
@@ -440,13 +446,11 @@ export class TeaAttendanceComponent implements OnInit, AfterViewInit {
     this.classAttendance.updateAttendance(this.dataSource11.data).subscribe(
       () => {
         this.isEditing = false;
-        this.isEditing2 = false;
         this.showToast('success', 'Điểm danh thành công');
       },
       () => {
         this.showToast('error', 'Điểm danh thất bại');
         this.cancelEditing();
-        this.cancelEditing2();
       }
     );
   }
@@ -462,6 +466,52 @@ export class TeaAttendanceComponent implements OnInit, AfterViewInit {
     this.registerForm.disable();
     this.loadStudents(this.scheduleId);
     this.updateChartData();
+  }
+
+  saveImageClassAttendance() {
+    if (this.registerForm.valid && this.file_store && this.file_store[0]) this.uploadImage();
+  }
+
+  loadImage(imagePath: string | null): void {
+    if (imagePath) {
+      this.imageSerive.getImageAttendance(this.scheduleId).subscribe(
+        (imageBlob: Blob) => {
+          const imageUrl = URL.createObjectURL(imageBlob);
+          this.selectedImage = imageUrl;
+        },
+        () => {
+          this.selectedImage = null;
+        }
+      );
+    }
+  }
+
+  uploadImage(): void {
+    if (this.file_store && this.file_store[0]) {
+      const formData: FormData = new FormData();
+      formData.append('file', this.file_store[0]);
+
+      this.classAttendance.uploadImageForAttend(formData, this.scheduleId).subscribe(
+        (response: boolean) => {
+          this.loadSchedules(this.classId);
+          this.loadStudents(this.scheduleId);
+          this.isEditing2 = false;
+          this.registerForm.disable();
+          
+          if (!response) {
+            this.showToast('error', 'Không thể tải hình ảnh')
+          }
+          else {
+            this.showToast('success', 'Tải ảnh thành công');
+          }
+        },
+        () => {
+          this.isEditing2 = false;
+          this.registerForm.disable();
+          this.showToast('error', 'Có lỗi xảy ra khi tải ảnh')
+        }
+      );
+    }
   }
 
   handleFileInputChange(files: FileList | null): void {

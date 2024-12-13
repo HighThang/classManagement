@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -125,6 +125,7 @@ export class TeaScoreComponent implements OnInit, AfterViewInit {
   @ViewChild('sort11') sort11!: MatSort;
 
   @ViewChild('dialogTemplate1') dialogTemplate1: any;
+  @ViewChild('input11') searchInput!: ElementRef<HTMLInputElement>;
 
   chartOptions!: {
     series: ApexAxisChartSeries;
@@ -132,6 +133,8 @@ export class TeaScoreComponent implements OnInit, AfterViewInit {
     colors: string[];
     xaxis: ApexXAxis;
     plotOptions: ApexPlotOptions;
+    legend: ApexLegend;
+    yaxis: ApexYAxis;
   };
 
   constructor(
@@ -151,7 +154,7 @@ export class TeaScoreComponent implements OnInit, AfterViewInit {
       ],
       chart: {
         type: 'bar',
-        height: 350,
+        height: 375,
       },
       colors: [
         'rgba(255, 69, 96, 0.85)', 'rgba(255, 69, 96, 0.85)', 'rgba(255, 69, 96, 0.85)', 'rgba(255, 69, 96, 0.85)',
@@ -171,6 +174,11 @@ export class TeaScoreComponent implements OnInit, AfterViewInit {
           columnWidth: '50%',
         },
       },
+      legend: {
+        show: false
+      },
+      yaxis: {
+      }
     };
   }
 
@@ -251,6 +259,13 @@ export class TeaScoreComponent implements OnInit, AfterViewInit {
     this.dataSource11.filter = filterValue.trim().toLowerCase();
   }
 
+  resetFilter(): void {
+    if (this.searchInput) {
+      this.searchInput.nativeElement.value = '';
+    }
+    this.applyFilter11({ target: { value: '' } } as unknown as Event);
+  }
+
   openDialogCreateExam(templateRef: any): void {
     this.dialog.open(templateRef, {
       width: '33%',
@@ -316,7 +331,7 @@ export class TeaScoreComponent implements OnInit, AfterViewInit {
   openStudentListDialog(examId: number) {
     this.examId = examId;
     const dialog1 = this.dialog.open(this.dialogTemplate1, {
-      width: '85%',
+      width: '95vw',
       maxHeight: '95vh',
     });
 
@@ -339,6 +354,7 @@ export class TeaScoreComponent implements OnInit, AfterViewInit {
 
     dialog1.afterClosed().subscribe(() => {
       this.isEditing = false;
+      this.resetFilter();
     });
   }
 
@@ -369,13 +385,21 @@ export class TeaScoreComponent implements OnInit, AfterViewInit {
 
   updateChartData() {
     const distribution = Array(11).fill(0);
-  
+
     this.dataSource11.data.forEach((student: any) => {
       const score = student.score;
-  
+      
       if (score !== null && score >= 0 && score <= 10) {
         const index = Math.round(score);
         distribution[index]++;
+      }
+    });
+
+    let maxCount = 0;
+
+    distribution.forEach((count, index) => {
+      if (count > maxCount) {
+        maxCount = count;
       }
     });
   
@@ -385,6 +409,10 @@ export class TeaScoreComponent implements OnInit, AfterViewInit {
         data: distribution,
       },
     ];
+    this.chartOptions.yaxis = {
+      max: maxCount,
+      tickAmount: maxCount
+    }
   }
 
   enableEditing() {

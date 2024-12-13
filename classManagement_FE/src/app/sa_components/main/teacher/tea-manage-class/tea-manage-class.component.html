@@ -7,7 +7,7 @@
                 <div class="header">
                     <div class="icon-grid-1" style="padding-top: 20px">
                         <app-icon iconName="search" style="padding: 10px; color: var(--theme-background);"></app-icon>
-                        <mat-form-field appearance="outline" style="width: 55vh;">
+                        <mat-form-field appearance="outline" style="width: 55vh; padding-bottom: 20px;">
                             <mat-label>Tìm kiếm lớp học</mat-label>
                             <input matInput (input)="applyFilter($event)" placeholder="Nhập từ khóa tìm kiếm">
                         </mat-form-field>
@@ -20,7 +20,7 @@
                         <h2 mat-dialog-title style="color: var(--theme-background); font-weight: bold;">Tạo lớp học</h2>
                         <hr />
                         <mat-dialog-content [formGroup]="formGroup">
-                            <mat-form-field appearance="outline" style="width: 100%; margin-bottom: 15px;">
+                            <mat-form-field appearance="outline" style="width: 100%; margin-bottom: 15px; padding-bottom: 20px;">
                                 <mat-label>Tên lớp</mat-label>
                                 <input matInput formControlName="className" placeholder="Nhập tên lớp" />
                                 <mat-error *ngIf="formGroup.get('className')?.hasError('required')">
@@ -28,7 +28,7 @@
                                 </mat-error>
                             </mat-form-field>
 
-                            <mat-form-field appearance="outline" style="width: 100%; margin-bottom: 15px;">
+                            <mat-form-field appearance="outline" style="width: 100%; margin-bottom: 15px; padding-bottom: 20px;">
                                 <mat-label>Tên môn học</mat-label>
                                 <mat-select formControlName="selectedSubject" placeholder="Chọn môn học">
                                     <mat-option *ngFor="let subject of subjects" [value]="subject.id">
@@ -40,7 +40,7 @@
                                 </mat-error>
                             </mat-form-field>
 
-                            <mat-form-field appearance="outline" style="width: 100%; margin-bottom: 15px;">
+                            <mat-form-field appearance="outline" style="width: 100%; margin-bottom: 15px; padding-bottom: 20px;">
                                 <mat-label>Ghi chú</mat-label>
                                 <textarea matInput formControlName="notes" rows="3"
                                     placeholder="Nhập ghi chú"></textarea>

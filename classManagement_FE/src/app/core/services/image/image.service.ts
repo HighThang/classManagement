@@ -13,4 +13,8 @@ export class ImageService {
   getImage(): Observable<Blob> {
     return this.http.get(this.imageBaseUrl, { responseType: 'blob' });
   }
+
+  getImageAttendance(scheduleId: number): Observable<Blob> {
+    return this.http.get(`${this.imageBaseUrl}/image-attendance?scheduleId=${scheduleId}`, { responseType: 'blob' });
+  }
 }

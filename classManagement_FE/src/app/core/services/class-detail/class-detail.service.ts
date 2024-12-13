@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 
 export interface ClassDetails {
@@ -8,6 +8,7 @@ export interface ClassDetails {
   subjectName: string;
   createdDate: string;
   note: string;
+  teacherName: string;
 }
 
 export interface ScheduleData {
@@ -16,8 +17,8 @@ export interface ScheduleData {
   periodInDay: string; 
   dayInWeek: string; 
   createdDate: string; 
+  imageClassAttendance: string;
 }
-
 
 @Injectable({
   providedIn: 'root',
@@ -95,7 +96,32 @@ export class ClassDetailsService {
   }
 
   getDocuments(classId: number): Observable<any> {
-    return this.http.get(`${this.baseUrl}/document?classId=${classId}`);
+    const params = new HttpParams().set('classId', classId.toString());
+    return this.http.get(`${this.baseUrl}/document`, { params });
+  }
+
+  uploadDocumentPdf(classId: number, file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.put(`${this.baseUrl}/document/${classId}`, formData);
+  }
+
+  deleteDocument(documentId: number): Observable<any> {
+    return this.http.put(`${this.baseUrl}/document/delete/${documentId}`, {});
+  }
+
+  downloadDocument(documentId: number): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/document/download/${documentId}`, {
+      responseType: 'blob',
+      observe: 'response',
+    }).pipe(
+      map((response) => {
+        const contentDisposition = response.headers.get('content-disposition');
+        const filename = this.extractFilename(contentDisposition);
+        Object.assign(response.body as Blob, { name: filename });
+        return response.body as Blob;
+      })
+    );
   }
 }
 

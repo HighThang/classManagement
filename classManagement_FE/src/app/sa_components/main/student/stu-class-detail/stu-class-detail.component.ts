@@ -96,6 +96,7 @@ export class StuClassDetailComponent implements OnInit, AfterViewInit {
       createdDate: '',
       note: '',
       className: '',
+      teacherName: ''
     };
 
     this.classDetailsService.checkPermissionForStudent(studentId, this.classId).subscribe({

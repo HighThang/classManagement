@@ -66,4 +66,8 @@ export class ExamScoreService {
   editExamScores(data: any): Observable<any> {
     return this.http.put(this.baseUrl, data);
   }
+
+  getAllExamsForStudent(classId: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/student-exam-result?classId=${classId}`);
+  }
 }

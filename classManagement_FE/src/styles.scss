@@ -52,6 +52,7 @@ body {
   --text-button-color: white;
   --text-disable-color: rgb(167, 167, 167);
 
+  --mdc-outlined-text-field-outline-color: var(--theme-background) !important;
 }
 
 @mixin custom-material-theme($primary, $accent, $warn) {

@@ -120,6 +120,9 @@
                 padding: 4px;
                 border-radius: 10px;
 
+                overflow-x: auto;
+                overflow-y: auto;
+
                 .header {
                     display: flex;
                     justify-content: space-between;
@@ -129,6 +132,22 @@
                         align-items: center;
                     }
                 }
+            }
+
+            .table::-webkit-scrollbar {
+                width: 8px;
+            }
+        
+            .table::-webkit-scrollbar-track {
+                display: none;
+                background: #f1f1f1;
+                border-radius: 10px;
+            }
+        
+            .table::-webkit-scrollbar-thumb {
+                background-color: #888;
+                border-radius: 10px;
+                border: 2px solid #f1f1f1;
             }
         }
     }

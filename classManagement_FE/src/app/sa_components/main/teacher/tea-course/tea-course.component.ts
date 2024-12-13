@@ -53,8 +53,12 @@ export class TeaCourseComponent implements AfterViewInit {
   }
 
   openDialog(templateRef: any): void {
-    this.dialog.open(templateRef, {
-      width: '500px',
+    const dialogRef = this.dialog.open(templateRef, {
+      width: '40%', maxHeight: '60vh'
+    });
+
+    dialogRef.afterClosed().subscribe(() => {
+      this.subjectName = '';
     });
   }
 

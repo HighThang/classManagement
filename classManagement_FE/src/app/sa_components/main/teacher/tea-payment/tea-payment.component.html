@@ -1,1 +1,143 @@
-<p>tea-payment works!</p>
+<div class="container">
+    <div class="content">
+        <div class="class_details">
+            <div class="header">
+                <h3 class="centered-title">Thanh toán học phí</h3>
+            </div>
+
+            <div class="table">
+                <div class="header">
+                    <h5 mat-dialog-title style="color: var(--theme-background); font-weight: bold; margin-bottom: 0px; padding-left: 5px; padding-top: 5px;">
+                        Tìm kiếm học phí</h5>
+                </div>
+                <hr>
+                <div class="search-filters" style="display: flex; justify-content: space-between;">
+                    <mat-form-field appearance="outline" style="padding-top: 10px; padding-bottom: 15px; padding-left: 5px; padding-right: 5px;">
+                        <mat-label>Tìm theo tên lớp học</mat-label>
+                        <mat-select 
+                            (selectionChange)="applyFilter('className', $event.value)">
+                            <mat-option [value]="null">-- None --</mat-option>
+                            <mat-option *ngFor="let class of availableClasses" [value]="class">{{ class }}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" style="padding-top: 10px; padding-bottom: 15px; padding-left: 5px; padding-right: 5px;">
+                        <mat-label>Tìm theo họ tên</mat-label>
+                        <input matInput (input)="onInputChange('name', $event)">
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" style="padding-top: 10px; padding-bottom: 15px; padding-left: 5px; padding-right: 5px;">
+                        <mat-label>Tìm theo email</mat-label>
+                        <input matInput (input)="onInputChange('email', $event)">
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" style="padding-top: 10px; padding-bottom: 15px; padding-left: 5px; padding-right: 5px;">
+                        <mat-label>Tìm theo số điện thoại</mat-label>
+                        <input matInput (input)="onInputChange('phone', $event)">
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="more-detail">
+            <div class="table">
+                <div class="header">
+                    <h5 mat-dialog-title style="color: var(--theme-background); font-weight: bold; margin-bottom: 0px; padding-left: 5px; padding-top: 5px;">
+                        Danh sách chưa đóng học phí</h5>
+                </div>
+                <hr>
+                <table mat-table [dataSource]="dataSource1" matSort #sort1="matSort" matSortActive="id"
+                    matSortDirection="asc" class="example-table">
+                    <ng-container matColumnDef="id">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header
+                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                            ID</th>
+                        <td mat-cell *matCellDef="let row" style="height: 66px;">{{ row.id }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="year">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header
+                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                            Năm</th>
+                        <td mat-cell *matCellDef="let row">{{ row.year }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="month">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header
+                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                            Tháng</th>
+                        <td mat-cell *matCellDef="let row">{{ row.month }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="className">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header
+                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                            Tên lớp</th>
+                        <td mat-cell *matCellDef="let row">{{ row.className }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="lastName">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header
+                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                            Họ</th>
+                        <td mat-cell *matCellDef="let row">{{ row.lastName }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="surname">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header
+                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                            Tên đệm</th>
+                        <td mat-cell *matCellDef="let row">{{ row.surname }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="firstName">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header
+                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                            Tên</th>
+                        <td mat-cell *matCellDef="let row">{{ row.firstName }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="email">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header
+                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                            Email</th>
+                        <td mat-cell *matCellDef="let row">{{ row.email }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="phone">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header
+                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                            Số điện thoại</th>
+                        <td mat-cell *matCellDef="let row">{{ row.phone }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="feeNotSubmitted">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header
+                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                            Học phí còn nợ</th>
+                        <td mat-cell *matCellDef="let row">{{ row.feeNotSubmitted | number:'1.0-0' }}đ</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="pay">
+                        <th mat-header-cell *matHeaderCellDef
+                            style="text-align: center; background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                            Xác nhận thanh toán</th>
+                        <td mat-cell *matCellDef="let row" style="text-align: center;">
+                            <button mat-mini-fab (click)="pay(row.id)"
+                                style="background-color: var(--theme-background); border-radius: 15%;color: white;">
+                                <mat-icon>done</mat-icon>
+                            </button>
+                        </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns1"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns1;"></tr>
+
+                    <tr class="mat-row" *matNoDataRow>
+                        <td class="mat-cell" colspan="5">Không có dữ liệu</td>
+                    </tr>
+                </table>
+
+                <mat-paginator #paginator1 [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page">
+                </mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>

@@ -12,8 +12,7 @@
                             <form [formGroup]="formGroup">
                                 <div class="icon-grid-1">
                                     <app-icon iconName="classroom"></app-icon>
-                                    <mat-form-field class="form-field" appearance="outline"
-                                        style="padding-bottom: 2cap;">
+                                    <mat-form-field class="form-field" appearance="outline" style="padding-bottom: 20px;">
                                         <mat-label>Chọn lớp học</mat-label>
                                         <mat-select formControlName="classroomId">
                                             <mat-option *ngFor="let classroom of classrooms" [value]="classroom.id">
@@ -239,13 +238,13 @@
             style="display: flex; justify-content: space-between; padding-left: 10px; padding-right: 10px; padding-top: 5px; padding-bottom: 5px;">
             <div class="attendance-by-image">
                 <button mat-raised-button [disabled]="!activeBtn || isEditing" *ngIf="!isEditing2" (click)="enableEditing2()"
-                    style="background-color: var(--theme-background); color: white;"> Điểm danh bằng ảnh</button>
+                    style="background-color: var(--theme-background); color: white;">Điểm danh bằng ảnh</button>
                 <div *ngIf="isEditing2" class="editing-controls">
                     <button mat-raised-button (click)="cancelEditing2()"
                         style="background-color: rgb(179, 179, 179); color: white; margin-right: 10px;">
                         Hủy
                     </button>
-                    <button mat-raised-button (click)="saveChanges()"
+                    <button mat-raised-button (click)="saveImageClassAttendance()"
                         style="background-color: rgb(0, 175, 0); color: white; margin-right: 10px;">
                         Gửi
                     </button>

@@ -158,6 +158,38 @@ app-icon {
     color: var(--theme-background);
 }
 
+.dialog-container {
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+
+    overflow-y: auto;
+    overflow-x: auto;
+}
+
+.highlight-row {
+    background: beige;
+}
+
+.dialog-container::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.dialog-container::-webkit-scrollbar-track {
+    display: none;
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.dialog-container::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 10px;
+    border: 2px solid #f1f1f1;
+}
+
 @keyframes slideIn1 {
     from {
         transform: translateY(-10%);

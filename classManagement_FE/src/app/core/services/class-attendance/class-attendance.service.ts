@@ -26,6 +26,11 @@ export class ClassAttendanceService {
     return this.http.put(this.apiUrl, data);
   }
 
+  uploadImageForAttend(formData: FormData, scheduleId: number): Observable<boolean> {
+    const url = `http://localhost:8081/api/class-schedule/upload-image-for-attend?scheduleId=${scheduleId}`;
+    return this.http.put<boolean>(url, formData);
+  }
+
   downloadAttendanceResults(classId: number): Observable<Blob> {
     return this.http.get(`${this.apiUrl}/${classId}/result`, {
       responseType: 'blob',
@@ -51,5 +56,9 @@ export class ClassAttendanceService {
       }
     }
     return null;
+  }
+
+  getClassAttendanceForStudent(classId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/student-attendance-result?classId=${classId}`);
   }
 }

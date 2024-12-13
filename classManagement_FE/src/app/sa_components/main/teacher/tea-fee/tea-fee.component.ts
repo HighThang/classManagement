@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
+  Validators,
 } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatOptionModule, MatNativeDateModule } from '@angular/material/core';
@@ -48,15 +49,7 @@ import {
   ClassAttendanceService,
 } from '../../../../core/services/class-attendance/class-attendance.service';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-
-export type ChartOptions = {
-  chart: ApexChart;
-  labels: string[];
-  colors: string[];
-  legend: ApexLegend;
-  dataLabels: ApexDataLabels;
-  responsive: ApexResponsive[];
-};
+import { FeeService, TutorFeeDetailDto, TutorFeeDto } from '../../../../core/services/fee/fee.service';
 
 @Component({
   selector: 'app-tea-fee',
@@ -88,8 +81,8 @@ export type ChartOptions = {
     MatNativeDateModule,
     MatFormFieldModule,
     MatSelectModule,
-    // ChartComponent,
     MatCheckboxModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './tea-fee.component.html',
   styleUrl: './tea-fee.component.scss',
@@ -105,82 +98,43 @@ export type ChartOptions = {
 })
 export class TeaFeeComponent implements OnInit, AfterViewInit {
   formGroup!: FormGroup;
-  registerForm!: FormGroup;
+  formGroup2!: FormGroup;
+  formGroup3!: FormGroup;
 
   classrooms: Classroom[] = [];
   showDetails: boolean = false;
-
-  activeBtn = true;
-  isEditing = false;
-  isEditing2 = false;
-
-  selectedImage: string | null = null;
-  file_store: FileList | null = null;
+  activeBtn: boolean = true;
+  isEditing: boolean = false;
+  isLoading = false;
 
   classId!: number;
-  scheduleId!: number;
   classDetails!: ClassDetails;
-  scheduleDetails!: ScheduleData;
+  tutorFeeId!: number;
+  selectedTutorFee!: TutorFeeDto;
 
-  displayedColumns1: string[] = [
-    'id',
-    'day',
-    'periodInDay',
-    'dayInWeek',
-    'createdDate',
-    'edit',
-  ];
-  dataSource1 = new MatTableDataSource<ScheduleData>();
-
-  displayedColumns11: string[] = ['id', 'email', 'name', 'attend'];
-  dataSource11 = new MatTableDataSource<Attendance>();
+  displayedColumns1: string[] = ['id', 'year', 'month', "totalLesson", "lessonPrice", "feeEstimate", "feeCollected", "feeNotCollected", "createdDate", "details"];
+  dataSource1 = new MatTableDataSource<TutorFeeDto>();
 
   @ViewChild('paginator1') paginator1!: MatPaginator;
   @ViewChild('sort1') sort1!: MatSort;
-  @ViewChild('paginator11') paginator11!: MatPaginator;
-  @ViewChild('sort11') sort11!: MatSort;
 
   @ViewChild('dialogTemplate1') dialogTemplate1: any;
 
-  chartOptions: Partial<ChartOptions> = {
-    chart: {
-      width: 333,
-      type: 'pie',
-    },
-    labels: ['Đi học', 'Vắng học'],
-    colors: ['rgb(0, 227, 150)', 'rgb(255, 69, 96)'],
-    legend: {
-      position: 'bottom',
-    },
-    dataLabels: {
-      enabled: true,
-    },
-    responsive: [
-      {
-        breakpoint: 480,
-        options: {
-          legend: {
-            position: 'bottom',
-          },
-        },
-      },
-    ],
-  };
-  chartSeries: number[] = [0, 0];
-  totalCount: number = 0;
+  displayedColumns11: string[] = ['id', "studentName", "email", "phone", "numberOfClassesAttended", "totalNumberOfClasses", "feeAmount", "feeSubmitted", "feeNotSubmitted"];
+  dataSource11 = new MatTableDataSource<TutorFeeDetailDto>();
 
+  @ViewChild('paginator11') paginator11!: MatPaginator;
+  @ViewChild('sort11') sort11!: MatSort;
+  @ViewChild('input11') searchInput!: ElementRef<HTMLInputElement>;
+  
   constructor(
     private classDetailsService: ClassDetailsService,
     private classroomService: ClassroomService,
     public dialog: MatDialog,
     private fb: FormBuilder,
     private router: Router,
-    private classAttendance: ClassAttendanceService
-  ) {
-    this.registerForm = this.fb.group({
-      imageURL: [{ value: '', disabled: true }],
-    });
-  }
+    private feeService: FeeService
+  ) {}
 
   ngOnInit(): void {
     const userData = sessionStorage.getItem('currentUser');
@@ -194,12 +148,20 @@ export class TeaFeeComponent implements OnInit, AfterViewInit {
       classroomId: [this.classId || null],
     });
 
+    this.formGroup2 = this.fb.group({
+      classId: this.classId,
+      month: [new Date().getMonth() + 1, [Validators.required, Validators.min(1), Validators.max(12)]],
+      year: [new Date().getFullYear(), [Validators.required, Validators.min(1900), Validators.max(2200)]],
+      classSessionPrice: [null, [Validators.required, Validators.min(0)]],
+    })
+
     this.classDetails = {
       id: 0,
       subjectName: '',
       createdDate: '',
       note: '',
       className: '',
+      teacherName: ''
     };
 
     this.loadClassrooms();
@@ -208,15 +170,13 @@ export class TeaFeeComponent implements OnInit, AfterViewInit {
       this.checkPermissionAndLoadData(teacherId, this.classId);
     }
 
-    this.formGroup
-      .get('classroomId')
-      ?.valueChanges.subscribe((selectedClassId) => {
-        if (selectedClassId) {
-          sessionStorage.setItem('currentClassId', selectedClassId.toString());
-          this.classId = selectedClassId;
-          this.checkPermissionAndLoadData(teacherId, this.classId);
-        }
-      });
+    this.formGroup.get('classroomId')?.valueChanges.subscribe((selectedClassId) => {
+      if (selectedClassId) {
+        sessionStorage.setItem('currentClassId', selectedClassId.toString());
+        this.classId = selectedClassId;
+        this.checkPermissionAndLoadData(teacherId, this.classId);
+      }
+    });
   }
 
   ngAfterViewInit(): void {
@@ -236,14 +196,23 @@ export class TeaFeeComponent implements OnInit, AfterViewInit {
         if (hasPermission) {
           sessionStorage.setItem('currentClassId', classId.toString());
           this.showDetails = true;
+
           this.loadClassDetails(classId);
-          this.loadSchedules(classId);
+          this.loadTutorFee(classId);
+
+          this.formGroup2 = this.fb.group({
+            classId: this.classId,
+            month: [new Date().getMonth() + 1, [Validators.required, Validators.min(1), Validators.max(12)]],
+            year: [new Date().getFullYear(), [Validators.required, Validators.min(1900), Validators.max(2200)]],
+            classSessionPrice: ['', [Validators.required, Validators.min(0)]],
+          })
+          
         } else {
           this.showToast('error', 'Bạn không có quyền truy cập lớp này');
           sessionStorage.removeItem('currentClassId');
           this.showDetails = false;
           this.router.navigate(['teacher/manage_class']);
-        }
+        }   
       },
       error: () => {
         this.showToast('error', 'Có lỗi xảy ra khi kiểm tra quyền');
@@ -259,82 +228,66 @@ export class TeaFeeComponent implements OnInit, AfterViewInit {
     });
   }
 
+  calculateFee(): void {
+    if (this.formGroup2.invalid) {
+      return;
+    }
+
+    const { classId, month, year, classSessionPrice } = this.formGroup2.value;
+
+    this.feeService.calculateNewFee(classId, month, year, classSessionPrice).subscribe({
+      next: () => {
+        this.showToast('success', 'Tính học phí thành công')
+      },
+      error: (error) => {
+        switch (error.error.error) {
+          case 'Not found schedule!':
+            this.showToast('error', 'Lớp không có lịch học');
+            break;
+          case 'Not found attendance!':
+            this.showToast('error', 'Lớp không có thông tin điểm danh')
+            break;
+          case 'Existed!':
+            this.showToast('warning', 'Học phí đã tồn tại')
+            break;
+          default:
+            this.showToast('error', 'Có lỗi khi tính học phí')
+            break;
+        }
+      }
+    });
+  }
+
   applyFilter1(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource1.filter = filterValue.trim().toLowerCase();
   }
 
-  applyFilter11(event: Event): void {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource11.filter = filterValue.trim().toLowerCase();
-  }
-
-  downloadAttendanceTable() {}
-
-  periods = [
-    { value: 'PERIOD_1', viewValue: 'Ca học 1' },
-    { value: 'PERIOD_2', viewValue: 'Ca học 2' },
-    { value: 'PERIOD_3', viewValue: 'Ca học 3' },
-    { value: 'PERIOD_4', viewValue: 'Ca học 4' },
-    { value: 'PERIOD_5', viewValue: 'Ca học 5' },
-    { value: 'PERIOD_6', viewValue: 'Ca học 6' },
-  ];
-
-  daysInWeek = [
-    { value: 'MONDAY', viewValue: 'Thứ Hai' },
-    { value: 'TUESDAY', viewValue: 'Thứ Ba' },
-    { value: 'WEDNESDAY', viewValue: 'Thứ Tư' },
-    { value: 'THURSDAY', viewValue: 'Thứ Năm' },
-    { value: 'FRIDAY', viewValue: 'Thứ Sáu' },
-    { value: 'SATURDAY', viewValue: 'Thứ Bảy' },
-    { value: 'SUNDAY', viewValue: 'Chủ Nhật' },
-  ];
-
-  private loadSchedules(classId: number): void {
-    this.classDetailsService.getSchedules(classId).subscribe({
+  private loadTutorFee(classId: number): void {
+    this.feeService.searchTutorFees(classId).subscribe({
       next: (response: any) => {
-        const mappedData = response.content.map((item: any) => ({
+        const mappedData = response.map((item: TutorFeeDto) => ({
           id: item.id,
-          day: item.day,
-          periodInDay: this.mapPeriodInDay(item.periodInDay),
-          dayInWeek: this.mapDayInWeek(item.dayInWeek),
-          createdDate: item.createdDate,
+          year: item.year,
+          month: item.month,
+          totalLesson: item.totalLesson,
+          lessonPrice: item.lessonPrice,
+          feeEstimate: item.feeEstimate,
+          feeCollected: item.feeCollected,
+          feeNotCollected: item.feeNotCollected,
+          createdDate: item.createdDate
         }));
         this.dataSource1.data = mappedData;
       },
       error: () => {
-        this.showToast('error', 'Tải lịch học không thành công');
+        this.showToast('error', 'Tải học phí không thành công');
       },
     });
   }
 
-  private mapPeriodInDay(periodInDay: string): string {
-    const periodMap: { [key: string]: string } = {
-      PERIOD_1: 'Ca học 1',
-      PERIOD_2: 'Ca học 2',
-      PERIOD_3: 'Ca học 3',
-      PERIOD_4: 'Ca học 4',
-      PERIOD_5: 'Ca học 5',
-      PERIOD_6: 'Ca học 6',
-    };
-    return periodMap[periodInDay] || periodInDay;
-  }
+  openStudentListDialog(tutorFeeId: number) {
+    this.tutorFeeId = tutorFeeId;
 
-  private mapDayInWeek(dayInWeek: string): string {
-    const dayMap: { [key: string]: string } = {
-      MONDAY: 'Thứ Hai',
-      TUESDAY: 'Thứ Ba',
-      WEDNESDAY: 'Thứ Tư',
-      THURSDAY: 'Thứ Năm',
-      FRIDAY: 'Thứ Sáu',
-      SATURDAY: 'Thứ Bảy',
-      SUNDAY: 'Chủ Nhật',
-    };
-    return dayMap[dayInWeek] || dayInWeek;
-  }
-
-  openStudentListDialog(scheduleId: number) {
-    this.scheduleId = scheduleId;
     const dialog1 = this.dialog.open(this.dialogTemplate1, {
       width: '85%',
       maxHeight: '95vh',
@@ -345,130 +298,146 @@ export class TeaFeeComponent implements OnInit, AfterViewInit {
       this.dataSource11.sort = this.sort11;
     });
 
-    this.loadStudents(scheduleId);
+    this.loadTutorFeeDetails(tutorFeeId);
 
-    const selectedSchedule = this.dataSource1.data
-      .filter((item: any) => item.id === scheduleId)
+    const selectedTutorFee = this.dataSource1.data
+      .filter((item: any) => item.id === tutorFeeId)
       .map((item) => ({
         id: item.id,
-        day: new Date(item.day).toLocaleDateString('vi-VN'),
-        periodInDay: item.periodInDay,
-        dayInWeek: item.dayInWeek,
-        createdDate: item.createdDate,
-      }));
+        year: item.year,
+        month: item.month,
+        totalLesson: item.totalLesson,
+        lessonPrice: item.lessonPrice,
+        feeEstimate: item.feeEstimate,
+        feeCollected: item.feeCollected,
+        feeNotCollected: item.feeNotCollected,
+        createdDate: item.createdDate
+      })
+    );
 
-    this.scheduleDetails = selectedSchedule[0];
+    this.selectedTutorFee = selectedTutorFee[0];
+
+    this.formGroup3 = this.fb.group({
+      tutorFeeId: this.tutorFeeId,
+      re_classSessionPrice: [{ value: this.selectedTutorFee.lessonPrice, disabled: true }, [Validators.required, Validators.min(0)]],
+    })
 
     dialog1.afterClosed().subscribe(() => {
       this.isEditing = false;
+      this.formGroup3.disable;
+      this.resetFilter();
     });
   }
 
-  private loadStudents(scheduleId: number): void {
-    this.classAttendance.getClassAttendance(scheduleId).subscribe({
+  applyFilter11(event: Event): void {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource11.filter = filterValue.trim().toLowerCase();
+  }
+
+  resetFilter(): void {
+    if (this.searchInput) {
+      this.searchInput.nativeElement.value = '';
+    }
+    this.applyFilter11({ target: { value: '' } } as unknown as Event);
+  }
+
+  private loadTutorFeeDetails(tutorFeeId: number): void {
+    this.feeService.getTutorFeeDetailsByTutorFeeId(tutorFeeId).subscribe({
       next: (response: any) => {
-        const activeData = response.content.map((item: any) => ({
+        const activeData = response.map((item: TutorFeeDetailDto) => ({
           id: item.id,
+          studentName: item.studentName,
           email: item.email,
-          name: item.name,
-          isAttended: item.isAttended,
+          phone: item.phone,
+          numberOfClassesAttended: item.numberOfClassesAttended,
+          totalNumberOfClasses: item.totalNumberOfClasses,
+          feeAmount: item.feeAmount,
+          feeSubmitted: item.feeSubmitted,
+          feeNotSubmitted: item.feeNotSubmitted,
+          year: item.year,
+          month: item.month,
+          lessionPrice: item.lessionPrice
         }));
 
-        if (!activeData) {
+        if (activeData.length === 0) {
           this.activeBtn = false;
         }
 
         else {
           this.dataSource11.data = activeData;
-          this.totalCount = response.content.length;
-          this.updateChartData();
         }
       },
-      error: (err) => {
-        console.error('Error fetching students:', err);
+      error: () => {
+        this.showToast('error', 'Lỗi khi tải chi tiết học phí')
       },
     });
   }
 
-  updateChartData() {
-    const attendedCount = this.dataSource11.data.filter(
-      (row) => row.isAttended
-    ).length;
-    const absentCount = this.totalCount - attendedCount;
-    this.chartSeries = [attendedCount, absentCount];
-  }
-
   enableEditing() {
     this.isEditing = true;
+    this.formGroup3.enable();
   }
 
-  enableEditing2() {
-    this.isEditing2 = true;
-    this.registerForm.enable();
-  }
+  reCalculateFee(): void {
+    if (this.formGroup3.invalid) {
+      return;
+    }
 
-  markAllAttended() {
-    this.dataSource11.data.forEach((row) => (row.isAttended = true));
-    this.updateChartData();
-  }
+    const { tutorFeeId, re_classSessionPrice } = this.formGroup3.value;
 
-  saveChanges() {
-    this.classAttendance.updateAttendance(this.dataSource11.data).subscribe(
-      () => {
+    this.feeService.reCalculateFee(tutorFeeId, re_classSessionPrice).subscribe({
+      next: () => {
+        this.showToast('success', 'Tính lại học phí thành công');
+        this.loadTutorFeeDetails(this.tutorFeeId);
+        this.formGroup3.disable();
         this.isEditing = false;
-        this.isEditing2 = false;
-        this.showToast('success', 'Điểm danh thành công');
+        this.selectedTutorFee.lessonPrice = re_classSessionPrice;
       },
-      () => {
-        this.showToast('error', 'Điểm danh thất bại');
+      error: () => {
+        this.showToast('error', 'Tính lại học phí không thành công');
         this.cancelEditing();
-        this.cancelEditing2();
       }
-    );
+    });
   }
 
   cancelEditing() {
     this.isEditing = false;
-    this.loadStudents(this.scheduleId);
-    this.updateChartData();
+    this.formGroup3.patchValue({re_classSessionPrice: this.selectedTutorFee.lessonPrice});
+    this.formGroup3.disable();
   }
 
-  cancelEditing2() {
-    this.isEditing2 = false;
-    this.registerForm.disable();
-    this.loadStudents(this.scheduleId);
-    this.updateChartData();
+  sendEmailTutorFeeToStudent() {
+    this.isLoading = true;
+
+    this.feeService.sendTutorFeeNotification(this.classId, this.selectedTutorFee.month, this.selectedTutorFee.year, this.selectedTutorFee.lessonPrice).subscribe({
+      next: () => {
+        this.isLoading = false;
+        this.showToast('success', "Gửi email thành công")
+      },
+      error: () => {
+        this.isLoading = false;
+        this.showToast('error', "Không thể gửi email")
+      },
+    });
   }
 
-  handleFileInputChange(files: FileList | null): void {
-    this.file_store = files;
-    if (files && files[0]) {
-      const file = files[0];
-      const count = files.length > 1 ? `(+${files.length - 1} files)` : '';
-      this.registerForm.patchValue({
-        imageURL: `${file.name}${count}`,
-      });
-    } else {
-      this.registerForm.patchValue({
-        imageURL: '',
-      });
-    }
-  }
+  downloadTutorFeeTable() {
+    this.feeService.downloadTutorFeeResults(this.classId, this.selectedTutorFee.month, this.selectedTutorFee.year, this.selectedTutorFee.lessonPrice).subscribe({
+      next: (response: Blob) => {
+        const fileURL = window.URL.createObjectURL(response);
+        const anchor = document.createElement('a');
+        anchor.href = fileURL;
+        anchor.download = `hoc_phi_${this.selectedTutorFee.month}_${this.selectedTutorFee.year}_lop_${this.classId}.xlsx`;
+        anchor.click();
 
-  onFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
+        window.URL.revokeObjectURL(fileURL);
 
-    if (input.files && input.files[0]) {
-      const file: File = input.files[0];
-      const reader = new FileReader();
-
-      reader.onload = () => {
-        this.selectedImage = reader.result as string;
-      };
-
-      reader.readAsDataURL(file);
-      this.file_store = input.files;
-    }
+        this.showToast('success', 'Tải file thành công')
+      },
+      error: () => {
+        this.showToast('error', 'Không thể tải file')
+      },
+    });
   }
 
   showToast(icon: 'success' | 'error' | 'info' | 'warning', title: string) {

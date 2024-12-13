@@ -7,7 +7,7 @@
                 <div class="header">
                     <div class="icon-grid-1" style="padding-top: 20px">
                         <app-icon iconName="search" style="padding: 10px; color: var(--theme-background);"></app-icon>
-                        <mat-form-field appearance="outline" style="width: 55vh;">
+                        <mat-form-field appearance="outline" style="width: 55vh; padding-bottom: 20px;">
                             <mat-label>Tìm kiếm môn học</mat-label>
                             <input matInput (input)="applyFilter($event)">
                         </mat-form-field>
@@ -21,7 +21,7 @@
                             giảng dạy</h2>
                         <hr>
                         <mat-form-field appearance="outline" class="input-field"
-                            style="width: 92%; padding-top: 15px; display: flex; justify-self: center;">
+                            style="width: 92%; padding-top: 15px; display: flex; justify-self: center; padding-bottom: 20px;">
                             <mat-label>Tên môn học</mat-label>
                             <input matInput [(ngModel)]="subjectName" name="subjectName" #subjectNameCtrl="ngModel"
                                 placeholder="Nhập tên môn học" required>
@@ -31,7 +31,7 @@
                         <hr>
                         <mat-dialog-actions align="end" class="dialog-footer">
                             <button mat-button mat-dialog-close style="background-color: gainsboro;">Hủy</button>
-                            <button mat-raised-button color="primary" (click)="submitRequest(subjectNameCtrl)">Gửi yêu
+                            <button mat-raised-button style="background-color: var(--theme-background); color: white;" (click)="submitRequest(subjectNameCtrl)">Gửi yêu
                                 cầu</button>
                         </mat-dialog-actions>
                     </div>

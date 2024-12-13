@@ -2,7 +2,7 @@
     <div class="content">
         <div class="class_details">
             <div class="header">
-                <h3 class="centered-title">Quản lý điểm danh</h3>
+                <h3 class="centered-title">Quản lý điểm kiểm tra</h3>
             </div>
 
             <div class="table">
@@ -186,86 +186,96 @@
 
         <hr>
 
-        <div class="score-chart"
-            style="padding-top: 10px; padding-right: 10px; padding-left: 10px; justify-self: center; width: 95%;">
-            <apx-chart [series]="chartOptions.series" [chart]="chartOptions.chart" [colors]="chartOptions.colors"
-                [xaxis]="chartOptions.xaxis" [plotOptions]="chartOptions.plotOptions">
-            </apx-chart>
-        </div>
+        <div class="form-grid">
+            <div class="form-section">
+                <div class="score-chart" style="padding-top: 10px; padding-right: 10px; padding-left: 10px; justify-self: center; width: 95%;">
+                    <apx-chart 
+                        [series]="chartOptions.series" 
+                        [chart]="chartOptions.chart" 
+                        [colors]="chartOptions.colors"
+                        [xaxis]="chartOptions.xaxis" 
+                        [legend]="chartOptions.legend"
+                        [plotOptions]="chartOptions.plotOptions"
+                        [yaxis]="chartOptions.yaxis">
+                    </apx-chart>
+                </div>
 
-        <hr>
-
-        <div class="actions"
-            style="display: flex; justify-content: space-between; padding-left: 10px; padding-right: 10px; padding-top: 5px; padding-bottom: 5px;">
-            <div class="exam-name">
-                <mat-form-field appearance="outline">
-                    <mat-label>Tên bài kiểm tra</mat-label>
-                    <input matInput [(ngModel)]="examDetail.examName" disabled>
-                </mat-form-field>
-            </div>
-
-            <div class="score" style="align-self: center;">
-                <button mat-raised-button [disabled]="!activeBtn" *ngIf="!isEditing" (click)="enableEditing()"
-                    style="background-color: var(--theme-background); color: white;">
-                    Chỉnh sửa điểm
-                </button>
-                <div *ngIf="isEditing" class="editing-controls">
-                    <button mat-raised-button (click)="saveChanges()"
-                        style="background-color: rgb(0, 175, 0); color: white; margin-left: 10px;">
-                        Lưu
-                    </button>
-                    <button mat-raised-button (click)="cancelEditing()"
-                        style="background-color: rgb(179, 179, 179); color: white; margin-left: 10px;">
-                        Hủy
-                    </button>
+                <div class="exam-name" style="justify-self: center;">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Tên bài kiểm tra</mat-label>
+                        <input matInput [(ngModel)]="examDetail.examName" disabled>
+                    </mat-form-field>
                 </div>
             </div>
+
+            <div class="divider"></div>
+
+            <div class="form-section">
+                <div class="actions" style="justify-items: end; padding-left: 10px; padding-right: 10px; padding-top: 5px; padding-bottom: 5px;">
+                    <div class="score" style="align-self: center;">
+                        <button mat-raised-button [disabled]="!activeBtn" *ngIf="!isEditing" (click)="enableEditing()"
+                            style="background-color: var(--theme-background); color: white;">
+                            Chỉnh sửa điểm
+                        </button>
+                        <div *ngIf="isEditing" class="editing-controls">
+                            <button mat-raised-button (click)="saveChanges()"
+                                style="background-color: rgb(0, 175, 0); color: white; margin-left: 10px;">
+                                Lưu
+                            </button>
+                            <button mat-raised-button (click)="cancelEditing()"
+                                style="background-color: rgb(179, 179, 179); color: white; margin-left: 10px;">
+                                Hủy
+                            </button>
+                        </div>
+                    </div>
+                </div>
+        
+                <table mat-table [dataSource]="dataSource11" matSort #sort11="matSort" style="padding: 10px;" matSortActive="id"
+                    matSortDirection="asc" class="example-table">
+                    <ng-container matColumnDef="id">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header
+                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                            ID</th>
+                        <td mat-cell *matCellDef="let row" style="height: 55px;">{{ row.id }}
+                        </td>
+                    </ng-container>
+        
+                    <ng-container matColumnDef="email">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header
+                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                            Email</th>
+                        <td mat-cell *matCellDef="let row">{{ row.email }}</td>
+                    </ng-container>
+        
+                    <ng-container matColumnDef="name">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header
+                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                            Họ tên</th>
+                        <td mat-cell *matCellDef="let row">{{ row.name }}</td>
+                    </ng-container>
+        
+                    <ng-container matColumnDef="score">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header
+                            style="justify-items: center; background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%); padding-left: 25px;">
+                            Điểm
+                        </th>
+                        <td mat-cell *matCellDef="let row" style="text-align: center;">
+                            <input type="number" [(ngModel)]="row.score" [disabled]="!isEditing" (change)="updateChartData()"
+                                style="height: 4vh; width: 15%; font-size: 16px;">
+                        </td>
+                    </ng-container>
+        
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns11"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns11;"></tr>
+        
+                    <tr class="mat-row" *matNoDataRow>
+                        <td class="mat-cell" colspan="4">Không có dữ liệu</td>
+                    </tr>
+                </table>
+        
+                <mat-paginator #paginator11 [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page">
+                </mat-paginator>
+            </div>
         </div>
-
-        <table mat-table [dataSource]="dataSource11" matSort #sort11="matSort" style="padding: 10px;" matSortActive="id"
-            matSortDirection="asc" class="example-table">
-            <ng-container matColumnDef="id">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header
-                    style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
-                    ID</th>
-                <td mat-cell *matCellDef="let row" style="height: 55px;">{{ row.id }}
-                </td>
-            </ng-container>
-
-            <ng-container matColumnDef="email">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header
-                    style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
-                    Email</th>
-                <td mat-cell *matCellDef="let row">{{ row.email }}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="name">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header
-                    style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
-                    Họ tên</th>
-                <td mat-cell *matCellDef="let row">{{ row.name }}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="score">
-                <th mat-header-cell *matHeaderCellDef
-                    style="text-align: center; background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
-                    Điểm
-                </th>
-                <td mat-cell *matCellDef="let row" style="text-align: center;">
-                    <input type="number" [(ngModel)]="row.score" [disabled]="!isEditing" (change)="updateChartData()"
-                        style="height: 4vh; width: 15%; font-size: 16px;">
-                </td>
-            </ng-container>
-
-            <tr mat-header-row *matHeaderRowDef="displayedColumns11"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns11;"></tr>
-
-            <tr class="mat-row" *matNoDataRow>
-                <td class="mat-cell" colspan="4">Không có dữ liệu</td>
-            </tr>
-        </table>
-
-        <mat-paginator #paginator11 [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page">
-        </mat-paginator>
     </div>
 </ng-template>
