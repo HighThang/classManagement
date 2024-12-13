@@ -3,10 +3,12 @@ package ptit.d20.do_an.class_management.service;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import ptit.d20.do_an.class_management.exception.BusinessException;
 import ptit.d20.do_an.class_management.exception.ResourceNotFoundException;
 import ptit.d20.do_an.class_management.repository.ClassAttendanceRepository;
@@ -21,6 +23,9 @@ import ptit.d20.do_an.class_management.repository.ClassroomRepository;
 
 import javax.persistence.criteria.Predicate;
 import javax.transaction.Transactional;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -38,18 +43,20 @@ public class ClassScheduleService {
     private final TutorFeeService tutorFeeService;
     private final UserService userService;
     private final ClassAttendanceRepository classAttendanceRepository;
+    private final String tempFolder;
 
     @Autowired
     public ClassScheduleService(
             ClassScheduleRepository classScheduleRepository,
             ClassroomRepository classroomRepository,
             TutorFeeService tutorFeeService,
-            UserService userService, ClassAttendanceRepository classAttendanceRepository) {
+            UserService userService, ClassAttendanceRepository classAttendanceRepository, @Value("${app.temp}") String tempFolder) {
         this.classScheduleRepository = classScheduleRepository;
         this.classroomRepository = classroomRepository;
         this.tutorFeeService = tutorFeeService;
         this.userService = userService;
         this.classAttendanceRepository = classAttendanceRepository;
+        this.tempFolder = tempFolder;
     }
 
     public List<ClassSchedule> getAllClassSchedule(Long classId) {
@@ -159,5 +166,64 @@ public class ClassScheduleService {
 
     public List<ClassSchedule> getSchedulesByTeacherEmail(String email) {
         return classScheduleRepository.findByCreatedBy(email);
+    }
+
+    public Boolean uploadImageToAttend(MultipartFile file, Long scheduleId) {
+        Optional<ClassSchedule> classSchedule = classScheduleRepository.findById(scheduleId);
+
+        if (classSchedule.isEmpty()) throw new BusinessException("Error");
+
+        // Tạo thư mục tạm thời nếu chưa tồn tại
+        File tempFolder = new File(this.tempFolder + "/classAttendance");
+        if (!tempFolder.exists()) {
+            tempFolder.mkdirs();
+        }
+
+        // Tạo file tạm thời
+        File tempFile = new File(tempFolder, file.getOriginalFilename());
+        try {
+            // Lưu file vào thư mục tạm
+            file.transferTo(tempFile);
+        } catch (Exception e) {
+            log.error("Cannot process file", e);
+            throw new BusinessException("Cannot process file");
+        }
+
+        // Kiểm tra định dạng file
+        String fileExtension = ClassroomService.getExtension(tempFile);
+        if (!"jpg".equalsIgnoreCase(fileExtension) && !"png".equalsIgnoreCase(fileExtension)) {
+            throw new BusinessException("Invalid file format. Only JPG and PNG are allowed.");
+        }
+
+        // Tạo thư mục lưu trữ ảnh nếu chưa tồn tại
+        String finalPath = "image/classAtendance/" + classSchedule.get().getId() + "/";
+        File finalFolder = new File(finalPath);
+        if (!finalFolder.exists()) {
+            finalFolder.mkdirs();
+        }
+
+        // Định nghĩa đường dẫn cuối cùng cho file
+        File finalFile = new File(finalPath, file.getOriginalFilename());
+        try {
+            // Di chuyển file từ thư mục tạm đến thư mục đích
+            Files.move(tempFile.toPath(), finalFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        } catch (Exception e) {
+            log.error("Cannot move file to /document folder", e);
+            throw new BusinessException("Cannot move file to /document folder");
+        }
+
+        // Cập nhật đường dẫn ảnh trong thông tin sinh viên
+        String imageUrl = finalPath + file.getOriginalFilename(); // Lưu đường dẫn relative vào DB
+
+        classSchedule.get().setImageClassAttendance(imageUrl);
+
+        classScheduleRepository.save(classSchedule.get());
+
+        return true;
+    }
+
+    public ClassSchedule getClassScheduleById(Long scheduleId) {
+        Optional<ClassSchedule> classSchedule = classScheduleRepository.findById(scheduleId);
+        return classSchedule.get();
     }
 }

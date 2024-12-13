@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ptit.d20.do_an.class_management.dto.TutorFeeDetailDto;
 import ptit.d20.do_an.class_management.service.TutorFeeService;
 
 import javax.servlet.ServletOutputStream;
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -24,19 +26,19 @@ public class TutorFeeController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<?> search(@RequestParam Map<String, String> params, Pageable pageable) throws Exception {
-        return ResponseEntity.ok(tutorFeeService.search(params, pageable));
+    public ResponseEntity<?> search(@RequestParam Long classroomId) {
+        return ResponseEntity.ok(tutorFeeService.searchByClassroomId(classroomId));
     }
 
     @GetMapping
-    public ResponseEntity<?> getTutorFeeDetail(
-            @RequestParam Long tutorFeeId) {
-        return ResponseEntity.ok(tutorFeeService.getTutorFeeDetail(tutorFeeId));
+    public ResponseEntity<?> getTutorFeeDetailsByTutorFeeId(@RequestParam Long tutorFeeId) {
+        List<TutorFeeDetailDto> tutorFeeDetails = tutorFeeService.getTutorFeeDetailsByTutorFeeId(tutorFeeId);
+        return ResponseEntity.ok(tutorFeeDetails);
     }
 
     @GetMapping("/student-not-submitted-tutor-fee")
-    public ResponseEntity<?> getStudentNotSubmittedTutorFee(@RequestParam Map<String, String> params, Pageable pageable) {
-        return ResponseEntity.ok(tutorFeeService.getStudentNotSubmittedTutorFee(params, pageable));
+    public ResponseEntity<?> getStudentNotSubmittedTutorFee(@RequestParam Map<String, String> params) {
+        return ResponseEntity.ok(tutorFeeService.getStudentNotSubmittedTutorFee(params));
     }
 
     @GetMapping("/calculate")
@@ -98,13 +100,12 @@ public class TutorFeeController {
     }
 
     @PutMapping("/pay")
-    public ResponseEntity<?> sendTutorFeeNotification( @RequestParam Long tutorFeeDetailId) {
+    public ResponseEntity<?> pay( @RequestParam Long tutorFeeDetailId) {
         return ResponseEntity.ok(tutorFeeService.pay(tutorFeeDetailId));
     }
 
     @GetMapping("/fee-for-student")
-    public ResponseEntity<?> getTutorFeeForStudent(
-            @RequestParam Long classId) {
+    public ResponseEntity<?> getTutorFeeForStudent(@RequestParam Long classId) {
         return ResponseEntity.ok(tutorFeeService.getTutorFeeForStudent(classId));
     }
 }

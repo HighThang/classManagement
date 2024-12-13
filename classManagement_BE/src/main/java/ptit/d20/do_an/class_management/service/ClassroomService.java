@@ -393,7 +393,7 @@ public class ClassroomService {
         classroomDto.setSubjectName(classroom.getSubjectName());
         classroomDto.setCreatedDate(classroom.getCreatedDate());
         User teacher = classroom.getTeacher();
-        classroomDto.setTeacherName(teacher.getFirstName() + " " + teacher.getSurname() + " " + teacher.getLastName());
+        classroomDto.setTeacherName(teacher.getLastName() + " " + teacher.getSurname() + " " + teacher.getFirstName());
 
         return classroomDto;
     }

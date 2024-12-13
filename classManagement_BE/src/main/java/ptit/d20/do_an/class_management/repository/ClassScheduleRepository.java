@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import ptit.d20.do_an.class_management.domain.ClassRegistration;
 import ptit.d20.do_an.class_management.domain.ClassSchedule;
 
 import javax.transaction.Transactional;
@@ -28,4 +29,5 @@ public interface ClassScheduleRepository extends JpaRepository<ClassSchedule, Lo
 
     @Query("SELECT cs FROM ClassSchedule cs WHERE cs.classroom.id IN :classroomIds")
     List<ClassSchedule> findAllByClassroomIds(@Param("classroomIds") List<Long> classroomIds);
+
 }

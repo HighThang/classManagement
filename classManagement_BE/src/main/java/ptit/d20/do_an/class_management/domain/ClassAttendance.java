@@ -23,5 +23,4 @@ public class ClassAttendance extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "class_registration_id")
     private ClassRegistration classRegistration;
-
 }

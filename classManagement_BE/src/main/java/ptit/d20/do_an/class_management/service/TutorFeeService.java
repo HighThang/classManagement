@@ -60,18 +60,55 @@ public class TutorFeeService {
         this.tempFolder = tempFolder;
     }
 
+//    public Page<TutorFeeDto> search(Map<String, String> params, Pageable pageable) {
+//        Specification<TutorFee> specs = getSpecification(params);
+//        List<TutorFee> tutorFees = tutorFeeRepository.findAll(specs, pageable).getContent();
+//        List<TutorFeeDto> tutorFeeDtos = new ArrayList<>();
+//        for (TutorFee tutorFee : tutorFees) {
+//
+//            List<TutorFeeDetail> tutorFeeDetails = tutorFee.getTutorFeeDetails();
+//            int numberOfAttendance = tutorFeeDetails.stream().map(TutorFeeDetail::getNumberOfAttendedLesson).mapToInt(i -> i).sum();
+//            Long feeEstimate = tutorFeeDetails.stream().map(TutorFeeDetail::getFeeAmount).mapToLong(i -> i).sum();;// (long) tutorFee.getLessonPrice() * tutorFee.getTotalLesson();
+//            Long feeCollected = tutorFee.getTutorFeeDetails().stream().map(TutorFeeDetail::getFeeSubmitted).mapToLong(i -> i).sum();
+//            Long feeNotCollected = feeEstimate - feeCollected;
+//            TutorFeeDto tutorFeeDto = TutorFeeDto.builder()
+//                    .createdDate(tutorFee.getCreatedDate())
+//                    .id(tutorFee.getId())
+//                    .year(tutorFee.getYear())
+//                    .month(tutorFee.getMonth())
+//                    .lessonPrice(tutorFee.getLessonPrice())
+//                    .totalLesson(tutorFee.getTotalLesson())
+//                    .feeEstimate(feeEstimate)
+//                    .feeCollected(feeCollected)
+//                    .feeNotCollected(feeNotCollected)
+//                    .build();
+//
+//            tutorFeeDtos.add(tutorFeeDto);
+//        }
+//
+//        return new PageImpl<>(tutorFeeDtos);
+//    }
 
-    public Page<TutorFeeDto> search(Map<String, String> params, Pageable pageable) {
-        Specification<TutorFee> specs = getSpecification(params);
-        List<TutorFee> tutorFees = tutorFeeRepository.findAll(specs, pageable).getContent();
+    public List<TutorFeeDto> searchByClassroomId(Long classroomId) {
+        // Tìm tất cả `TutorFee` theo `classroomId`
+        List<TutorFee> tutorFees = tutorFeeRepository.findAllByClassroomId(classroomId);
         List<TutorFeeDto> tutorFeeDtos = new ArrayList<>();
-        for (TutorFee tutorFee : tutorFees) {
 
+        for (TutorFee tutorFee : tutorFees) {
+            // Tính toán các giá trị cần thiết
             List<TutorFeeDetail> tutorFeeDetails = tutorFee.getTutorFeeDetails();
-            int numberOfAttendance = tutorFeeDetails.stream().map(TutorFeeDetail::getNumberOfAttendedLesson).mapToInt(i -> i).sum();
-            Long feeEstimate = tutorFeeDetails.stream().map(TutorFeeDetail::getFeeAmount).mapToLong(i -> i).sum();;// (long) tutorFee.getLessonPrice() * tutorFee.getTotalLesson();
-            Long feeCollected = tutorFee.getTutorFeeDetails().stream().map(TutorFeeDetail::getFeeSubmitted).mapToLong(i -> i).sum();
+            int numberOfAttendance = tutorFeeDetails.stream()
+                    .map(TutorFeeDetail::getNumberOfAttendedLesson)
+                    .mapToInt(i -> i).sum();
+            Long feeEstimate = tutorFeeDetails.stream()
+                    .map(TutorFeeDetail::getFeeAmount)
+                    .mapToLong(i -> i).sum();
+            Long feeCollected = tutorFeeDetails.stream()
+                    .map(TutorFeeDetail::getFeeSubmitted)
+                    .mapToLong(i -> i).sum();
             Long feeNotCollected = feeEstimate - feeCollected;
+
+            // Tạo `TutorFeeDto`
             TutorFeeDto tutorFeeDto = TutorFeeDto.builder()
                     .createdDate(tutorFee.getCreatedDate())
                     .id(tutorFee.getId())
@@ -87,10 +124,32 @@ public class TutorFeeService {
             tutorFeeDtos.add(tutorFeeDto);
         }
 
-        return new PageImpl<>(tutorFeeDtos);
+        return tutorFeeDtos;
     }
 
-    public Page<TutorFeeDetailNotSubmittedDto> getStudentNotSubmittedTutorFee(Map<String, String> params, Pageable pageable) {
+//    public Page<TutorFeeDetailNotSubmittedDto> getStudentNotSubmittedTutorFee(Map<String, String> params, Pageable pageable) {
+//        User user = userService.getCurrentUserLogin();
+//        List<Classroom> classrooms = user.getClassrooms();
+//
+//        List<Long> classroomIds = classrooms.stream()
+//                .map(Classroom::getId)
+//                .collect(Collectors.toList());
+//
+//        Specification<TutorFeeDetail> spec = hasSearchCriteria(params)
+//                .and((root, query, cb) -> root.get("tutorFee").get("classroom").get("id").in(classroomIds))
+//                .and((root, query, cb) -> cb.lessThan(root.get("feeSubmitted"), root.get("feeAmount")));
+//
+//        Page<TutorFeeDetail> all = tutorFeeDetailRepository.findAll(spec, pageable);
+//        List<TutorFeeDetail> unpaidTutorFeeDetails = all.getContent();
+//
+//        List<TutorFeeDetailNotSubmittedDto> students = unpaidTutorFeeDetails.stream()
+//                .map(this::convertToFeeNotSubmittedDto)
+//                .collect(Collectors.toList());
+//
+//        return new PageImpl<>(students, pageable, all.getTotalElements());
+//    }
+
+    public Map<String, Object> getStudentNotSubmittedTutorFee(Map<String, String> params) {
         User user = userService.getCurrentUserLogin();
         List<Classroom> classrooms = user.getClassrooms();
 
@@ -102,14 +161,16 @@ public class TutorFeeService {
                 .and((root, query, cb) -> root.get("tutorFee").get("classroom").get("id").in(classroomIds))
                 .and((root, query, cb) -> cb.lessThan(root.get("feeSubmitted"), root.get("feeAmount")));
 
-        Page<TutorFeeDetail> all = tutorFeeDetailRepository.findAll(spec, pageable);
-        List<TutorFeeDetail> unpaidTutorFeeDetails = all.getContent();
-
+        List<TutorFeeDetail> unpaidTutorFeeDetails = tutorFeeDetailRepository.findAll(spec);
         List<TutorFeeDetailNotSubmittedDto> students = unpaidTutorFeeDetails.stream()
                 .map(this::convertToFeeNotSubmittedDto)
                 .collect(Collectors.toList());
 
-        return new PageImpl<>(students, pageable, all.getTotalElements());
+        Map<String, Object> response = new HashMap<>();
+        response.put("total", students.size());
+        response.put("data", students);
+
+        return response;
     }
 
     private TutorFeeDetailNotSubmittedDto convertToFeeNotSubmittedDto(TutorFeeDetail tutorFeeDetail) {
@@ -265,6 +326,10 @@ public class TutorFeeService {
 
         List<TutorFeeDetail> tutorFeeDetails = new ArrayList<>();
         for (ClassRegistration student : classRegistrations1) {
+            if (student.getActive() == false) {
+                continue; // Bỏ qua bản ghi này
+            }
+
             TutorFeeDetail tutorFeeDetail = new TutorFeeDetail();
             tutorFeeDetail.setClassRegistration(student);
             tutorFeeDetail.setTutorFee(tutorFee);
@@ -310,14 +375,14 @@ public class TutorFeeService {
         return tutorFee;
     }
 
-    private List<TutorFeeDetailDto>  buildTutorFeeDto(List<TutorFeeDetail> tutorFeeDetails, TutorFee tutorFee) {
+    private List<TutorFeeDetailDto> buildTutorFeeDto(List<TutorFeeDetail> tutorFeeDetails, TutorFee tutorFee) {
         List<TutorFeeDetailDto> tutorFeeDetailDtos = new ArrayList<>();
         for (TutorFeeDetail tutorFeeDetail : tutorFeeDetails) {
             TutorFeeDetailDto tutorFeeDetailDto = new TutorFeeDetailDto();
             ClassRegistration student = tutorFeeDetail.getClassRegistration();
-            String studentName = student.getFirstName() + " " + student.getSurname() + " " + student.getLastName();
+
+            String studentName = student.getLastName() + " " + student.getSurname() + " " + student.getFirstName();
             tutorFeeDetailDto.setStudentName(studentName);
-            tutorFeeDetailDto.setLastName(student.getLastName());
             tutorFeeDetailDto.setEmail(student.getEmail());
             tutorFeeDetailDto.setPhone(student.getPhone());
             tutorFeeDetailDto.setTotalNumberOfClasses(tutorFee.getTotalLesson());
@@ -328,11 +393,14 @@ public class TutorFeeService {
             tutorFeeDetailDto.setFeeNotSubmitted(feeAmount - tutorFeeDetail.getFeeSubmitted());
             tutorFeeDetailDto.setId(tutorFeeDetail.getId());
             tutorFeeDetailDto.setTime(tutorFee.getYear().toString() + "-" + tutorFee.getMonth());
+            tutorFeeDetailDto.setYear(tutorFee.getYear());
+            tutorFeeDetailDto.setMonth(tutorFee.getMonth());
+            tutorFeeDetailDto.setLessionPrice(tutorFee.getLessonPrice());
 
             tutorFeeDetailDtos.add(tutorFeeDetailDto);
         }
 
-        tutorFeeDetailDtos.sort(Comparator.comparing(TutorFeeDetailDto::getLastName));
+        tutorFeeDetailDtos.sort(Comparator.comparing(TutorFeeDetailDto::getId));
         return tutorFeeDetailDtos;
     }
 
@@ -436,7 +504,7 @@ public class TutorFeeService {
         List<ClassRegistration> studentCalculated = existFeeDetails.stream().map(TutorFeeDetail::getClassRegistration).collect(Collectors.toList());
         List<ClassRegistration> newStudent = new ArrayList<>();
         for (ClassRegistration classRegistration : classRegistrations) {
-            if (!studentCalculated.contains(classRegistration)) {
+            if (!studentCalculated.contains(classRegistration) && classRegistration.getActive() == true) {
                 newStudent.add(classRegistration);
             }
         }
@@ -473,11 +541,12 @@ public class TutorFeeService {
         return tutorFeeDetails;
     }
 
-    public Page<TutorFeeDetailDto> getTutorFeeDetail(Long tutorFeeId) {
+    public List<TutorFeeDetailDto> getTutorFeeDetailsByTutorFeeId(Long tutorFeeId) {
         TutorFee existTutorFee = tutorFeeRepository.findById(tutorFeeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Not found tutorFee with id " + tutorFeeId));
-        List<TutorFeeDetailDto> tutorFeeDetailDtos = buildTutorFeeDto(existTutorFee.getTutorFeeDetails(), existTutorFee);
-        return new PageImpl<>(tutorFeeDetailDtos);
+
+        // Convert list of TutorFeeDetail to TutorFeeDetailDto
+        return buildTutorFeeDto(existTutorFee.getTutorFeeDetails(), existTutorFee);
     }
 
     public Object pay(Long tutorFeeDetailId) {
@@ -492,30 +561,47 @@ public class TutorFeeService {
         return new ApiResponse(true, "Success");
     }
 
-    public Object getTutorFeeForStudent(Long classId) {
+//    public Object getTutorFeeForStudent(Long classId) {
+//        User user = userService.getCurrentUserLogin();
+//        if (user.getRole().getName() != RoleName.STUDENT) {
+//            throw new BusinessException("Not have permission");
+//        }
+//        Classroom classroom = classroomService.getById(classId);
+//        ClassRegistration classRegistration = classroom.getClassRegistrations().stream()
+//                .filter(classRegistration1 -> classRegistration1.getStudent() != null && classRegistration1.getActive() != false && classRegistration1.getStudent().equals(user))
+//                .findFirst()
+//                .orElseThrow(() -> new ResourceNotFoundException("Not found info"));
+//        List<TutorFeeDetail> tutorFeeDetails = classRegistration.getTutorFeeDetails();
+//        List<TutorFeeDetailDto> tutorFeeDetailDtos = buildTutorFeeDtoForStudent(tutorFeeDetails);
+//        return new PageImpl<>(tutorFeeDetailDtos);
+//    }
+
+    public List<TutorFeeDetailDto> getTutorFeeForStudent(Long classId) {
         User user = userService.getCurrentUserLogin();
         if (user.getRole().getName() != RoleName.STUDENT) {
             throw new BusinessException("Not have permission");
         }
+
         Classroom classroom = classroomService.getById(classId);
         ClassRegistration classRegistration = classroom.getClassRegistrations().stream()
-                .filter(classRegistration1 -> classRegistration1.getStudent() != null && classRegistration1.getStudent().equals(user))
+                .filter(classRegistration1 -> classRegistration1.getStudent() != null
+                        && classRegistration1.getActive() != false
+                        && classRegistration1.getStudent().equals(user))
                 .findFirst()
                 .orElseThrow(() -> new ResourceNotFoundException("Not found info"));
+
         List<TutorFeeDetail> tutorFeeDetails = classRegistration.getTutorFeeDetails();
-        List<TutorFeeDetailDto> tutorFeeDetailDtos = buildTutorFeeDto(tutorFeeDetails);
-        return new PageImpl<>(tutorFeeDetailDtos);
+        return buildTutorFeeDtoForStudent(tutorFeeDetails);
     }
 
-    private List<TutorFeeDetailDto>  buildTutorFeeDto(List<TutorFeeDetail> tutorFeeDetails) {
+    private List<TutorFeeDetailDto> buildTutorFeeDtoForStudent(List<TutorFeeDetail> tutorFeeDetails) {
         List<TutorFeeDetailDto> tutorFeeDetailDtos = new ArrayList<>();
         for (TutorFeeDetail tutorFeeDetail : tutorFeeDetails) {
             TutorFee tutorFee = tutorFeeDetail.getTutorFee();
             TutorFeeDetailDto tutorFeeDetailDto = new TutorFeeDetailDto();
             ClassRegistration student = tutorFeeDetail.getClassRegistration();
-            String studentName = student.getFirstName() + " " + student.getSurname() + " " + student.getLastName();
+            String studentName = student.getLastName() + " " + student.getSurname() + " " + student.getFirstName();
             tutorFeeDetailDto.setStudentName(studentName);
-            tutorFeeDetailDto.setLastName(student.getLastName());
             tutorFeeDetailDto.setEmail(student.getEmail());
             tutorFeeDetailDto.setPhone(student.getPhone());
             tutorFeeDetailDto.setTotalNumberOfClasses(tutorFee.getTotalLesson());
@@ -532,7 +618,7 @@ public class TutorFeeService {
             tutorFeeDetailDtos.add(tutorFeeDetailDto);
         }
 
-        tutorFeeDetailDtos.sort(Comparator.comparing(TutorFeeDetailDto::getLastName));
+        tutorFeeDetailDtos.sort(Comparator.comparing(TutorFeeDetailDto::getId));
         return tutorFeeDetailDtos;
     }
 }

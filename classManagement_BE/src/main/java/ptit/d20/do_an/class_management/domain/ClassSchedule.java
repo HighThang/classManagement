@@ -34,4 +34,7 @@ public class ClassSchedule extends BaseEntity {
     @JsonIgnore
     @OneToMany(mappedBy = "classSchedule", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<ClassAttendance> classAttendances;
+
+    @Column(name = "image_class_attendance")
+    private String imageClassAttendance;
 }
