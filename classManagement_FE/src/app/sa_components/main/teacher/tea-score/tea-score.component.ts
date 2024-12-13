@@ -199,6 +199,7 @@ export class TeaScoreComponent implements OnInit, AfterViewInit {
     if (this.classId) {
       this.checkPermissionAndLoadData(teacherId, this.classId);
     }
+    else this.activeBtn = false;
 
     this.formGroup.get('classroomId')?.valueChanges.subscribe((selectedClassId) => {
       if (selectedClassId) {
@@ -226,6 +227,7 @@ export class TeaScoreComponent implements OnInit, AfterViewInit {
         if (hasPermission) {
           sessionStorage.setItem('currentClassId', classId.toString());
           this.showDetails = true;
+          this.activeBtn = true;
           this.loadClassDetails(classId);
           this.loadClassExam(classId);
         } else {

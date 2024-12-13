@@ -204,6 +204,7 @@ export class TeaAttendanceComponent implements OnInit, AfterViewInit {
     if (this.classId) {
       this.checkPermissionAndLoadData(teacherId, this.classId);
     }
+    else this.activeBtn = false;
 
     this.formGroup
       .get('classroomId')
@@ -233,6 +234,7 @@ export class TeaAttendanceComponent implements OnInit, AfterViewInit {
         if (hasPermission) {
           sessionStorage.setItem('currentClassId', classId.toString());
           this.showDetails = true;
+          this.activeBtn = true;
           this.loadClassDetails(classId);
           this.loadSchedules(classId);
         } else {
@@ -379,10 +381,9 @@ export class TeaAttendanceComponent implements OnInit, AfterViewInit {
 
     this.scheduleDetails = selectedSchedule[0];
 
-    console.log(this.scheduleDetails)
-
     dialog1.afterClosed().subscribe(() => {
       this.isEditing = false;
+      this.isEditing2 = false;
       this.resetFilter();
       this.registerForm.reset();
       this.selectedImage = null;
@@ -404,6 +405,7 @@ export class TeaAttendanceComponent implements OnInit, AfterViewInit {
         }
 
         else {
+          this.activeBtn = true;
           this.dataSource11.data = activeData;
           this.totalCount = response.content.length;
           this.updateChartData();

@@ -253,3 +253,8 @@ app-icon {
         }
     }
 }
+
+::ng-deep .mat-mdc-raised-button[disabled], .mat-mdc-raised-button.mat-mdc-button-disabled {
+    color: rgb(0, 0, 0, 0.38) !important;
+    background-color: rgb(0, 0, 0, 0.12) !important;
+}

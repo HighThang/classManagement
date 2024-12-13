@@ -20,6 +20,13 @@ export interface ScheduleData {
   imageClassAttendance: string;
 }
 
+export interface DocumentData {
+  id: number,
+  createdDate: string,
+  documentName: string,
+  documentLink: string
+}
+
 @Injectable({
   providedIn: 'root',
 })

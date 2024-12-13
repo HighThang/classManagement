@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { ClassDetails, ClassDetailsService, ScheduleData } from '../../../../core/services/class-detail/class-detail.service';
+import { ClassDetails, ClassDetailsService, DocumentData, ScheduleData } from '../../../../core/services/class-detail/class-detail.service';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
@@ -23,9 +23,7 @@ import { MatNativeDateModule, MatOptionModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
-import { UserResponse } from '../../../../core/interfaces/response.interface';
 import saveAs from 'file-saver';
-import { MatCardModule } from '@angular/material/card';
 
 @Component({
   selector: 'app-tea-class-details',
@@ -37,14 +35,10 @@ import { MatCardModule } from '@angular/material/card';
     MatButtonModule,
     CommonModule,
     MatProgressSpinnerModule,
-    MatSnackBarModule,
     MatDialogModule,
     MatSnackBarModule,
     MatTableModule,
-    MatButtonModule,
     MatInputModule,
-    MatIconModule,
-    MatTabsModule,
     MatToolbarModule,
     RouterModule,
     FormsModule,
@@ -57,7 +51,6 @@ import { MatCardModule } from '@angular/material/card';
     MatNativeDateModule,
     MatFormFieldModule,
     MatSelectModule,
-    MatCardModule
   ],
   templateUrl: './tea-class-details.component.html',
   styleUrls: ['./tea-class-details.component.scss'],
@@ -78,7 +71,8 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
   displayedColumns2: string[] = ['id', 'day', 'periodInDay', 'dayInWeek', 'createdDate', 'deleted'];
   dataSource2 = new MatTableDataSource<ScheduleData>();
 
-  displayedColumns3: string[] = ['documentName', 'documentLink', 'actions'];
+  displayedColumns3: string[] = ['id', 'documentName', 'createdDate', 'download', 'delete'];
+  dataSource3 = new MatTableDataSource<DocumentData>();
 
   @ViewChild('paginator1') paginator1!: MatPaginator;
   @ViewChild('sort1') sort1!: MatSort;
@@ -86,12 +80,15 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
   @ViewChild('sort11') sort11!: MatSort;
   @ViewChild('paginator2') paginator2!: MatPaginator;
   @ViewChild('sort2') sort2!: MatSort;
+  @ViewChild('paginator3') paginator3!: MatPaginator;
+  @ViewChild('sort3') sort3!: MatSort;
   @ViewChild('dialogTemplate1') dialogTemplate1: any;
   @ViewChild('dialogTemplate2') dialogTemplate2: any;
+  @ViewChild('dialogTemplate3') dialogTemplate3: any;
 
   @ViewChild('input11') searchInput!: ElementRef<HTMLInputElement>;
-  
-  documents: any[] = [];
+  @ViewChild('inputDoc') inputDoc!: ElementRef<HTMLInputElement>;
+
   selectedFile: File | null = null;
 
   constructor(
@@ -152,6 +149,8 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
     this.dataSource1.sort = this.sort1;
     this.dataSource2.paginator = this.paginator2;
     this.dataSource2.sort = this.sort2;
+    this.dataSource3.paginator = this.paginator3;
+    this.dataSource3.sort = this.sort3;
   }
 
   // classDetails
@@ -243,7 +242,7 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
         this.dataSource1.data = activeData; 
         this.dataSource11.data = inactiveData;
       },
-      error: (err) => {
+      error: () => {
         this.showToast('error', 'Lỗi khi tải danh sách học sinh');
       },
     });
@@ -463,25 +462,49 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
   // Documents
   loadDocuments(): void {
     this.classDetailsService.getDocuments(this.classId).subscribe({
-      next: (data: any) => {
-        this.documents = data.content;
+      next: (response: any) => {
+        const mappedData = response.content.map((item: DocumentData) => ({
+          id: item.id,
+          documentName: item.documentName,
+          documentLink: item.documentLink,
+          createdDate: item.createdDate, 
+        }));
+        this.dataSource3.data = mappedData;
       },
-      error: (err) => {
-        console.error('Error fetching documents:', err);
+      error: () => {
+        this.showToast('error', 'Lỗi khi tải danh sách tài liệu');
       },
     });
   }
 
-  // openUploadDocumentDialog() {
-  //   // Open dialog to upload document
-  // }
+  applyFilter3(event: Event): void {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource3.filter = filterValue.trim().toLowerCase();
+  }
 
-  onFileSelected(event: any): void {
-    const file = event.target.files[0];
-    if (file && file.type === 'application/pdf') {
-      this.selectedFile = file;
+  openUploadDocumentDialog() {
+    const dialogRef = this.dialog.open(this.dialogTemplate3, {
+      width: '40%',  maxHeight: '55vh'
+    });
+
+    dialogRef.afterClosed().subscribe(() => {
+      this.resetUploadDoc();
+    });
+  }
+
+  resetUploadDoc(): void {
+    if (this.inputDoc) {
+      this.inputDoc.nativeElement.value = '';
+      this.selectedFile = null;
+    }
+  }
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.selectedFile = input.files[0];
     } else {
-      alert('Vui lòng chọn tệp PDF.');
+      this.selectedFile = null; 
     }
   }
 
@@ -489,32 +512,41 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
     if (this.selectedFile) {
       this.classDetailsService.uploadDocumentPdf(this.classId, this.selectedFile).subscribe({
         next: () => {
-          alert('Tải lên thành công!');
+          this.showToast('success', 'Tải lên tài liệu thành công');
           this.loadDocuments();
           this.selectedFile = null;
+          this.dialog.closeAll();
         },
-        error: (err) => {
-          console.error('Error uploading document:', err);
+        error: () => {
+          this.showToast('error', 'Lỗi không thể tải tài liệu lên');
         },
       });
-    } else {
-      alert('Vui lòng chọn một file để tải lên.');
     }
   }
 
   deleteDocument(documentId: number): void {
-    if (confirm('Bạn có chắc chắn muốn xóa tài liệu này không?')) {
-      this.classDetailsService.deleteDocument(documentId).subscribe({
-        next: () => {
-          alert('Xóa thành công!');
-          this.loadDocuments();
-        },
-        error: (err) => {
-          console.error('Error deleting document:', err);
-          alert('Không thể xóa tài liệu. Vui lòng thử lại sau.');
-        },
-      });
-    }
+    Swal.fire({
+      title: 'Xác nhận',
+      text: 'Bạn có chắc chắn muốn xóa tài liệu này?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Xóa',
+      cancelButtonText: 'Hủy',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.classDetailsService.deleteDocument(documentId).subscribe({
+          next: () => {
+            this.showToast('success', 'Xóa tài liệu thành công')
+            this.loadDocuments();
+          },
+          error: () => {
+            this.showToast('error', 'Lỗi không thể xóa tài liệu')
+          },
+        });
+      }
+    });      
   }
   
   downloadDocument(documentId: number): void {
@@ -528,9 +560,11 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
         link.download = filename;
         link.click();
         window.URL.revokeObjectURL(url);
+
+        this.showToast('success', 'Tải về tài liệu thành công')
       },
       error: () => {
-        this.showToast('error', 'Lỗi không thể tải tài liệu')
+        this.showToast('error', 'Lỗi không thể tải tài liệu về')
       },
     });
   }

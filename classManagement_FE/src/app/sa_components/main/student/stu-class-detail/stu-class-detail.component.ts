@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { ClassDetails, ClassDetailsService, ScheduleData } from '../../../../core/services/class-detail/class-detail.service';
+import { ClassDetails, ClassDetailsService, DocumentData, ScheduleData } from '../../../../core/services/class-detail/class-detail.service';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
@@ -70,16 +70,20 @@ export class StuClassDetailComponent implements OnInit, AfterViewInit {
   displayedColumns2: string[] = ['id', 'day', 'periodInDay', 'dayInWeek', 'createdDate'];
   dataSource2 = new MatTableDataSource<ScheduleData>();
 
+  displayedColumns3: string[] = ['id', 'documentName', 'createdDate', 'download'];
+  dataSource3 = new MatTableDataSource<DocumentData>();
+
   @ViewChild('paginator1') paginator1!: MatPaginator;
   @ViewChild('sort1') sort1!: MatSort;
   @ViewChild('paginator2') paginator2!: MatPaginator;
   @ViewChild('sort2') sort2!: MatSort;
+  @ViewChild('paginator3') paginator3!: MatPaginator;
+  @ViewChild('sort3') sort3!: MatSort;
 
   constructor(
     private classDetailsService: ClassDetailsService,
     private route: ActivatedRoute,
     public dialog: MatDialog,
-    private http: HttpClient,
     private router: Router
   ) {}
 
@@ -107,7 +111,7 @@ export class StuClassDetailComponent implements OnInit, AfterViewInit {
           this.loadClassDetails();
           this.loadStudents();
           this.loadSchedules();
-          //
+          this.loadDocuments();
         } else {
           this.showToast('error', 'Bạn không có quyền truy cập lớp này');
           this.router.navigate(['student/class']);
@@ -125,6 +129,8 @@ export class StuClassDetailComponent implements OnInit, AfterViewInit {
     this.dataSource1.sort = this.sort1;
     this.dataSource2.paginator = this.paginator2;
     this.dataSource2.sort = this.sort2;
+    this.dataSource3.paginator = this.paginator3;
+    this.dataSource3.sort = this.sort3;
   }
 
   // classDetails
@@ -232,18 +238,54 @@ export class StuClassDetailComponent implements OnInit, AfterViewInit {
   }
 
   // Documents
-  private loadDocuments() {
-    this.classDetailsService.getDocuments(this.classId!).subscribe((data) => {
-      // this.documents = data.content || [];
+  loadDocuments(): void {
+    this.classDetailsService.getDocuments(this.classId).subscribe({
+      next: (response: any) => {
+        const mappedData = response.content.map((item: DocumentData) => ({
+          id: item.id,
+          documentName: item.documentName,
+          documentLink: item.documentLink,
+          createdDate: item.createdDate, 
+        }));
+        this.dataSource3.data = mappedData;
+      },
+      error: () => {
+        this.showToast('error', 'Lỗi khi tải danh sách tài liệu');
+      },
     });
   }
 
-  openUploadDocumentDialog() {
-    // Open dialog to upload document
+  applyFilter3(event: Event): void {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource3.filter = filterValue.trim().toLowerCase();
+  }
+  
+  downloadDocument(documentId: number): void {
+    this.classDetailsService.downloadDocument(documentId).subscribe({
+      next: (blob) => {
+        const filename = this.getFilenameFromBlob(blob);
+
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        link.click();
+        window.URL.revokeObjectURL(url);
+
+        this.showToast('success', 'Tải về tài liệu thành công')
+      },
+      error: () => {
+        this.showToast('error', 'Lỗi không thể tải tài liệu về')
+      },
+    });
   }
 
-  deleteDocument(doc: any) {
-    // Handle deleting document
+  private getFilenameFromBlob(blob: Blob): string {
+    if ((blob as any).name) {
+      return (blob as any).name;
+    }
+  
+    return 'downloaded_file.xlsx';
   }
 
   showToast(icon: 'success' | 'error' | 'info' | 'warning', title: string) {
