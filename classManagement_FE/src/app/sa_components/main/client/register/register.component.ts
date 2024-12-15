@@ -83,10 +83,6 @@ export class RegisterComponent implements OnInit {
     return control.get('password')?.value === control.get('confirmPassword')?.value ? null : { mismatch: true };
   }
 
-  togglePasswordVisibility() {
-    this.passwordFieldType = this.passwordFieldType === 'password' ? 'text' : 'password';
-  }
-
   onRegister() {
     if (this.registerForm.valid) {
       this.isLoading = true; // Bắt đầu loading

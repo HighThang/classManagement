@@ -26,19 +26,20 @@
                             </mat-icon>
                         </mat-form-field>
                     </div>
-
-                    <div class="actions-row">
-                        <mat-checkbox [checked]="true" [disabled]="true">Nhớ tài khoản</mat-checkbox>
-                        <app-button [type]="'warning'">Quên mật khẩu</app-button>
-                    </div>
-
-                    <div class="login">
-                        <app-button [type]="'primary'" class="login-button" [disabled]="!loginForm.valid"
-                            (click)="onLogin()">
-                            Đăng nhập
-                        </app-button>
-                    </div>
                 </form>
+
+                <div class="actions-row">
+                    <mat-checkbox [checked]="true" [disabled]="true">Nhớ tài khoản</mat-checkbox>
+                    <button mat-raised-button routerLink="/forget-pass"
+                        style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%) ; color: rgb(75, 75, 75)">Quên mật khẩu</button>
+                </div>
+
+                <div class="login">
+                    <app-button [type]="'primary'" class="login-button" [disabled]="!loginForm.valid"
+                        (click)="onLogin()">
+                        Đăng nhập
+                    </app-button>
+                </div>
             </mat-card-content>
         </mat-card>
     </div>

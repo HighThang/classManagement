@@ -119,12 +119,12 @@
                                     </mat-icon>
                                     <mat-error>
                                         @switch (true) {
-                                        @case (registerForm.get('confirmPassword')?.hasError('required')) {
-                                        Xác nhận mật khẩu là <strong>bắt buộc</strong>
-                                        }
-                                        @case (registerForm.errors?.['mismatch']) {
-                                        Mật khẩu không trùng khớp
-                                        }
+                                            @case (registerForm.get('confirmPassword')?.hasError('required')) {
+                                                Xác nhận mật khẩu là <strong>bắt buộc</strong>
+                                            }
+                                            @case (registerForm.errors?.['mismatch']) {
+                                                Mật khẩu không trùng khớp
+                                            }
                                         }
                                     </mat-error>
                                 </mat-form-field>

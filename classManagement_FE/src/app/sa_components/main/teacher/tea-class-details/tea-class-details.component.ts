@@ -60,6 +60,7 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
   classDetails!: ClassDetails;
   editedClassName: string = '';
   editedNote: string = '';
+  isLoading: boolean = false;
   isEditing: boolean = false;
   formGroup: FormGroup;
 
@@ -264,12 +265,16 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
   }
 
   activateStudent(studentId: number) {
+    this.isLoading = true;
+    
     this.classDetailsService.activateStudent(studentId).subscribe({
       next: () => {
+        this.isLoading = false;
         this.showToast('success', 'Kích hoạt học sinh thành công');
         this.loadStudents();
       },
       error: () => {
+        this.isLoading = false;
         this.showToast('error', 'Lỗi khi kích hoạt học sinh này');
       },
     });

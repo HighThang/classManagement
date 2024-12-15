@@ -8,16 +8,15 @@ import { ReactiveFormsModule, FormGroup, FormBuilder, Validators, FormsModule } 
 import { ITheme } from '../../../../core/interfaces/theme.interface';
 import { MatInputModule } from '@angular/material/input';
 import { AuthService } from '../../../../core/services/auth/auth.service';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { catchError, of } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatCardModule, MatIconModule, MatButtonModule, SharedModule, MatInputModule, FormsModule, MatCheckboxModule],
+  imports: [CommonModule, ReactiveFormsModule, MatCardModule, MatIconModule, MatButtonModule, SharedModule, MatInputModule, FormsModule, MatCheckboxModule, RouterModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
 })
@@ -33,7 +32,7 @@ export class LoginComponent {
     event.stopPropagation();
   }
 
-  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router, private http: HttpClient) {
+  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {
     this.loginForm = this.fb.group({
       username: ['admin', Validators.required],
       password: ['123456', Validators.required],

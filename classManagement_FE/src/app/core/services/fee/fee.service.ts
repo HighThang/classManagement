@@ -26,7 +26,8 @@ export interface TutorFeeDetailDto {
   feeNotSubmitted: number;
   month: number;
   year: number;
-  lessionPrice: number;
+  lessonPrice: number;
+  time: string;
 }
 
 @Injectable({

@@ -30,6 +30,7 @@ import { teacherGuard } from './core/guards/teacher-guard/teacher.guard';
 import { studentGuard } from './core/guards/student-guard/student.guard';
 import { TeaClassDetailsComponent } from './sa_components/main/teacher/tea-class-details/tea-class-details.component';
 import { StuClassDetailComponent } from './sa_components/main/student/stu-class-detail/stu-class-detail.component';
+import { ForgetPasswordComponent } from './sa_components/main/client/forget-password/forget-password.component';
 
 export const routes: Routes = [
   {
@@ -47,6 +48,13 @@ export const routes: Routes = [
         canActivate: [clientGuard],
         component: LoginComponent,
         title: 'Đăng nhập',
+        providers: [provideHttpClient()],
+      },
+      {
+        path: 'forget-pass',
+        canActivate: [clientGuard],
+        component: ForgetPasswordComponent,
+        title: 'Quên mật khẩu',
         providers: [provideHttpClient()],
       },
       {

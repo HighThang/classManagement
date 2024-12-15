@@ -356,7 +356,7 @@ export class TeaFeeComponent implements OnInit, AfterViewInit {
           feeNotSubmitted: item.feeNotSubmitted,
           year: item.year,
           month: item.month,
-          lessionPrice: item.lessionPrice
+          lessionPrice: item.lessonPrice
         }));
 
         if (activeData.length === 0) {

@@ -12,18 +12,16 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatInputModule } from '@angular/material/input';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { FormBuilder, FormGroup, FormsModule, NgModel, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { SharedModule } from '../../../../shared/shared.module';
 import { Student } from '../../../../core/services/admin/admin.service';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import Swal from 'sweetalert2';
-import { HttpClient } from '@angular/common/http';
 import { MatNativeDateModule, MatOptionModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
-import saveAs from 'file-saver';
 
 @Component({
   selector: 'app-stu-class-detail',
@@ -37,12 +35,8 @@ import saveAs from 'file-saver';
     MatProgressSpinnerModule,
     MatSnackBarModule,
     MatDialogModule,
-    MatSnackBarModule,
     MatTableModule,
-    MatButtonModule,
     MatInputModule,
-    MatIconModule,
-    MatTabsModule,
     MatToolbarModule,
     RouterModule,
     FormsModule,

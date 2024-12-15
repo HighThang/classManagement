@@ -77,6 +77,8 @@ body {
   --theme-checked: cornflowerblue;
   --theme-border-input: cornflowerblue;
 
+  --mdc-outlined-text-field-hover-outline-color: #0021df !important;
+
   @include custom-material-theme(mat.m2-define-palette(mat.$m2-indigo-palette, 500),
     mat.m2-define-palette(mat.$m2-pink-palette, A200),
     mat.m2-define-palette(mat.$m2-red-palette));
@@ -94,6 +96,8 @@ body {
   --theme-checked: rgb(255, 170, 67);
   --theme-border-input: rgb(255, 170, 67);
 
+  --mdc-outlined-text-field-hover-outline-color: rgb(226, 124, 0) !important;
+
   @include custom-material-theme(mat.m2-define-palette(mat.$m2-orange-palette, 500),
     mat.m2-define-palette(mat.$m2-pink-palette, A200),
     mat.m2-define-palette(mat.$m2-red-palette));
@@ -110,6 +114,8 @@ body {
   --theme-background-hover: #8bc34a;
   --theme-checked: #8bc34a;
   --theme-border-input: #8bc34a;
+
+  --mdc-outlined-text-field-hover-outline-color: #78e000 !important;
 
   @include custom-material-theme(mat.m2-define-palette(mat.$m2-light-green-palette, 500),
     mat.m2-define-palette(mat.$m2-pink-palette, A200),
