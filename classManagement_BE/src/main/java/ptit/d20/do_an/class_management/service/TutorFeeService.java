@@ -392,10 +392,10 @@ public class TutorFeeService {
             tutorFeeDetailDto.setFeeSubmitted(tutorFeeDetail.getFeeSubmitted());
             tutorFeeDetailDto.setFeeNotSubmitted(feeAmount - tutorFeeDetail.getFeeSubmitted());
             tutorFeeDetailDto.setId(tutorFeeDetail.getId());
-            tutorFeeDetailDto.setTime(tutorFee.getYear().toString() + "-" + tutorFee.getMonth());
+            tutorFeeDetailDto.setTime(tutorFee.getCreatedDate());
             tutorFeeDetailDto.setYear(tutorFee.getYear());
             tutorFeeDetailDto.setMonth(tutorFee.getMonth());
-            tutorFeeDetailDto.setLessionPrice(tutorFee.getLessonPrice());
+            tutorFeeDetailDto.setLessonPrice(tutorFee.getLessonPrice());
 
             tutorFeeDetailDtos.add(tutorFeeDetailDto);
         }
@@ -613,7 +613,8 @@ public class TutorFeeService {
             tutorFeeDetailDto.setId(tutorFeeDetail.getId());
             tutorFeeDetailDto.setMonth(tutorFee.getMonth());
             tutorFeeDetailDto.setYear(tutorFee.getYear());
-            tutorFeeDetailDto.setLessionPrice(tutorFee.getLessonPrice());
+            tutorFeeDetailDto.setLessonPrice(tutorFee.getLessonPrice());
+            tutorFeeDetailDto.setTime(tutorFee.getCreatedDate());
 
             tutorFeeDetailDtos.add(tutorFeeDetailDto);
         }

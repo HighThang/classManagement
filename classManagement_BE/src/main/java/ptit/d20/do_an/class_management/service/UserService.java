@@ -128,7 +128,7 @@ public class UserService {
 
     public void createDefaultStudentAccount(ClassRegistration student) {
         if (StringUtils.isNotBlank(student.getEmail())) {
-            String randomPassword = "123456";
+            String randomPassword = RandomStringUtils.randomAlphanumeric(6);
 
             if (userRepository.existsByUsername(student.getEmail())) {
                 throw new BadRequestException("Username " + student.getEmail() + " already in use");
@@ -172,7 +172,7 @@ public class UserService {
 //            String activeCode = RandomStringUtils.randomAlphanumeric(6);
 //            user.setActiveCode(activeCode);
 
-//            sendEmailVerification(user, randomPassword);
+            sendEmailVerification(user, randomPassword);
             student.setStudent(user);
         }
     }
@@ -360,14 +360,14 @@ public class UserService {
     }
 
     private boolean verifyEmail(String code, User user) {
-        Instant startOfToday = LocalDate.now().atStartOfDay(ZoneOffset.UTC).toInstant();
-        if (user.getNumberActiveAttempt() >= 3) {
-            if (user.getLastActiveAttempt().isAfter(startOfToday)) {
-                throw new BusinessException("Only 3 times to verify email a day, please try in next day!");
-            } else {
-                user.setNumberActiveAttempt(0);
-            }
-        }
+//        Instant startOfToday = LocalDate.now().atStartOfDay(ZoneOffset.UTC).toInstant();
+//        if (user.getNumberActiveAttempt() >= 3) {
+//            if (user.getLastActiveAttempt().isAfter(startOfToday)) {
+//                throw new BusinessException("Only 3 times to verify email a day, please try in next day!");
+//            } else {
+//                user.setNumberActiveAttempt(0);
+//            }
+//        }
         boolean result = StringUtils.equalsIgnoreCase(code, user.getActiveCode());
         user.setNumberActiveAttempt(user.getNumberActiveAttempt() + 1);
         user.setLastActiveAttempt(Instant.now());
@@ -405,20 +405,11 @@ public class UserService {
         return result ? new ApiResponse(true, "Success") : new ApiResponse(false, "Failed");
     }
 
-    public ApiResponse resetPassword(String newPass) {
-        User user = getCurrentUserLogin();
-        user.setPassword(passwordEncoder.encode(newPass));
-        userRepository.save(user);
-        return new ApiResponse(true, "Success");
-    }
-
-
     public List<User> findAllByEmailIn(List<String> emails) {
         return userRepository.findAllByEmailIn(emails);
     }
 
     public boolean isEmailExisting(String email) {
-        // Giả định gọi repository để kiểm tra email
         return userRepository.existsByEmail(email);
     }
 

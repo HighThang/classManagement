@@ -2,6 +2,8 @@ package ptit.d20.do_an.class_management.dto;
 
 import lombok.Data;
 
+import java.time.Instant;
+
 @Data
 public class TutorFeeDetailDto {
     private String studentName;
@@ -13,9 +15,9 @@ public class TutorFeeDetailDto {
     private Long feeAmount;
     private Long feeSubmitted;
     private Long feeNotSubmitted;
-    private String time;
+    private Instant time;
     private Long id;
     private Integer year;
     private Integer month;
-    private Integer lessionPrice;
+    private Integer lessonPrice;
 }
