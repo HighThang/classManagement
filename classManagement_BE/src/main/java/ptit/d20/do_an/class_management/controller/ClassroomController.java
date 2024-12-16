@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ptit.d20.do_an.class_management.domain.Classroom;
+import ptit.d20.do_an.class_management.dto.ClassroomStatusForStudentDto;
 import ptit.d20.do_an.class_management.dto.classroom.ClassroomDto;
 import ptit.d20.do_an.class_management.dto.classroom.NewClassRequest;
 import ptit.d20.do_an.class_management.service.ClassroomService;
@@ -61,10 +62,16 @@ public class ClassroomController {
 //        return ResponseEntity.ok(page);
 //    }
 
+//    @GetMapping("/class-for-student")
+//    public ResponseEntity<?> searchClassForStudent(@RequestParam Map<String, String> params) throws Exception {
+//        List<Classroom> classrooms = classroomService.searchClassForStudent(params);
+//        return ResponseEntity.ok(classrooms);
+//    }
+
     @GetMapping("/class-for-student")
-    public ResponseEntity<?> searchClassForStudent(@RequestParam Map<String, String> params) throws Exception {
-        List<Classroom> classrooms = classroomService.searchClassForStudent(params); // Gọi phương thức trả về danh sách
-        return ResponseEntity.ok(classrooms); // Trả về toàn bộ danh sách
+    public ResponseEntity<?> searchClassForStudent(@RequestParam Map<String, String> params) {
+        List<ClassroomStatusForStudentDto> classroomStatusList = classroomService.searchClassForStudent(params);
+        return ResponseEntity.ok(classroomStatusList);
     }
 
     @GetMapping("/isTeachersClassroom")
@@ -74,8 +81,8 @@ public class ClassroomController {
     }
 
     @GetMapping("/isStudentsClassroom")
-    public ResponseEntity<Boolean> isStudentsClassroom(@RequestParam Long studentId, Long classroomId, boolean active) {
-        boolean exists = classroomService.isStudentsClassroom(studentId, classroomId, active);
+    public ResponseEntity<Boolean> isStudentsClassroom(@RequestParam Long studentId, Long classroomId) {
+        boolean exists = classroomService.isStudentsClassroom(studentId, classroomId);
         return ResponseEntity.ok(exists);
     }
 }

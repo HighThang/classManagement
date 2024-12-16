@@ -15,6 +15,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ptit.d20.do_an.class_management.domain.User;
+import ptit.d20.do_an.class_management.dto.ClassroomStatusForStudentDto;
 import ptit.d20.do_an.class_management.exception.BusinessException;
 import ptit.d20.do_an.class_management.exception.ResourceNotFoundException;
 import ptit.d20.do_an.class_management.repository.ClassRegistrationRepository;
@@ -42,10 +43,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Log4j2
@@ -312,21 +310,45 @@ public class ClassroomService {
 //        return classroomRepository.findAll(specs, pageable);
 //    }
 
-    public List<Classroom> searchClassForStudent(Map<String, String> params) {
+    public List<ClassroomStatusForStudentDto>searchClassForStudent(Map<String, String> params) {
         User currentLoginUser = SecurityUtils.getCurrentUserLogin()
                 .flatMap(userRepository::findByUsername)
                 .orElseThrow(() -> new BusinessException("Can not find current user login!"));
         if (currentLoginUser.getRole().getName() != RoleName.STUDENT) {
             throw new BusinessException("Require Role Student!");
         }
-        List<ClassRegistration> classRegistrations = classRegistrationRepository.findAllByStudentIdAndActive(currentLoginUser.getId(), true);
-        List<Classroom> classrooms = classRegistrations.stream().map(ClassRegistration::getClassroom).collect(Collectors.toList());
-        List<Long> classIds = classrooms.stream().map(Classroom::getId).collect(Collectors.toList());
+        List<ClassRegistration> classRegistrations = classRegistrationRepository.findAllByStudentIdAndActiveOrDeleted(currentLoginUser.getId());
+
+//        List<Classroom> classrooms = classRegistrations.stream().map(ClassRegistration::getClassroom).collect(Collectors.toList());
+        List<ClassroomStatusForStudentDto> classroomStatusList = classRegistrations.stream()
+                .map(registration -> new ClassroomStatusForStudentDto(
+                        registration.getClassroom(),
+                        registration.getActive(),
+                        registration.getDeleted()))
+                .collect(Collectors.toList());
+
+//        List<Long> classIds = classrooms.stream().map(Classroom::getId).collect(Collectors.toList());
+        List<Long> classIds = classroomStatusList.stream()
+                .map(dto -> dto.getClassroom().getId())
+                .collect(Collectors.toList());
+
         if (classIds.isEmpty()) {
             return new ArrayList<>();
         }
+
+//        Specification<Classroom> specs = getSpecificationForStudent(params, classIds);
+//        return classroomRepository.findAll(specs);
         Specification<Classroom> specs = getSpecificationForStudent(params, classIds);
-        return classroomRepository.findAll(specs); // Không sử dụng Pageable ở đây
+        List<Classroom> filteredClassrooms = classroomRepository.findAll(specs);
+
+        // Lọc lại danh sách classroomStatusList để chỉ giữ các lớp học nằm trong kết quả filteredClassrooms
+        Set<Long> filteredClassIds = filteredClassrooms.stream()
+                .map(Classroom::getId)
+                .collect(Collectors.toSet());
+
+        return classroomStatusList.stream()
+                .filter(dto -> filteredClassIds.contains(dto.getClassroom().getId()))
+                .collect(Collectors.toList());
     }
 
     private Specification<Classroom> getSpecificationForStudent(Map<String, String> params, List<Long> classIds) {
@@ -426,6 +448,9 @@ public class ClassroomService {
         List<Classroom> classrooms = classroomRepository.findAllBySubjectName(subjectName);
         List<String> availableClasses = new ArrayList<>();
         for (Classroom classroom : classrooms) {
+            if (classroom.getTeacher().getActive() == false) {
+                continue;
+            }
             User teacher = classroom.getTeacher();
             String classNameAndTeacherName = classroom.getId() + " - " + classroom.getClassName() + " - "
                     + teacher.getLastName() + " " + teacher.getSurname() + " " + teacher.getFirstName();
@@ -452,6 +477,7 @@ public class ClassroomService {
         student.setEmailConfirmed(false);
         student.setClassroom(classroom);
         student.setActive(false);
+        student.setDeleted(false);
 
         if (requestRegistrationDto.getIdStudent() != null && requestRegistrationDto.getImgUrlRequest() != null) {
             student.setImgURLRequest(requestRegistrationDto.getImgUrlRequest());
@@ -525,7 +551,7 @@ public class ClassroomService {
         return classroomRepository.existsByTeacherIdAndId(teacherId, id);
     }
 
-    public boolean isStudentsClassroom(Long studentId, Long classroomId, boolean active) {
-        return classRegistrationRepository.existsByStudentIdAndClassroomIdAndActive(studentId, classroomId, active);
+    public boolean isStudentsClassroom(Long studentId, Long classroomId) {
+        return classRegistrationRepository.existsByStudentIdAndClassroomIdAndActiveOrDeleted(studentId, classroomId);
     }
 }

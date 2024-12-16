@@ -16,4 +16,10 @@ public interface ClassAttendanceRepository extends JpaRepository<ClassAttendance
     void deleteAllByClassScheduleId(Long scheduleId);
 
     void deleteAllByClassRegistrationId(Long studentId);
+
+    boolean existsByClassRegistrationId(Long studentId);
+
+    boolean existsByClassRegistrationIdAndIsAttended(Long studentId, boolean isAttended);
+
+    boolean existsByClassScheduleIdAndIsAttended(Long scheduleId, boolean isAttended);
 }

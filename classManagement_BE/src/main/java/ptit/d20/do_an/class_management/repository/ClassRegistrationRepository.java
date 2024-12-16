@@ -17,6 +17,10 @@ public interface ClassRegistrationRepository extends JpaSpecificationExecutor<Cl
     List<ClassRegistration> findAllByClassroomIdOrderByLastNameAsc(Long classId);
 
     List<ClassRegistration> findAllByStudentIdAndActive(Long studentId, boolean active);
+
+    @Query("SELECT cr FROM ClassRegistration cr WHERE cr.student.id = :studentId AND (cr.active = true OR cr.deleted = true)")
+    List<ClassRegistration> findAllByStudentIdAndActiveOrDeleted(@Param("studentId") Long studentId);
+
     List<ClassRegistration> findAllByEmail(String email);
 
     @Modifying
@@ -28,5 +32,8 @@ public interface ClassRegistrationRepository extends JpaSpecificationExecutor<Cl
 
     boolean existsByStudentIdAndClassroomId(Long studentId, Long classroomId);
 
-    boolean existsByStudentIdAndClassroomIdAndActive(Long studentId, Long classroomId, boolean active);
+//    boolean existsByStudentIdAndClassroomIdAndActive(Long studentId, Long classroomId, boolean active);
+
+    @Query("SELECT COUNT(cr) > 0 FROM ClassRegistration cr WHERE cr.student.id = :studentId AND cr.classroom.id = :classroomId AND (cr.active = true OR cr.deleted = true)")
+    boolean existsByStudentIdAndClassroomIdAndActiveOrDeleted(@Param("studentId") Long studentId, @Param("classroomId") Long classroomId);
 }

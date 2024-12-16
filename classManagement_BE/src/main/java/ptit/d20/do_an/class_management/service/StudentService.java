@@ -40,6 +40,7 @@ public class StudentService {
     private final ClassRegistrationRepository classRegistrationRepository;
     private final ClassAttendanceRepository classAttendanceRepository;
     private final TutorFeeDetailRepository tutorFeeDetailRepository;
+    private final ExamScoreRepository examScoreRepository;
     private final ClassroomRepository classroomRepository;
     private final UserService userService;
     private final ClassroomService classroomService;
@@ -51,13 +52,14 @@ public class StudentService {
             ClassRegistrationRepository classRegistrationRepository,
             ClassAttendanceRepository classAttendanceRepository,
             TutorFeeDetailRepository tutorFeeDetailRepository,
-            ClassroomRepository classroomRepository,
+            ExamScoreRepository examScoreRepository, ClassroomRepository classroomRepository,
             UserService userService,
             ClassroomService classroomService,
             @Value("${app.temp}") String tempFolder, UserRepository userRepository) {
         this.classRegistrationRepository = classRegistrationRepository;
         this.classAttendanceRepository = classAttendanceRepository;
         this.tutorFeeDetailRepository = tutorFeeDetailRepository;
+        this.examScoreRepository = examScoreRepository;
         this.classroomRepository = classroomRepository;
         this.userService = userService;
         this.classroomService = classroomService;
@@ -220,21 +222,66 @@ public class StudentService {
         return fileName;
     }
 
+//    @Transactional
+//    public ApiResponse deleteStudent(Long studentId) {
+//        User user = userService.getCurrentUserLogin();
+//        if (user.getRole().getName() != RoleName.TEACHER) {
+//            throw new BusinessException("Missing permission");
+//        }
+//        List<Classroom> classrooms = user.getClassrooms();
+//        List<ClassRegistration> classRegistrations = classrooms.stream().flatMap(classroom -> classroom.getClassRegistrations().stream()).collect(Collectors.toList());
+//        classRegistrations.stream()
+//                .filter(student -> student.getId().equals(studentId)).findFirst()
+//                .orElseThrow(() -> new ResourceNotFoundException("Not found student"));
+//        try {
+//            classAttendanceRepository.deleteAllByClassRegistrationId(studentId);
+//            // if exist tutorFee -> can not delete
+//            classRegistrationRepository.deleteById(studentId);
+//        } catch (Exception e) {
+//            log.error("Exception during delete operation", e);
+//            throw new BusinessException("Deletion failed due to an error");
+//        }
+//
+//        return new ApiResponse(true, "Success");
+//    }
+
     @Transactional
     public ApiResponse deleteStudent(Long studentId) {
         User user = userService.getCurrentUserLogin();
         if (user.getRole().getName() != RoleName.TEACHER) {
             throw new BusinessException("Missing permission");
         }
+
+        // Kiểm tra quyền truy cập của giáo viên với các lớp học
         List<Classroom> classrooms = user.getClassrooms();
-        List<ClassRegistration> classRegistrations = classrooms.stream().flatMap(classroom -> classroom.getClassRegistrations().stream()).collect(Collectors.toList());
+        List<ClassRegistration> classRegistrations = classrooms.stream()
+                .flatMap(classroom -> classroom.getClassRegistrations().stream())
+                .collect(Collectors.toList());
+
+        // Kiểm tra sự tồn tại của học sinh
         classRegistrations.stream()
-                .filter(student -> student.getId().equals(studentId)).findFirst()
+                .filter(student -> student.getId().equals(studentId))
+                .findFirst()
                 .orElseThrow(() -> new ResourceNotFoundException("Not found student"));
+
+        // Kiểm tra tồn tại trong Attendance hoặc TutorFee
+        boolean hasRelevantAttendance = classAttendanceRepository.existsByClassRegistrationIdAndIsAttended(studentId, true);
+        boolean hasRelevantTutorFee = tutorFeeDetailRepository.existsByClassRegistrationIdAndNumberOfAttendedLessonNot(studentId, 0);
+
         try {
-            classAttendanceRepository.deleteAllByClassRegistrationId(studentId);
-            // if exist tutorFee -> can not delete
-            classRegistrationRepository.deleteById(studentId);
+            if (hasRelevantAttendance) {
+                // Nếu tồn tại trong Attendance, chỉ cập nhật trạng thái
+                classRegistrationRepository.findById(studentId).ifPresent(classRegistration -> {
+                    classRegistration.setDeleted(true);
+                    classRegistration.setActive(false);
+                    classRegistrationRepository.save(classRegistration);
+                });
+            } else {
+                classAttendanceRepository.deleteAllByClassRegistrationId(studentId);
+                examScoreRepository.deleteAllByClassRegistrationId(studentId);
+                tutorFeeDetailRepository.deleteAllByClassRegistrationId(studentId);
+                classRegistrationRepository.deleteById(studentId);
+            }
         } catch (Exception e) {
             log.error("Exception during delete operation", e);
             throw new BusinessException("Deletion failed due to an error");
@@ -242,6 +289,7 @@ public class StudentService {
 
         return new ApiResponse(true, "Success");
     }
+
 
     public Object updateStudent(StudentDto studentDto) {
         ClassRegistration existingStudent = classRegistrationRepository.findById(studentDto.getId())
@@ -270,6 +318,8 @@ public class StudentService {
         }
 
         existingStudent.setActive(true);
+        existingStudent.setDeleted(false);
+
         classRegistrationRepository.save(existingStudent);
 
         return "Success";

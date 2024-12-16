@@ -153,6 +153,10 @@ public class ClassScheduleService {
         schedules.stream()
                 .filter(schedule -> schedule.getId().equals(scheduleId)).findFirst()
                 .orElseThrow(() -> new ResourceNotFoundException("Not found schedule"));
+
+        boolean hasRelevantAttendance = classAttendanceRepository.existsByClassScheduleIdAndIsAttended(scheduleId, true);
+        if (hasRelevantAttendance) throw new BusinessException("Error");
+
         try {
             classAttendanceRepository.deleteAllByClassScheduleId(scheduleId);
             classScheduleRepository.deleteById(scheduleId);
