@@ -31,10 +31,13 @@ export class StuClassListComponent implements AfterViewInit {
 
   displayedColumns: string[] = ['id','className','subjectName','note','createdDate','attendance','score','fee','details'];
   dataSource = new MatTableDataSource<Classroom>();
-  resultsLength = 0;
+  displayedColumns2: string[] = ['id','className','subjectName','note','createdDate','attendance','score','fee','details'];
+  dataSource2 = new MatTableDataSource<Classroom>();
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild('paginator2') paginator2!: MatPaginator;
+  @ViewChild('sort2') sort2!: MatSort;
 
   constructor(
     private classroomService: ClassroomService,
@@ -43,26 +46,31 @@ export class StuClassListComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
+    this.dataSource2.paginator = this.paginator2;
+    this.dataSource2.sort = this.sort2;
     this.loadData();
   }
 
   loadData(): void {
-    // const page = this.paginator?.pageIndex || 0;
-    // const size = this.paginator?.pageSize || 10;
-    // const sort = this.sort?.active
-    //   ? `${this.sort.active},${this.sort.direction || 'asc'}`
-    //   : 'id,asc';
+    this.classroomService.getClassroomsForStudent({}).subscribe({
+      next: (response) => {
+        const activeData = response
+          .filter((item: any) => item.active === true && item.deleted === false)
+          .map((item: any) => (item.classroom));
+  
+        const inactiveData = response
+          .filter((item: any) => item.active === false && item.deleted === true)
+          .map((item: any) => (item.classroom));
 
-    this.classroomService
-      .getClassroomsForStudent({})
-      .subscribe({
-        next: (response) => {
-          this.dataSource.data = response; 
-        },
-        error: (error) => {
-          console.error('Error fetching classrooms:', error);
-        },
-      });
+        this.dataSource.data = activeData; 
+        this.dataSource2.data = inactiveData; 
+
+        console.log(this.dataSource2.data)
+      },
+      error: () => {
+        this.showToast('error', 'Lỗi khi tải dữ liệu lớp học')
+      },
+    });
   }
 
   applyFilter(event: Event): void {
@@ -70,8 +78,27 @@ export class StuClassListComponent implements AfterViewInit {
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
+  applyFilter2(event: Event): void {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource2.filter = filterValue.trim().toLowerCase();
+  }
+
   navigateTo(path: string, id: number): void {
     this.router.navigate([path]);
     sessionStorage.setItem('currentClassId', id.toString());
+  }
+
+  showToast(icon: 'success' | 'error' | 'info' | 'warning', title: string) {
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'bottom-end',
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+    });
+    Toast.fire({
+      icon: icon,
+      title: title,
+    });
   }
 }

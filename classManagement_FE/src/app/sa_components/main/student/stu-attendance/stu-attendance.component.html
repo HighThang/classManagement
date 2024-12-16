@@ -12,12 +12,23 @@
                             <form [formGroup]="formGroup">
                                 <div class="icon-grid-1">
                                     <app-icon iconName="classroom"></app-icon>
+                                    
                                     <mat-form-field class="form-field" appearance="outline">
                                         <mat-label>Chọn lớp học</mat-label>
                                         <mat-select formControlName="classroomId">
-                                            <mat-option *ngFor="let classroom of classrooms" [value]="classroom.id">
-                                                #{{ classroom.id }} - {{ classroom.className }}
-                                            </mat-option>
+                                            <mat-optgroup *ngIf="activeClassrooms.length > 0" label="Đang học">
+                                                <mat-option *ngFor="let classroom of activeClassrooms"
+                                                    [value]="classroom.id">
+                                                    #{{ classroom.id }} - {{ classroom.className }}
+                                                </mat-option>
+                                            </mat-optgroup>
+
+                                            <mat-optgroup *ngIf="deletedClassrooms.length > 0" label="Ngừng học">
+                                                <mat-option *ngFor="let classroom of deletedClassrooms"
+                                                    [value]="classroom.id">
+                                                    #{{ classroom.id }} - {{ classroom.className }}
+                                                </mat-option>
+                                            </mat-optgroup>
                                         </mat-select>
                                     </mat-form-field>
                                 </div>
@@ -39,8 +50,7 @@
                                 <app-icon iconName="person"></app-icon>
                                 <mat-form-field appearance="outline">
                                     <mat-label>Tên giáo viên</mat-label>
-                                    <input matInput
-                                        [ngModel]="classDetails.teacherName" disabled>
+                                    <input matInput [ngModel]="classDetails.teacherName" disabled>
                                 </mat-form-field>
                             </div>
                         </div>
@@ -60,13 +70,9 @@
 
                     <div class="right" *ngIf="classDetails && showDetails" [@fadeInOut]>
                         <div class="class-info" style="justify-self: center;">
-                            <apx-chart 
-                                [series]="chartSeries" 
-                                [chart]="chartOptions.chart!" 
-                                [labels]="chartOptions.labels!"
-                                [colors]="chartOptions.colors!" 
-                                [legend]="chartOptions.legend!"
-                                [dataLabels]="chartOptions.dataLabels!" 
+                            <apx-chart [series]="chartSeries" [chart]="chartOptions.chart!"
+                                [labels]="chartOptions.labels!" [colors]="chartOptions.colors!"
+                                [legend]="chartOptions.legend!" [dataLabels]="chartOptions.dataLabels!"
                                 [responsive]="chartOptions.responsive!">
                             </apx-chart>
                         </div>
@@ -80,7 +86,7 @@
                 <div class="header">
                     <div class="icon-grid-1" style="padding-top: 20px">
                         <app-icon iconName="search" style="padding: 10px; margin-bottom: 0px;"></app-icon>
-                        <mat-form-field appearance="outline" style="width: 55vh;">
+                        <mat-form-field appearance="outline" style="width: 29vw;">
                             <mat-label>Tìm kiếm</mat-label>
                             <input matInput #input1 (input)="applyFilter1($event)" placeholder="Nhập từ khóa tìm kiếm">
                         </mat-form-field>
@@ -93,7 +99,8 @@
                         <th mat-header-cell *matHeaderCellDef mat-sort-header
                             style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%); padding-left: 20px;">
                             Ngày</th>
-                        <td mat-cell *matCellDef="let row" style="padding-left: 20px;">{{ row.day | date: 'dd/MM/yyyy' }}</td>
+                        <td mat-cell *matCellDef="let row" style="padding-left: 20px;">{{ row.day | date: 'dd/MM/yyyy'
+                            }}</td>
                     </ng-container>
 
                     <ng-container matColumnDef="dayInWeek">

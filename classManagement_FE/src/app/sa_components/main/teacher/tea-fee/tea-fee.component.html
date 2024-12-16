@@ -92,7 +92,7 @@
                                     <input matInput id="year" formControlName="year" type="number" />
                                     <mat-error
                                         *ngIf="formGroup2.get('year')?.invalid && formGroup2.get('year')?.touched">
-                                        Vui lòng nhập năm từ 2000 đến 2100.
+                                        Vui lòng năm hợp lệ
                                     </mat-error>
                                 </mat-form-field>
                             </div>
@@ -125,7 +125,7 @@
                 <div class="header">
                     <div class="icon-grid-1" style="padding-top: 10px">
                         <app-icon iconName="search" style="padding: 10px; margin-bottom: 0px;"></app-icon>
-                        <mat-form-field appearance="outline" style="width: 55vh;">
+                        <mat-form-field appearance="outline" style="width: 29vw;">
                             <mat-label>Tìm kiếm</mat-label>
                             <input matInput #input1 (input)="applyFilter1($event)" placeholder="Nhập từ khóa tìm kiếm">
                         </mat-form-field>
@@ -280,7 +280,8 @@
             style="display: flex; justify-content: space-between; padding-left: 10px; padding-right: 10px; padding-top: 5px; padding-bottom: 5px;">
             <div class="calculate">
                 <button mat-raised-button [disabled]="!activeBtn" *ngIf="!isEditing" (click)="enableEditing()"
-                    style="background-color: var(--theme-background); color: white;">Tính lại học phí</button>
+                    style="background-color: var(--theme-background); color: white;"><mat-icon>calculate</mat-icon>
+                    Tính lại học phí</button>
                 <div *ngIf="isEditing" class="editing-controls">
                     <button mat-raised-button (click)="cancelEditing()"
                         style="background-color: rgb(179, 179, 179); color: white; margin-right: 10px;">
@@ -335,18 +336,18 @@
                 <td mat-cell *matCellDef="let row">{{ row.phone }}</td>
             </ng-container>
 
-            <ng-container matColumnDef="numberOfClassesAttended">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header
-                    style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
-                    Số buổi đi học</th>
-                <td mat-cell *matCellDef="let row">{{ row.numberOfClassesAttended }}</td>
-            </ng-container>
-
             <ng-container matColumnDef="totalNumberOfClasses">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header
                     style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
                     Tổng số buổi</th>
                 <td mat-cell *matCellDef="let row">{{ row.totalNumberOfClasses }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="numberOfClassesAttended">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                    style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                    Số buổi đi học</th>
+                <td mat-cell *matCellDef="let row">{{ row.numberOfClassesAttended }}</td>
             </ng-container>
 
             <ng-container matColumnDef="feeAmount">

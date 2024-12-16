@@ -13,7 +13,7 @@
                                 <div class="icon-grid-1">
                                     <app-icon iconName="classroom"></app-icon>
                                     <mat-form-field class="form-field" appearance="outline"
-                                        style="padding-bottom: 2cap;">
+                                        style="padding-bottom: 20px;">
                                         <mat-label>Chọn lớp học</mat-label>
                                         <mat-select formControlName="classroomId">
                                             <mat-option *ngFor="let classroom of classrooms" [value]="classroom.id">
@@ -72,7 +72,7 @@
                 <div class="header">
                     <div class="icon-grid-1" style="padding-top: 10px">
                         <app-icon iconName="search" style="padding: 10px; margin-bottom: 0px;"></app-icon>
-                        <mat-form-field appearance="outline" style="width: 55vh;">
+                        <mat-form-field appearance="outline" style="width: 29vw;">
                             <mat-label>Tìm kiếm</mat-label>
                             <input matInput #input1 (input)="applyFilter1($event)" placeholder="Nhập từ khóa tìm kiếm">
                         </mat-form-field>
@@ -169,7 +169,7 @@
     <div class="dialog-container">
         <div class="header" style="display: flex; justify-content: space-between; align-items: center;">
             <h2 mat-dialog-title style="color: var(--theme-background); font-weight: bold;">
-                Danh sách lớp học</h2>
+                Chi tiết điểm</h2>
 
             <div class="icon-grid-1" style="width: 50%;">
                 <app-icon iconName="search" style="padding: 10px; margin-bottom: 0px;"></app-icon>
@@ -190,13 +190,13 @@
             <div class="form-section">
                 <div class="score-chart" style="padding-top: 10px; padding-right: 10px; padding-left: 10px; justify-self: center; width: 95%;">
                     <apx-chart 
-                        [series]="chartOptions.series" 
-                        [chart]="chartOptions.chart" 
-                        [colors]="chartOptions.colors"
-                        [xaxis]="chartOptions.xaxis" 
-                        [legend]="chartOptions.legend"
-                        [plotOptions]="chartOptions.plotOptions"
-                        [yaxis]="chartOptions.yaxis">
+                        [series]="chartOptions.series!" 
+                        [chart]="chartOptions.chart!" 
+                        [colors]="chartOptions.colors!"
+                        [xaxis]="chartOptions.xaxis!" 
+                        [legend]="chartOptions.legend!"
+                        [plotOptions]="chartOptions.plotOptions!"
+                        [yaxis]="chartOptions.yaxis!">
                     </apx-chart>
                 </div>
 
@@ -215,6 +215,7 @@
                     <div class="score" style="align-self: center;">
                         <button mat-raised-button [disabled]="!activeBtn" *ngIf="!isEditing" (click)="enableEditing()"
                             style="background-color: var(--theme-background); color: white;">
+                            <mat-icon>edit</mat-icon>
                             Chỉnh sửa điểm
                         </button>
                         <div *ngIf="isEditing" class="editing-controls">

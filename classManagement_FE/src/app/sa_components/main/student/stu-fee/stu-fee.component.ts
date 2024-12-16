@@ -101,7 +101,8 @@ import { FeeService, TutorFeeDetailDto } from '../../../../core/services/fee/fee
 export class StuFeeComponent implements OnInit, AfterViewInit {
   formGroup!: FormGroup;
 
-  classrooms: Classroom[] = [];
+  activeClassrooms: Classroom[] = [];
+  deletedClassrooms: Classroom[] = [];  
   showDetails: boolean = false;
 
   classId!: number;
@@ -164,8 +165,22 @@ export class StuFeeComponent implements OnInit, AfterViewInit {
   }
 
   loadClassrooms(): void {
-    this.classroomService.getClassroomsForStudent({}).subscribe((data) => {
-      this.classrooms = data;
+    this.classroomService.getClassroomsForStudent({}).subscribe({
+      next: (response) => {
+        const activeData = response
+          .filter((item: any) => item.active === true && item.deleted === false)
+          .map((item: any) => (item.classroom));
+  
+        const inactiveData = response
+          .filter((item: any) => item.active === false && item.deleted === true)
+          .map((item: any) => (item.classroom));
+
+        this.activeClassrooms = activeData; 
+        this.deletedClassrooms = inactiveData; 
+      },
+      error: () => {
+        this.showToast('error', 'Lỗi khi tải dữ liệu lớp học')
+      },
     });
   }
 

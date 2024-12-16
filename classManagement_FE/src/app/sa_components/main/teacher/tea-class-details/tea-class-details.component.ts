@@ -68,6 +68,8 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
   dataSource1 = new MatTableDataSource<Student>();
   displayedColumns11: string[] = ['id', 'email', 'lastName', 'surname', 'firstName', 'phone', 'dob', 'active', 'deleted'];
   dataSource11 = new MatTableDataSource<Student>();
+  displayedColumns12: string[] = ['id', 'email', 'lastName', 'surname', 'firstName', 'phone', 'dob', 'active'];
+  dataSource12 = new MatTableDataSource<Student>();
 
   displayedColumns2: string[] = ['id', 'day', 'periodInDay', 'dayInWeek', 'createdDate', 'deleted'];
   dataSource2 = new MatTableDataSource<ScheduleData>();
@@ -79,6 +81,8 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
   @ViewChild('sort1') sort1!: MatSort;
   @ViewChild('paginator11') paginator11!: MatPaginator;
   @ViewChild('sort11') sort11!: MatSort;
+  @ViewChild('paginator12') paginator12!: MatPaginator;
+  @ViewChild('sort12') sort12!: MatSort;
   @ViewChild('paginator2') paginator2!: MatPaginator;
   @ViewChild('sort2') sort2!: MatSort;
   @ViewChild('paginator3') paginator3!: MatPaginator;
@@ -86,8 +90,11 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
   @ViewChild('dialogTemplate1') dialogTemplate1: any;
   @ViewChild('dialogTemplate2') dialogTemplate2: any;
   @ViewChild('dialogTemplate3') dialogTemplate3: any;
+  @ViewChild('dialogTemplate4') dialogTemplate4: any;
 
   @ViewChild('input11') searchInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('input12') searchInput2!: ElementRef<HTMLInputElement>;
+
   @ViewChild('inputDoc') inputDoc!: ElementRef<HTMLInputElement>;
 
   selectedFile: File | null = null;
@@ -206,11 +213,23 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
     this.dataSource11.filter = filterValue.trim().toLowerCase();
   }
 
+  applyFilter12(event: Event): void {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource12.filter = filterValue.trim().toLowerCase();
+  }
+
   resetFilter(): void {
     if (this.searchInput) {
       this.searchInput.nativeElement.value = '';
     }
     this.applyFilter11({ target: { value: '' } } as unknown as Event);
+  }
+
+  resetFilter2(): void {
+    if (this.searchInput2) {
+      this.searchInput2.nativeElement.value = '';
+    }
+    this.applyFilter12({ target: { value: '' } } as unknown as Event);
   }
 
   private loadStudents(): void {
@@ -229,7 +248,19 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
           }));
   
         const inactiveData = response.content
-          .filter((item: any) => item.student === null || item.active === false)
+          .filter((item: any) => item.active === false && item.deleted === false)
+          .map((item: any) => ({
+            id: item.id,
+            email: item.email,
+            firstName: item.firstName,
+            surname: item.surname,
+            lastName: item.lastName,
+            phone: item.phone,
+            dob: new Date(item.dob).toLocaleDateString('vi-VN'),
+          }));
+
+        const deletedData = response.content
+          .filter((item: any) => item.deleted === true)
           .map((item: any) => ({
             id: item.id,
             email: item.email,
@@ -242,6 +273,7 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
   
         this.dataSource1.data = activeData; 
         this.dataSource11.data = inactiveData;
+        this.dataSource12.data = deletedData;
       },
       error: () => {
         this.showToast('error', 'Lỗi khi tải danh sách học sinh');
@@ -264,9 +296,24 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
     });
   }
 
+  openDeletedStudentDialog() {
+    const dialog3 = this.dialog.open(this.dialogTemplate4, {
+      width: '77%',  maxHeight: '77vh'
+    });
+
+    dialog3.afterOpened().subscribe(() => {
+      this.dataSource12.paginator = this.paginator12;
+      this.dataSource12.sort = this.sort12;
+    });
+
+    dialog3.afterClosed().subscribe(() => {
+      this.resetFilter2();
+    });
+  }
+
   activateStudent(studentId: number) {
     this.isLoading = true;
-    
+
     this.classDetailsService.activateStudent(studentId).subscribe({
       next: () => {
         this.isLoading = false;
@@ -298,7 +345,7 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
             this.loadStudents();
           },
           error: () => {
-            this.showToast('error', 'Không thể xóa học sinh này')
+            this.showToast('error', 'Có lỗi xảy ra khi xóa học sinh')
           },
         });
       }
@@ -383,7 +430,7 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
 
   openAddScheduleDialog() {
     const dialogRef = this.dialog.open(this.dialogTemplate2, {
-      width: '77%',  maxHeight: '77vh'
+      width: '55%',  maxHeight: '77vh'
     });
 
     dialogRef.afterClosed().subscribe(() => {

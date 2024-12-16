@@ -78,7 +78,7 @@
                         <div class="header">
                             <div class="icon-grid-1" style="padding-top: 20px">
                                 <app-icon iconName="search" style="padding: 10px;"></app-icon>
-                                <mat-form-field appearance="outline" style="width: 55vh;">
+                                <mat-form-field appearance="outline" style="width: 29vw;">
                                     <mat-label>Tìm kiếm</mat-label>
                                     <input matInput #input1 (input)="applyFilter1($event)"
                                         placeholder="Nhập từ khóa tìm kiếm">
@@ -86,7 +86,9 @@
                             </div>
                             <div class="student-actions">
                                 <button mat-raised-button style="background-color: cadetblue; color: white;"
-                                    (click)="openWaitingListDialog()">Danh sách chờ</button>
+                                    (click)="openWaitingListDialog()">
+                                    <mat-icon>input</mat-icon>
+                                    Danh sách chờ</button>
 
                                 <ng-template #dialogTemplate1>
                                     <div class="dialog-container">
@@ -114,7 +116,7 @@
                                         <hr>
 
                                         <table mat-table [dataSource]="dataSource11" matSort #sort11="matSort"
-                                            style="padding: 10px;" matSortActive="id" matSortDirection="asc"
+                                            matSortActive="id" matSortDirection="asc"
                                             class="example-table">
                                             <ng-container matColumnDef="id">
                                                 <th mat-header-cell *matHeaderCellDef mat-sort-header
@@ -206,8 +208,120 @@
                                     </div>
                                 </ng-template>
 
+                                <button mat-raised-button style="background-color: crimson; color: white;"
+                                    (click)="openDeletedStudentDialog()">
+                                    <mat-icon>highlight_off</mat-icon>
+                                    Danh sách thôi học</button>
+
+                                <ng-template #dialogTemplate4>
+                                    <div class="dialog-container">
+                                        <div class="header"
+                                            style="display: flex; justify-content: space-between; align-items: center;">
+                                            <h2 mat-dialog-title
+                                                style="color: var(--theme-background); font-weight: bold;">
+                                                Danh sách thôi học</h2>
+
+                                            <div class="icon-grid-1" style="padding-top: 20px; width: 50%;">
+                                                <app-icon iconName="search" style="padding: 10px;"></app-icon>
+                                                <mat-form-field appearance="outline" style="width: 80%;">
+                                                    <mat-label>Tìm kiếm</mat-label>
+                                                    <input matInput #input12 (input)="applyFilter12($event)"
+                                                        placeholder="Nhập từ khóa tìm kiếm">
+                                                </mat-form-field>
+                                            </div>
+
+                                            <button mat-icon-button mat-dialog-close
+                                                style="background-color: rgb(235, 235, 235); margin-right: 15px;">
+                                                <mat-icon>clear</mat-icon>
+                                            </button>
+                                        </div>
+
+                                        <hr>
+
+                                        <table mat-table [dataSource]="dataSource12" matSort #sort12="matSort"
+                                            matSortActive="id" matSortDirection="asc"
+                                            class="example-table">
+                                            <ng-container matColumnDef="id">
+                                                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                                    style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                                                    ID</th>
+                                                <td mat-cell *matCellDef="let row" style="height: 70px;">{{ row.id }}
+                                                </td>
+                                            </ng-container>
+
+                                            <ng-container matColumnDef="email">
+                                                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                                    style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                                                    Email</th>
+                                                <td mat-cell *matCellDef="let row">{{ row.email }}</td>
+                                            </ng-container>
+
+                                            <ng-container matColumnDef="lastName">
+                                                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                                    style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                                                    Họ</th>
+                                                <td mat-cell *matCellDef="let row">{{ row.lastName }}</td>
+                                            </ng-container>
+
+                                            <ng-container matColumnDef="surname">
+                                                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                                    style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                                                    Tên đệm</th>
+                                                <td mat-cell *matCellDef="let row">{{ row.surname }}</td>
+                                            </ng-container>
+
+                                            <ng-container matColumnDef="firstName">
+                                                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                                    style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                                                    Tên</th>
+                                                <td mat-cell *matCellDef="let row">{{ row.firstName }}</td>
+                                            </ng-container>
+
+                                            <ng-container matColumnDef="phone">
+                                                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                                    style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                                                    Số điện thoại</th>
+                                                <td mat-cell *matCellDef="let row">{{ row.phone }}</td>
+                                            </ng-container>
+
+                                            <ng-container matColumnDef="dob">
+                                                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                                    style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                                                    Ngày sinh</th>
+                                                <td mat-cell *matCellDef="let row">{{ row.dob }}</td>
+                                            </ng-container>
+
+                                            <ng-container matColumnDef="active">
+                                                <th mat-header-cell *matHeaderCellDef
+                                                    style="text-align: center; background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                                                    Thêm lại
+                                                </th>
+                                                <td mat-cell *matCellDef="let row" style="text-align: center;">
+                                                    <button mat-mini-fab (click)="activateStudent(row.id)"
+                                                        style="border-radius: 15%; color: white; background-color: rgb(34, 153, 84);">
+                                                        <mat-icon>done</mat-icon>
+                                                    </button>
+                                                </td>
+                                            </ng-container>
+
+                                            <tr mat-header-row *matHeaderRowDef="displayedColumns12"></tr>
+                                            <tr mat-row *matRowDef="let row; columns: displayedColumns12;"></tr>
+
+                                            <tr class="mat-row" *matNoDataRow>
+                                                <td class="mat-cell" colspan="7">Không có dữ liệu</td>
+                                            </tr>
+                                        </table>
+
+                                        <mat-paginator #paginator12 [pageSizeOptions]="[5, 10, 25, 100]"
+                                            aria-label="Select page">
+                                        </mat-paginator>
+                                    </div>
+                                </ng-template>
+
                                 <button mat-raised-button style="background-color: rgb(0, 175, 0); color: white;"
-                                    (click)="downloadStudentList()">Tải xuống</button>
+                                    (click)="downloadStudentList()">
+                                    <mat-icon>download</mat-icon>
+                                    Tải xuống</button>
                             </div>
                         </div>
                         <hr>
@@ -290,23 +404,22 @@
                         <div class="header">
                             <div class="icon-grid-1" style="padding-top: 20px">
                                 <app-icon iconName="search" style="padding: 10px;"></app-icon>
-                                <mat-form-field appearance="outline" style="width: 55vh;">
+                                <mat-form-field appearance="outline" style="width: 29vw;">
                                     <mat-label>Tìm kiếm môn học</mat-label>
                                     <input matInput #input2 (input)="applyFilter2($event)"
                                         placeholder="Nhập từ khóa tìm kiếm">
                                 </mat-form-field>
                             </div>
                             <div class="schedule-actions" style="align-content: center;">
-                                <button mat-raised-button
-                                    style="background-color: rgb(0, 175, 0); color: white; margin-right: 5px;"
-                                    (click)="openAddScheduleDialog()">Thêm lịch học</button>
+                                <button mat-raised-button style="background-color: var(--theme-background); color: white; margin-right: 5px;"
+                                    (click)="openAddScheduleDialog()"><mat-icon>add</mat-icon>Thêm lịch học</button>
 
                                 <ng-template #dialogTemplate2>
                                     <div class="dialog-container">
                                         <h2 mat-dialog-title style="color: var(--theme-background); font-weight: bold;">
                                             Tạo mới lịch học</h2>
                                         <hr>
-                                        <mat-dialog-content [formGroup]="formGroup">
+                                        <mat-dialog-content [formGroup]="formGroup" style="padding-bottom: 0px;">
                                             <div class="form-grid">
                                                 <div class="form-section">
                                                     <div class="icon-grid-1">
@@ -466,14 +579,14 @@
                         <div class="header">
                             <div class="icon-grid-1" style="padding-top: 20px">
                                 <app-icon iconName="search" style="padding: 10px;"></app-icon>
-                                <mat-form-field appearance="outline" style="width: 55vh;">
+                                <mat-form-field appearance="outline" style="width: 29vw;">
                                     <mat-label>Tìm kiếm</mat-label>
                                     <input matInput #input3 (input)="applyFilter3($event)" placeholder="Nhập từ khóa tìm kiếm">
                                 </mat-form-field>
                             </div>
                             <div class="student-actions">
-                                <button mat-raised-button style="background-color: rgb(0, 194, 0); color: white;" 
-                                    (click)="openUploadDocumentDialog()">Thêm tài liệu</button>
+                                <button mat-raised-button style="background-color: var(--theme-background); color: white;" 
+                                    (click)="openUploadDocumentDialog()"><mat-icon>add</mat-icon>Thêm tài liệu</button>
 
                                 <ng-template #dialogTemplate3>
                                     <div class="dialog-container">
@@ -534,7 +647,7 @@
                                     Tải xuống tài liệu</th>
                                 <td mat-cell *matCellDef="let row" style="text-align: center;">
                                     <button mat-mini-fab (click)="downloadDocument(row.id)"
-                                        style="background-color: var(--theme-background); border-radius: 15%; color: white;">
+                                        style="background-color: rgb(0, 194, 0); border-radius: 15%; color: white;">
                                         <mat-icon>download</mat-icon>
                                     </button>
                                 </td>

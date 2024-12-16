@@ -7,12 +7,14 @@
                 <div class="header">
                     <div class="icon-grid-1" style="padding-top: 20px">
                         <app-icon iconName="search" style="padding: 10px; color: var(--theme-background);"></app-icon>
-                        <mat-form-field appearance="outline" style="width: 55vh; padding-bottom: 20px;">
+                        <mat-form-field appearance="outline" style="width: 29vw; padding-bottom: 20px;">
                             <mat-label>Tìm kiếm môn học</mat-label>
                             <input matInput (input)="applyFilter($event)">
                         </mat-form-field>
                     </div>
-                    <app-button (click)="openDialog(dialogTemplate)">Đăng ký môn giảng dạy</app-button>
+                    <button mat-raised-button (click)="openDialog(dialogTemplate)" style="background-color: var(--theme-background); color: white;">
+                        <mat-icon>add</mat-icon>
+                        Đăng ký môn giảng dạy</button>
                 </div>
 
                 <ng-template #dialogTemplate>

@@ -120,7 +120,7 @@ export class TeaFeeComponent implements OnInit, AfterViewInit {
 
   @ViewChild('dialogTemplate1') dialogTemplate1: any;
 
-  displayedColumns11: string[] = ['id', "studentName", "email", "phone", "numberOfClassesAttended", "totalNumberOfClasses", "feeAmount", "feeSubmitted", "feeNotSubmitted"];
+  displayedColumns11: string[] = ['id', "studentName", "email", "phone", "totalNumberOfClasses", "numberOfClassesAttended", "feeAmount", "feeSubmitted", "feeNotSubmitted"];
   dataSource11 = new MatTableDataSource<TutorFeeDetailDto>();
 
   @ViewChild('paginator11') paginator11!: MatPaginator;

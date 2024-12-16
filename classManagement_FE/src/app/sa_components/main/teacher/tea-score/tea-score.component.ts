@@ -52,6 +52,16 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { Exam, ExamScoreService, ScoreDetail } from '../../../../core/services/exam-score/exam-score.service';
 import { saveAs } from 'file-saver'
 
+export type ChartOptions = {
+  series: ApexAxisChartSeries;
+  chart: ApexChart;
+  plotOptions: ApexPlotOptions;
+  yaxis: ApexYAxis;
+  xaxis: ApexXAxis;
+  colors: string[];
+  legend: ApexLegend;
+};
+
 @Component({
   selector: 'app-tea-score',
   standalone: true,
@@ -127,15 +137,7 @@ export class TeaScoreComponent implements OnInit, AfterViewInit {
   @ViewChild('dialogTemplate1') dialogTemplate1: any;
   @ViewChild('input11') searchInput!: ElementRef<HTMLInputElement>;
 
-  chartOptions!: {
-    series: ApexAxisChartSeries;
-    chart: ApexChart;
-    colors: string[];
-    xaxis: ApexXAxis;
-    plotOptions: ApexPlotOptions;
-    legend: ApexLegend;
-    yaxis: ApexYAxis;
-  };
+  chartOptions!: Partial<ChartOptions>;
 
   constructor(
     private classDetailsService: ClassDetailsService,
@@ -147,38 +149,10 @@ export class TeaScoreComponent implements OnInit, AfterViewInit {
   ) {
     this.chartOptions = {
       series: [
-        {
-          name: 'Số lượng học sinh',
-          data: [],
-        },
       ],
       chart: {
         type: 'bar',
-        height: 375,
       },
-      colors: [
-        'rgba(255, 69, 96, 0.85)', 'rgba(255, 69, 96, 0.85)', 'rgba(255, 69, 96, 0.85)', 'rgba(255, 69, 96, 0.85)',
-        'rgba(254, 176, 25, 0.85)', 'rgba(254, 176, 25, 0.85)', 'rgba(254, 176, 25, 0.85)', 
-        'rgba(0, 143, 251, 0.85)', 'rgba(0, 143, 251, 0.85)', 
-        'rgba(0, 227, 150, 0.85)', 'rgba(0, 227, 150, 0.85)'
-      ],
-      xaxis: {
-        categories: [
-          '0', '1', '2', '3', '4', '5',
-          '6', '7', '8', '9', '10',
-        ],
-      },
-      plotOptions: {
-        bar: {
-          distributed: true,
-          columnWidth: '50%',
-        },
-      },
-      legend: {
-        show: false
-      },
-      yaxis: {
-      }
     };
   }
 
@@ -404,17 +378,44 @@ export class TeaScoreComponent implements OnInit, AfterViewInit {
         maxCount = count;
       }
     });
-  
-    this.chartOptions.series = [
-      {
-        name: 'Số lượng học sinh',
-        data: distribution,
+
+    this.chartOptions = {
+      series: [
+        {
+          name: 'Số lượng học sinh',
+          data: distribution,
+        },
+      ],
+      chart: {
+        type: 'bar',
+        height: 375,
       },
-    ];
-    this.chartOptions.yaxis = {
-      max: maxCount,
-      tickAmount: maxCount
-    }
+      colors: [
+        'rgba(255, 69, 96, 0.85)', 'rgba(255, 69, 96, 0.85)', 'rgba(255, 69, 96, 0.85)', 'rgba(255, 69, 96, 0.85)',
+        'rgba(254, 176, 25, 0.85)', 'rgba(254, 176, 25, 0.85)', 'rgba(254, 176, 25, 0.85)', 
+        'rgba(0, 143, 251, 0.85)', 'rgba(0, 143, 251, 0.85)', 
+        'rgba(0, 227, 150, 0.85)', 'rgba(0, 227, 150, 0.85)'
+      ],
+      xaxis: {
+        categories: [
+          '0', '1', '2', '3', '4', '5',
+          '6', '7', '8', '9', '10',
+        ],
+      },
+      plotOptions: {
+        bar: {
+          distributed: true,
+          columnWidth: '50%',
+        },
+      },
+      legend: {
+        show: false
+      },
+      yaxis: {
+        max: maxCount,
+        tickAmount: maxCount
+      }
+    };
   }
 
   enableEditing() {

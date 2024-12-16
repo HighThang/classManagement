@@ -45,7 +45,7 @@ export class ClassDetailsService {
   }
 
   checkPermissionForStudent(studentId: number, classId: number): Observable<boolean> {
-    const url = `${this.baseUrl}/classroom/isStudentsClassroom?studentId=${studentId}&classroomId=${classId}&active=true`;
+    const url = `${this.baseUrl}/classroom/isStudentsClassroom?studentId=${studentId}&classroomId=${classId}`;
     return this.http.get<boolean>(url);
   }
 

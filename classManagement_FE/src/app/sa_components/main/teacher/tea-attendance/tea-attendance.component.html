@@ -71,7 +71,7 @@
                 <div class="header">
                     <div class="icon-grid-1" style="padding-top: 10px">
                         <app-icon iconName="search" style="padding: 10px; margin-bottom: 0px;"></app-icon>
-                        <mat-form-field appearance="outline" style="width: 55vh;">
+                        <mat-form-field appearance="outline" style="width: 29vw;">
                             <mat-label>Tìm kiếm</mat-label>
                             <input matInput #input1 (input)="applyFilter1($event)" placeholder="Nhập từ khóa tìm kiếm">
                         </mat-form-field>
@@ -136,7 +136,6 @@
                     </ng-container>
 
                     <tr mat-header-row *matHeaderRowDef="displayedColumns1"></tr>
-                    <!-- <tr mat-row *matRowDef="let row; columns: displayedColumns1;"></tr> -->
                     <tr mat-row *matRowDef="let row; columns: displayedColumns1;"
                         [class.highlight-row]="isToday(row.day)">
                     </tr>
@@ -157,7 +156,7 @@
     <div class="dialog-container">
         <div class="header" style="display: flex; justify-content: space-between; align-items: center;">
             <h2 mat-dialog-title style="color: var(--theme-background); font-weight: bold;">
-                Danh sách lớp học</h2>
+                Chi tiết điểm danh</h2>
 
             <div class="icon-grid-1" style="width: 50%;">
                 <app-icon iconName="search" style="padding: 10px; margin-bottom: 0px;"></app-icon>
@@ -238,7 +237,7 @@
             style="display: flex; justify-content: space-between; padding-left: 10px; padding-right: 10px; padding-top: 5px; padding-bottom: 5px;">
             <div class="attendance-by-image">
                 <button mat-raised-button [disabled]="!activeBtn || isEditing" *ngIf="!isEditing2" (click)="enableEditing2()"
-                    style="background-color: var(--theme-background); color: white;">Điểm danh bằng ảnh</button>
+                    style="background-color: var(--theme-background); color: white;"><mat-icon>image</mat-icon>Điểm danh bằng ảnh</button>
                 <div *ngIf="isEditing2" class="editing-controls">
                     <button mat-raised-button (click)="cancelEditing2()"
                         style="background-color: rgb(179, 179, 179); color: white; margin-right: 10px;">
@@ -254,7 +253,7 @@
             <div class="attendance">
                 <button mat-raised-button [disabled]="!activeBtn || isEditing2" *ngIf="!isEditing" (click)="enableEditing()"
                     style="background-color: var(--theme-background); color: white;">
-                    Điểm danh thủ công
+                    <mat-icon>flag</mat-icon>Điểm danh thủ công
                 </button>
                 <div *ngIf="isEditing" class="editing-controls">
                     <button mat-raised-button (click)="markAllAttended()"

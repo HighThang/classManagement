@@ -1,6 +1,6 @@
 <div class="container">
     <div class="content">
-        <h3 class="centered-title">Thông tin người dùng</h3>
+        <h3 class="centered-title" style="margin-bottom: 5px;">Thông tin người dùng</h3>
         <mat-card class="register-card">
 
             <mat-card-content>
@@ -11,10 +11,10 @@
                             <mat-icon>edit</mat-icon>Sửa thông tin
                         </app-button>
                         <div class="edit" *ngIf="isEditing" style="display: flex;">
-                            <button mat-button class="save-button" (click)="saveInfo()" style="background-color: rgb(46, 219, 46); color: white;">
+                            <button mat-raised-button class="save-button" (click)="saveInfo()" style="background-color: rgb(46, 219, 46); color: white;">
                                 <mat-icon>save</mat-icon>Lưu
                             </button>
-                            <button mat-button class="cancel-button" (click)="disableEdit()" style="background-color: rgb(150, 150, 150); color: white; margin-left: 10px;">
+                            <button mat-raised-button class="cancel-button" (click)="disableEdit()" style="background-color: rgb(150, 150, 150); color: white; margin-left: 10px;">
                                 <mat-icon>cancel</mat-icon>Hủy
                             </button>
                         </div>

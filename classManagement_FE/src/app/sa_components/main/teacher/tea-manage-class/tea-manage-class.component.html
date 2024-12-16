@@ -7,12 +7,14 @@
                 <div class="header">
                     <div class="icon-grid-1" style="padding-top: 20px">
                         <app-icon iconName="search" style="padding: 10px; color: var(--theme-background);"></app-icon>
-                        <mat-form-field appearance="outline" style="width: 55vh; padding-bottom: 20px;">
+                        <mat-form-field appearance="outline" style="width: 29vw; padding-bottom: 20px;">
                             <mat-label>Tìm kiếm lớp học</mat-label>
                             <input matInput (input)="applyFilter($event)" placeholder="Nhập từ khóa tìm kiếm">
                         </mat-form-field>
                     </div>
-                    <app-button (click)="openDialog()">Tạo lớp học</app-button>
+                    <button mat-raised-button (click)="openDialog()" style="background-color: var(--theme-background); color: white;">
+                        <mat-icon>add</mat-icon>Tạo lớp học
+                    </button>
                 </div>
 
                 <ng-template #dialogTemplate>
@@ -60,9 +62,7 @@
 
                 <hr>
 
-                <table mat-table [dataSource]="dataSource" matSort matSortActive="id" matSortDirection="asc"
-                    class="example-table">
-                    <!-- ID Column -->
+                <table mat-table [dataSource]="dataSource" matSort matSortActive="id" matSortDirection="asc" class="example-table">
                     <ng-container matColumnDef="id">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header
                             style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">ID
@@ -70,7 +70,6 @@
                         <td mat-cell *matCellDef="let row">{{ row.id }}</td>
                     </ng-container>
 
-                    <!-- Class Name Column -->
                     <ng-container matColumnDef="className">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header
                             style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">Tên
@@ -78,7 +77,6 @@
                         <td mat-cell *matCellDef="let row">{{ row.className }}</td>
                     </ng-container>
 
-                    <!-- Subject Name Column -->
                     <ng-container matColumnDef="subjectName">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header
                             style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">Tên
@@ -86,7 +84,6 @@
                         <td mat-cell *matCellDef="let row">{{ row.subjectName }}</td>
                     </ng-container>
 
-                    <!-- Note Column -->
                     <ng-container matColumnDef="note">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header
                             style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">Ghi
@@ -94,7 +91,6 @@
                         <td mat-cell *matCellDef="let row">{{ row.note }}</td>
                     </ng-container>
 
-                    <!-- Created Date Column -->
                     <ng-container matColumnDef="createdDate">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header
                             style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">Ngày
@@ -103,7 +99,6 @@
                             'dd/MM/yyyy, HH:mm a' }}</td>
                     </ng-container>
 
-                    <!-- Attendance Column -->
                     <ng-container matColumnDef="attendance">
                         <th mat-header-cell *matHeaderCellDef
                             style="text-align: center; background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
@@ -116,7 +111,6 @@
                         </td>
                     </ng-container>
 
-                    <!-- Score Column -->
                     <ng-container matColumnDef="score">
                         <th mat-header-cell *matHeaderCellDef
                             style="text-align: center; background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
@@ -129,7 +123,6 @@
                         </td>
                     </ng-container>
 
-                    <!-- Fee Column -->
                     <ng-container matColumnDef="fee">
                         <th mat-header-cell *matHeaderCellDef
                             style="text-align: center; background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
@@ -142,7 +135,6 @@
                         </td>
                     </ng-container>
 
-                    <!-- Details Column -->
                     <ng-container matColumnDef="details">
                         <th mat-header-cell *matHeaderCellDef
                             style="text-align: center; background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
