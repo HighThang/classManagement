@@ -196,8 +196,8 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
         this.showToast('success', 'Chỉnh sửa thành công!');
         this.loadClassDetails();
       },
-      error: () => {
-        this.showToast('error', 'Đã có lỗi xảy ra khi lưu!');
+      error: (err) => {
+        this.showToast('error', err.error.error || 'Lỗi khi sửa thông tin lớp học');
       },
     });
   }

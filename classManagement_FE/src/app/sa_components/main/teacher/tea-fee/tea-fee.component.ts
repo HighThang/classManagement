@@ -237,6 +237,7 @@ export class TeaFeeComponent implements OnInit, AfterViewInit {
 
     this.feeService.calculateNewFee(classId, month, year, classSessionPrice).subscribe({
       next: () => {
+        this.loadTutorFee(classId);
         this.showToast('success', 'Tính học phí thành công')
       },
       error: (error) => {
@@ -389,6 +390,7 @@ export class TeaFeeComponent implements OnInit, AfterViewInit {
       next: () => {
         this.showToast('success', 'Tính lại học phí thành công');
         this.loadTutorFeeDetails(this.tutorFeeId);
+        this.loadTutorFee(this.classId);
         this.formGroup3.disable();
         this.isEditing = false;
         this.selectedTutorFee.lessonPrice = re_classSessionPrice;

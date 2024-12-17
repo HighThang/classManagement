@@ -85,10 +85,6 @@ export class TeaPaymentComponent implements OnInit, AfterViewInit {
   ) {}
 
   ngOnInit(): void {
-    const userData = sessionStorage.getItem('currentUser');
-    const user = JSON.parse(userData!);
-    const teacherId = user.id;
-
     this.loadClassrooms();
 
     this.loadTutorFeeDetails();
@@ -106,11 +102,13 @@ export class TeaPaymentComponent implements OnInit, AfterViewInit {
   }
 
   loadTutorFeeDetails(): void {
-    const params = { ...this.filters };
+    const params = { };
     this.feeService.getStudentNotSubmittedTutorFee(params).subscribe({
       next: (response: any) => {
         this.originalData = response.data;
         this.dataSource1.data = response.data;
+
+        this.reapplyFilters();
       },
       error: (err) => {
         console.error('Error fetching tutor fee details:', err);
@@ -131,6 +129,23 @@ export class TeaPaymentComponent implements OnInit, AfterViewInit {
       this.filters[key] = value?.trim().toLowerCase();
     }  
 
+    this.dataSource1.data = this.originalData.filter((item) => {
+      return Object.keys(this.filters).every((filterKey) => {
+        if (!this.filters[filterKey]) return true;
+  
+        const filterValue = this.filters[filterKey];
+        if (filterKey === 'name') {
+          const fullName = `${item.lastName ?? ''} ${item.surname ?? ''} ${item.firstName ?? ''}`.toLowerCase();
+          return fullName.includes(filterValue);
+        } else {
+          const itemValue = item[filterKey]?.toString().toLowerCase();
+          return itemValue?.includes(filterValue);
+        }
+      });
+    });
+  }
+
+  reapplyFilters(): void {
     this.dataSource1.data = this.originalData.filter((item) => {
       return Object.keys(this.filters).every((filterKey) => {
         if (!this.filters[filterKey]) return true;

@@ -75,25 +75,43 @@ export class TeaCourseComponent implements AfterViewInit {
       idTeacher: teacherId,      
     };
   
-    this.courseService.addCourse(courseData).subscribe({
-      next: () => {
-        Swal.fire({
-          icon: 'success',
-          title: 'Thành công',
-          text: 'Yêu cầu đã được gửi thành công! Hãy chờ admin phê duyệt.',
-        });
-        this.dialog.closeAll();
-        this.loadCourses();
-
-        this.subjectName = '';  
+    this.courseService.checkSubjectExists(this.subjectName).subscribe({
+      next: (response) => {
+        if (!response.exists) {
+          this.courseService.addCourse(courseData).subscribe({
+            next: () => {
+              this.showToast('success', 'Gửi yêu cầu tạo môn học thành công')
+              this.dialog.closeAll();
+              this.loadCourses();
+      
+              this.subjectName = '';  
+            },
+            error: () => {
+              this.showToast('error', 'Có lỗi xảy ra khi gửi yêu cầu')
+            },
+          });
+        }
+        else {
+          this.showToast('error', 'Môn học đã tồn tại, hãy kiểm tra lại')
+        }
       },
       error: () => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Lỗi',
-          text: 'Gửi yêu cầu thất bại. Vui lòng thử lại!',
-        });
+        this.showToast('error', 'Có lỗi xảy ra khi kiểm tra môn học')
       },
     });
   }  
+
+  showToast(icon: 'success' | 'error' | 'info' | 'warning', title: string) {
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'bottom-end',
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+    });
+    Toast.fire({
+      icon: icon,
+      title: title,
+    });
+  }
 }

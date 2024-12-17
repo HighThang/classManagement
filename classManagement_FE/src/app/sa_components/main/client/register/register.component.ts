@@ -85,16 +85,16 @@ export class RegisterComponent implements OnInit {
 
   onRegister() {
     if (this.registerForm.valid) {
-      this.isLoading = true; // Bắt đầu loading
+      this.isLoading = true;
       this.email = this.registerForm.get('email')?.value;
 
       this.http.post(`http://localhost:8081/api/auth/send-code?email=${encodeURIComponent(this.email)}`, {}).subscribe({
         next: () => {
-          this.isLoading = false; // Kết thúc loading
+          this.isLoading = false;
           this.dialog.open(this.dialogTemplate);
         },
         error: () => {
-          this.isLoading = false; // Kết thúc loading
+          this.isLoading = false;
           Swal.fire('Lỗi', 'Không thể gửi email. Vui lòng thử lại.', 'error');
         },
       });
@@ -102,7 +102,7 @@ export class RegisterComponent implements OnInit {
   }
 
   verifyCode() {
-    this.isLoading = true; // Bắt đầu loading
+    this.isLoading = true;
     this.verificationCode = this.verificationForm.get('verificationCode')?.value;
 
     this.http.get<boolean>(`http://localhost:8081/api/auth/verify-code?email=${encodeURIComponent(this.email)}&code=${this.verificationCode}`).subscribe({
@@ -110,12 +110,12 @@ export class RegisterComponent implements OnInit {
         if (isValid) {
           this.createAccount();
         } else {
-          this.isLoading = false; // Kết thúc loading
+          this.isLoading = false;
           Swal.fire('Lỗi', 'Mã xác minh không chính xác.', 'error');
         }
       },
       error: () => {
-        this.isLoading = false; // Kết thúc loading
+        this.isLoading = false;
         Swal.fire('Lỗi', 'Không thể xác minh mã. Vui lòng thử lại.', 'error');
       },
     });
@@ -132,13 +132,13 @@ export class RegisterComponent implements OnInit {
 
     this.http.post('http://localhost:8081/api/auth/signup', formData).subscribe({
       next: () => {
-        this.isLoading = false; // Kết thúc loading
+        this.isLoading = false;
         Swal.fire('Thành công', 'Đã gửi yêu cầu tạo tài khoản.', 'success');
         this.dialog.closeAll();
         this.router.navigate(['/login']);
       },
       error: () => {
-        this.isLoading = false; // Kết thúc loading
+        this.isLoading = false;
         Swal.fire('Lỗi', 'Không thể tạo tài khoản.', 'error');
       },
     });

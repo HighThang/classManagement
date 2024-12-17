@@ -237,8 +237,6 @@ export class StuFeeComponent implements OnInit, AfterViewInit {
           }));
   
         this.dataSource1.data = activeData;
-
-        console.log(this.dataSource1.data)
       },
       error: () => {
         this.showToast('error', 'Lỗi khi tải dữ liệu');

@@ -100,30 +100,13 @@ export class TeaManageClassComponent implements OnInit, AfterViewInit {
 
     this.classroomService.createClassroom(classData).subscribe({
       next: () => {
-        Swal.fire({
-          icon: 'success',
-          title: 'Tạo lớp học thành công!',
-          toast: true,
-          position: 'bottom-end',
-          timer: 2000,
-          timerProgressBar: true,
-          showConfirmButton: false,
-        });
+        this.showToast('success', 'Tạo mới lớp học thành công');
         this.loadData();
         this.dialog.closeAll();
         this.formGroup.reset();
       },
-      error: () => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Tạo lớp học thất bại!',
-          text: 'Vui lòng thử lại.',
-          toast: true,
-          position: 'bottom-end',
-          timer: 3000,
-          timerProgressBar: true,
-          showConfirmButton: false,
-        });
+      error: (err) => {
+        this.showToast('error', err.error.error || 'Lỗi khi tạo mới lớp học');
       },
     });
   }
@@ -144,6 +127,20 @@ export class TeaManageClassComponent implements OnInit, AfterViewInit {
       error: (err) => {
         console.error('Error fetching subjects:', err);
       },
+    });
+  }
+
+  showToast(icon: 'success' | 'error' | 'info' | 'warning', title: string) {
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'bottom-end',
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+    });
+    Toast.fire({
+      icon: icon,
+      title: title,
     });
   }
 }

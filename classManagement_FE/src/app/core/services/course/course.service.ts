@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface Course {
@@ -23,5 +23,10 @@ export class CourseService {
   addCourse(courseData: { subName: string; idTeacher: number }): Observable<string> {
     const url = `${this.apiUrl}?subName=${encodeURIComponent(courseData.subName)}&idTeacher=${courseData.idTeacher}`;
     return this.http.post(url, null, { responseType: 'text' });
+  }
+
+  checkSubjectExists(subName: string): Observable<{ exists: boolean }> {
+    const params = new HttpParams().set('subName', subName);
+    return this.http.get<{ exists: boolean }>(`${this.apiUrl}/check-exists-subject`, { params });
   }
 }
