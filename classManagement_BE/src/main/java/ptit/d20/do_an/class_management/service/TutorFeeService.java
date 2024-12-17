@@ -326,7 +326,7 @@ public class TutorFeeService {
 
         List<TutorFeeDetail> tutorFeeDetails = new ArrayList<>();
         for (ClassRegistration student : classRegistrations1) {
-            if (student.getActive() == false) {
+            if (student.getActive() == false && student.getDeleted() == false) {
                 continue; // Bỏ qua bản ghi này
             }
 
@@ -504,7 +504,7 @@ public class TutorFeeService {
         List<ClassRegistration> studentCalculated = existFeeDetails.stream().map(TutorFeeDetail::getClassRegistration).collect(Collectors.toList());
         List<ClassRegistration> newStudent = new ArrayList<>();
         for (ClassRegistration classRegistration : classRegistrations) {
-            if (!studentCalculated.contains(classRegistration) && classRegistration.getActive() == true) {
+            if (!studentCalculated.contains(classRegistration) && (classRegistration.getActive() == true || classRegistration.getDeleted() == true)) {
                 newStudent.add(classRegistration);
             }
         }
@@ -576,7 +576,7 @@ public class TutorFeeService {
 //        return new PageImpl<>(tutorFeeDetailDtos);
 //    }
 
-    public List<TutorFeeDetailDto> getTutorFeeForStudent(Long classId) {
+    public List<TutorFeeDetailDto>getTutorFeeForStudent(Long classId) {
         User user = userService.getCurrentUserLogin();
         if (user.getRole().getName() != RoleName.STUDENT) {
             throw new BusinessException("Not have permission");
@@ -585,7 +585,7 @@ public class TutorFeeService {
         Classroom classroom = classroomService.getById(classId);
         ClassRegistration classRegistration = classroom.getClassRegistrations().stream()
                 .filter(classRegistration1 -> classRegistration1.getStudent() != null
-                        && classRegistration1.getActive() != false
+                        && (classRegistration1.getActive() == true || classRegistration1.getDeleted() == true)
                         && classRegistration1.getStudent().equals(user))
                 .findFirst()
                 .orElseThrow(() -> new ResourceNotFoundException("Not found info"));

@@ -8,7 +8,9 @@ import ptit.d20.do_an.class_management.domain.Subject;
 import ptit.d20.do_an.class_management.dto.SubjectDto;
 import ptit.d20.do_an.class_management.service.SubjectService;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/subjects")
@@ -29,11 +31,18 @@ public class SubjectController {
         return ResponseEntity.status(HttpStatus.CREATED).body("Subject created successfully with ID: " + createdSubject.getId());
     }
 
-    // API lấy danh sách môn học active = 1, deleted = 0
     @GetMapping("/active")
     public ResponseEntity<List<SubjectDto>> getActiveSubjects() {
         List<SubjectDto> activeSubjects = subjectService.getActiveSubjects();
         return ResponseEntity.ok(activeSubjects);
+    }
+
+    @GetMapping("/check-exists-subject")
+    public ResponseEntity<Map<String, Object>> checkSubjectExists(@RequestParam String subName) {
+        boolean exists = subjectService.checkSubjectExists(subName);
+        Map<String, Object> response = new HashMap<>();
+        response.put("exists", exists);
+        return ResponseEntity.ok(response);
     }
 }
 

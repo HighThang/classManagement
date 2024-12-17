@@ -91,14 +91,27 @@ public class ClassroomService {
     }
 
     public ApiResponse createNewClass(NewClassRequest request) {
+        // Lấy thông tin người dùng hiện tại
         User currentLoginUser = SecurityUtils.getCurrentUserLogin()
                 .flatMap(userRepository::findByUsername)
                 .orElseThrow(() -> new BusinessException("Can not find current user login!"));
 
+        // Kiểm tra xem người dùng hiện tại có phải là giáo viên không
         if (currentLoginUser.getRole().getName() != RoleName.TEACHER) {
             throw new BusinessException("Only teacher can create new class!");
         }
 
+        // Kiểm tra xem giáo viên đã từng tạo lớp với tên này chưa
+        boolean classExists = classroomRepository.existsByTeacherIdAndClassNameAndSubjectName(
+                currentLoginUser.getId(),
+                request.getClassName(),
+                request.getSubjectName()
+        );
+        if (classExists) {
+            throw new BusinessException("Lớp học của bạn đã tồn tại!");
+        }
+
+        // Tạo lớp học mới
         Classroom newClass = new Classroom();
         newClass.setClassName(request.getClassName());
         newClass.setSubjectName(request.getSubjectName());
@@ -107,6 +120,7 @@ public class ClassroomService {
         newClass.setDeleted(false);
 
         classroomRepository.save(newClass);
+
         log.info("Created new class for teacher with login {}", currentLoginUser.getUsername());
         return new ApiResponse(true, "Created new class successfully");
     }
@@ -426,6 +440,7 @@ public class ClassroomService {
 
     public ClassroomDto updateClassDetail(ClassroomDto classroomDto) {
         Classroom classroom = getById(classroomDto.getId());
+
         if (StringUtils.isNotBlank(classroomDto.getClassName())) {
             classroom.setClassName(classroomDto.getClassName());
         }
@@ -435,6 +450,16 @@ public class ClassroomService {
         if (StringUtils.isNotBlank(classroomDto.getNote())) {
             classroom.setNote(classroomDto.getNote());
         }
+
+        boolean classExists = classroomRepository.existsByTeacherIdAndClassNameAndSubjectName(
+                classroom.getTeacher().getId(),
+                classroom.getClassName(),
+                classroom.getSubjectName()
+        );
+        if (classExists) {
+            throw new BusinessException("Lớp học của bạn đã tồn tại!");
+        }
+
         classroom = classroomRepository.save(classroom);
         log.info("Updated classroom with id {}, name {}", classroom.getId(), classroom.getClassName());
         return buildClassroomDto(classroom);

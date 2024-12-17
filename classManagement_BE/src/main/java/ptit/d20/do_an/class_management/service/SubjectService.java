@@ -106,6 +106,10 @@ public class SubjectService {
         return subjectRepository.save(newSubject);
     }
 
+    public boolean checkSubjectExists(String subName) {
+        return subjectRepository.existsBySubName(subName);
+    }
+
     // Lấy danh sách môn học có active = 1 và deleted = 0
     public List<SubjectDto> getActiveSubjects() {
         List<Subject> subjects = subjectRepository.findByActiveAndDeleted(1, 0);

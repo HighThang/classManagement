@@ -91,8 +91,8 @@ public class AuthController {
     }
 
     @GetMapping("/verify-code")
-    public ResponseEntity<?> verifyEmail(String email, String code) {
-        return ResponseEntity.ok(userService.verifyEmail(email, code));
+    public ResponseEntity<?> verifyEmailToCreateAccount(String email, String code) {
+        return ResponseEntity.ok(userService.verifyEmailToCreateAccount(email, code));
     }
 
     @PostMapping("/send-code")

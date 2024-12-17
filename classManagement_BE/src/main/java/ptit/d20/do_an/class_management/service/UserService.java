@@ -106,10 +106,10 @@ public class UserService {
         user.setActive(false);
         user.setDeleted(false);
         user.setNumberActiveAttempt(0);
-        String activeCode = RandomStringUtils.randomAlphanumeric(6);
-        user.setActiveCode(activeCode);
+//        String activeCode = RandomStringUtils.randomAlphanumeric(6);
+//        user.setActiveCode(activeCode);
 
-        sendEmailVerification(user);
+//        sendEmailVerification(user);
         user = userRepository.save(user);
     }
 
@@ -174,6 +174,13 @@ public class UserService {
 
             sendEmailVerification(user, randomPassword);
             student.setStudent(user);
+
+            final User savedUser = user;
+            List<ClassRegistration> registrationsToUpdate =
+                    classRegistrationRepository.findAllByEmailAndStudentIsNull(student.getEmail());
+
+            registrationsToUpdate.forEach(registration -> registration.setStudent(savedUser));
+            classRegistrationRepository.saveAll(registrationsToUpdate);
         }
     }
 
@@ -413,29 +420,6 @@ public class UserService {
         return userRepository.existsByEmail(email);
     }
 
-    public List<UserDetailDto> getPendingTeachers() {
-        // Fetch users with the 'TEACHER' role and inactive status
-        List<User> pendingTeachers = userRepository.findByRoleNameAndActiveFalse(RoleName.TEACHER);
-
-        // Convert the list of users to UserDetailDto
-        return pendingTeachers.stream()
-                .map(user -> new UserDetailDto(
-                        user.getId(),
-                        user.getUsername(),
-                        user.getEmail(),
-                        user.getFirstName(),
-                        user.getLastName(),
-                        user.getPhone(),
-                        user.getDob(),
-                        user.getBusiness(),
-                        user.getImageURL(),
-                        user.getAddress(),
-                        user.getActive(),
-                        user.getDeleted()
-                ))
-                .collect(Collectors.toList());
-    }
-
     public boolean activateTeacherAccount(Long teacherId) {
         // Fetch the user by ID
         Optional<User> teacherOptional = userRepository.findById(teacherId);
@@ -477,12 +461,6 @@ public class UserService {
         return "Invalid"; // Return "Invalid" if user doesn't exist or isn't a TEACHER
     }
 
-    // Get all students
-    public List<UserDetailDto> getAllStudents() {
-        List<User> students = userRepository.findByRoleName(RoleName.STUDENT);
-        return students.stream().map(UserDetailDto::new).collect(Collectors.toList());
-    }
-
     // Activate a student
     public boolean activateStudent(Long studentId) {
         Optional<User> studentOptional = userRepository.findById(studentId);
@@ -513,26 +491,6 @@ public class UserService {
         return false;
     }
 
-    // Get all teachers
-    public List<UserDetailDto> getAllTeachers() {
-        List<User> teachers = userRepository.findByRoleName(RoleName.TEACHER);
-        return teachers.stream().map(UserDetailDto::new).collect(Collectors.toList());
-    }
-
-    public List<UserDetailDto> getInactiveTeachers() {
-        return userRepository.findByRoleNameAndActiveAndDeleted(RoleName.TEACHER, false, false)
-                .stream()
-                .map(UserDetailDto::new)
-                .collect(Collectors.toList());
-    }
-
-    public List<UserDetailDto> getActiveOrDeletedTeachers() {
-        return userRepository.findByRoleNameAndActiveOrDeleted(RoleName.TEACHER, true, true)
-                .stream()
-                .map(UserDetailDto::new)
-                .collect(Collectors.toList());
-    }
-
     public List<UserDetailDto> getTeacherByActiveAndDeleted(boolean active, boolean deleted) {
         return userRepository.findByRoleNameAndActiveAndDeleted(RoleName.TEACHER, active, deleted)
                 .stream()
@@ -547,7 +505,7 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public Boolean verifyEmail(String email, String code) {
+    public Boolean verifyEmailToCreateAccount(String email, String code) {
         Optional<EmailCode> emailCode = emailCodeRepository.findById(email);
         if (emailCode.isEmpty()) return false;
 
@@ -562,8 +520,8 @@ public class UserService {
         emailCodeRepository.save(emailCode);
 
         EmailDetail emailDetail = new EmailDetail();
-        emailDetail.setSubject("Classroom verification");
-        emailDetail.setMsgBody("Here is your code to reset your password: " + emailCode.getCode());
+        emailDetail.setSubject("Xác thực tài khoản lớp học");
+        emailDetail.setMsgBody("Đây là mã xác thực tài khoản email của bạn: " + emailCode.getCode());
         emailDetail.setRecipient(email);
 
         log.info("Sending email forgot password for email {}", emailCode.getEmail());

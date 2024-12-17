@@ -11,4 +11,5 @@ public interface SubjectRepository extends JpaRepository<Subject, Integer> {
     List<Subject> findAll(); // Method to get all subjects
     List<Subject> findByActiveAndDeleted(int active, int deleted);
 
+    boolean existsBySubName(String subName);
 }
