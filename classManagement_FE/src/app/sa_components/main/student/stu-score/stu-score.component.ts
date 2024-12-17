@@ -138,9 +138,6 @@ export class StuScoreComponent implements OnInit, AfterViewInit {
     this.chartOptions = {
       series: [
       ],
-      chart: {
-        type: 'bar',
-      },
     };
   }
 

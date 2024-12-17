@@ -150,9 +150,6 @@ export class TeaScoreComponent implements OnInit, AfterViewInit {
     this.chartOptions = {
       series: [
       ],
-      chart: {
-        type: 'bar',
-      },
     };
   }
 
