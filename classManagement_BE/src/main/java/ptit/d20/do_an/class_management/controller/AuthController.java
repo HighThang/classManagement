@@ -90,6 +90,12 @@ public class AuthController {
         return ResponseEntity.ok(exists);
     }
 
+    @GetMapping("/isExistingRequestInWishList")
+    public ResponseEntity<Boolean> isExistingRequestInWishList(@RequestParam String email, Long classroomId) {
+        boolean exists = userService.isExistingRequestInWishList(email, classroomId);
+        return ResponseEntity.ok(exists);
+    }
+
     @GetMapping("/verify-code")
     public ResponseEntity<?> verifyEmailToCreateAccount(String email, String code) {
         return ResponseEntity.ok(userService.verifyEmailToCreateAccount(email, code));

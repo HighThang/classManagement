@@ -533,4 +533,8 @@ public class UserService {
     public boolean isExistingEmailInWishList(String email) {
         return classRegistrationRepository.existsByEmail(email);
     }
+
+    public boolean isExistingRequestInWishList(String email, Long classroomId) {
+        return classRegistrationRepository.existsByEmailAndClassroomId(email, classroomId);
+    }
 }

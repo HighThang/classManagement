@@ -39,4 +39,6 @@ public interface ClassRegistrationRepository extends JpaSpecificationExecutor<Cl
 
     @Query("SELECT c FROM ClassRegistration c WHERE c.email = :email AND c.student IS NULL")
     List<ClassRegistration> findAllByEmailAndStudentIsNull(@Param("email") String email);
+
+    boolean existsByEmailAndClassroomId(String email, Long classroomId);
 }
