@@ -243,7 +243,7 @@
                         style="background-color: rgb(179, 179, 179); color: white; margin-right: 10px;">
                         Hủy
                     </button>
-                    <button mat-raised-button (click)="saveImageClassAttendance()"
+                    <button mat-raised-button (click)="saveImageClassAttendance()" [disabled]="!file_store"
                         style="background-color: rgb(0, 175, 0); color: white; margin-right: 10px;">
                         Gửi
                     </button>
@@ -320,3 +320,27 @@
         </mat-paginator>
     </div>
 </ng-template>
+
+<ng-template #attendedByImage>
+    <div class="dialog-container">
+        <h2 mat-dialog-title style="color: var(--theme-background); font-weight: bold;">Kết quả điểm danh</h2>
+        <hr>
+        <mat-dialog-content>
+            <div *ngIf="attendedResponses">
+                <li>Có {{ attendedResponses.matched_students.length }} học sinh điểm danh thành công.</li>
+                <li>Có {{ attendedResponses.students_not_in_photo.length }} học sinh điểm danh không thành công.</li>
+                <li *ngIf="attendedResponses.students_without_encoding.length > 0">Phát hiện {{ attendedResponses.students_without_encoding.length }} 
+                    học sinh có ảnh gương mặt không hợp lệ: {{ withoutEncodingNames }}</li>
+                <li *ngIf="attendedResponses.unmatched_faces_counts > 0">Phát hiện {{ attendedResponses.unmatched_faces_counts }} gương mặt không xác định.</li>
+            </div>
+        </mat-dialog-content>
+        <hr>
+        <mat-dialog-actions align="end" class="dialog-footer">
+            <button mat-button mat-dialog-close style="background-color: var(--theme-background); color: white;">Đóng</button>
+        </mat-dialog-actions>
+    </div>
+</ng-template>
+
+<div *ngIf="isLoading" class="loading-overlay">
+    <mat-spinner></mat-spinner>
+</div>

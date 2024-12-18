@@ -64,8 +64,6 @@ export class StuClassListComponent implements AfterViewInit {
 
         this.dataSource.data = activeData; 
         this.dataSource2.data = inactiveData; 
-
-        console.log(this.dataSource2.data)
       },
       error: () => {
         this.showToast('error', 'Lỗi khi tải dữ liệu lớp học')
