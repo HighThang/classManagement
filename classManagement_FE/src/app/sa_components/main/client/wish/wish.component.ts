@@ -134,10 +134,16 @@ export class WishComponent implements OnInit {
         idClassroom: this.extractClassId(this.thirdFormGroup.get('teachers')?.value) 
       };
   
-      this.clientService.requestToClass(requestDto).subscribe((response) => {
-        const classId = response; 
-        if (classId) {
-          this.uploadImage(classId);
+      this.clientService.checkIfRequestExistsForClient(requestDto.email, requestDto.idClassroom!).then((exists) => {
+        if (exists) {
+          Swal.fire('Thông báo', 'Bạn đã gửi yêu cầu trước đó.', 'warning');
+        } else {
+          this.clientService.requestToClass(requestDto).subscribe((response) => {
+            const classId = response; 
+            if (classId) {
+              this.uploadImage(classId);
+            }
+          });
         }
       });
     }

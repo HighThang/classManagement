@@ -28,4 +28,12 @@ export class ClientService {
     const url = `${this.apiUrl}/image-to-class/${id}`;
     return this.http.put<boolean>(url, formData);
   }
+
+  checkIfRequestExistsForClient(email: number, classroomId: number): Promise<boolean> {
+    const apiUrl = `http://localhost:8081/api/auth/isExistingRequestInWishList?email=${email}&classroomId=${classroomId}`;
+    return this.http
+      .get<boolean>(apiUrl).toPromise()
+      .then((response) => response || false)
+      .catch(() => false);
+  }
 }
