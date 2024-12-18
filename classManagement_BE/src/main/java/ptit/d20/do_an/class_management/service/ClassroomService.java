@@ -430,6 +430,8 @@ public class ClassroomService {
         classroomDto.setCreatedDate(classroom.getCreatedDate());
         User teacher = classroom.getTeacher();
         classroomDto.setTeacherName(teacher.getLastName() + " " + teacher.getSurname() + " " + teacher.getFirstName());
+        classroomDto.setTeacherEmail(teacher.getEmail());
+        classroomDto.setTeacherPhone(teacher.getPhone());
 
         return classroomDto;
     }
