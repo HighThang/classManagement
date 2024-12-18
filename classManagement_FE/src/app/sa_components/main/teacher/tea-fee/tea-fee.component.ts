@@ -161,7 +161,9 @@ export class TeaFeeComponent implements OnInit, AfterViewInit {
       createdDate: '',
       note: '',
       className: '',
-      teacherName: ''
+      teacherName: '',
+      teacherEmail: '',
+      teacherPhone: ''
     };
 
     this.loadClassrooms();

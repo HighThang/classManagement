@@ -40,6 +40,38 @@
                     </div>
                 </div>
 
+                <div class="class-info" style="padding-left: 10px; padding-right: 10px;">
+                    <div class="form-section">
+                        <div class="icon-grid-1">
+                            <app-icon iconName="person"></app-icon>
+                            <mat-form-field appearance="outline" style="margin-bottom: 10px;">
+                                <mat-label>Tên giáo viên</mat-label>
+                                <input matInput [(ngModel)]="classDetails.teacherName" disabled>
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="icon-grid-1">
+                            <app-icon iconName="email"></app-icon>
+                            <mat-form-field appearance="outline" style="margin-bottom: 10px;">
+                                <mat-label>Email</mat-label>
+                                <input matInput [(ngModel)]="classDetails.teacherEmail" disabled>
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="icon-grid-1">
+                            <app-icon iconName="phone"></app-icon>
+                            <mat-form-field appearance="outline" style="margin-bottom: 10px;">
+                                <mat-label>Số điện thoại</mat-label>
+                                <input matInput [ngModel]="classDetails.teacherPhone" disabled>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="form-section2" style="padding-left: 10px; padding-right: 10px;">
                     <div class="icon-grid-1">
                         <app-icon iconName="note"></app-icon>

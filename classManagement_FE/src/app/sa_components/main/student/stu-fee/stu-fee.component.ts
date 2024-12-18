@@ -142,6 +142,8 @@ export class StuFeeComponent implements OnInit, AfterViewInit {
       note: '',
       className: '',
       teacherName: '',
+      teacherEmail: '',
+      teacherPhone: ''
     };
 
     this.loadClassrooms();

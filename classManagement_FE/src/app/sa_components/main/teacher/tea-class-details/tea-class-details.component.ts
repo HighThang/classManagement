@@ -128,9 +128,11 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
       createdDate: '',
       note: '',
       className: '',
-      teacherName: ''
+      teacherName: '',
+      teacherEmail: '',
+      teacherPhone: ''
     };
-
+    
     this.classDetailsService.checkPermission(teacherId, this.classId).subscribe({
       next: (hasPermission) => {
         if (hasPermission) {

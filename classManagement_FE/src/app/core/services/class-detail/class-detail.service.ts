@@ -9,6 +9,8 @@ export interface ClassDetails {
   createdDate: string;
   note: string;
   teacherName: string;
+  teacherEmail: string;
+  teacherPhone: string;
 }
 
 export interface ScheduleData {

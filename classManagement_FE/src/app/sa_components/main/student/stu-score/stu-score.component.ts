@@ -160,6 +160,8 @@ export class StuScoreComponent implements OnInit, AfterViewInit {
       note: '',
       className: '',
       teacherName: '',
+      teacherEmail: '',
+      teacherPhone: ''
     };
 
     this.loadClassrooms();
