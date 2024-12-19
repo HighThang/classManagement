@@ -13,8 +13,8 @@ import { MatButtonModule } from '@angular/material/button';
   styleUrl: './home.component.scss'
 })
 export class HomeComponent {
-  teacherImages = ['/ani_pic(7).jpg'];
-  studentImages = ['/ani_pic(7).jpg'];
+  teacherImages = ['/gv1.png', '/gv2.png', '/gv3.png', '/gv4.png', '/gv5.png', '/gv6.png', '/gv7.png'];
+  studentImages = ['/hs1.png', '/hs2.png', '/hs3.png', '/hs4.png', '/hs5.png', '/hs6.png'];
 
   teacherImageIndex: number = 0;
   studentImageIndex: number = 0;
@@ -51,6 +51,14 @@ export class HomeComponent {
     } else {
       this.studentImageIndex = (this.studentImageIndex === this.studentImages.length - 1) ? 0 : this.studentImageIndex + 1;
       this.currentStudentImage = this.studentImages[this.studentImageIndex];
+    }
+  }
+
+  onTabChange(event: any) {
+    if (event.index === 0) {
+      this.showTeacherImages();
+    } else if (event.index === 1) {
+      this.showStudentImages();
     }
   }
 }

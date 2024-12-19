@@ -11,8 +11,8 @@
                 <img src="ani1-removebg.png"/>
             </div>
         </div>
-        <mat-tab-group mat-stretch-tabs class="mat-elevation-z4">
-            <mat-tab (click)="showTeacherImages()" label="Giao diện của Giáo Viên">
+        <mat-tab-group mat-stretch-tabs class="mat-elevation-z4" (selectedTabChange)="onTabChange($event)">
+            <mat-tab label="Giao diện của Giáo Viên">
                 <div class="teacher">
                     <div class="mota">
                         <h1 class="title">Chức năng của giáo viên:</h1>
@@ -33,7 +33,7 @@
                     </div>
                 </div>
             </mat-tab>
-            <mat-tab (click)="showStudentImages()" label="Giao diện của Học Sinh">
+            <mat-tab label="Giao diện của Học Sinh">
                 <div class="student">
                     <div class="mota">
                         <h1 class="title">Chức năng của học sinh:</h1>
@@ -42,7 +42,7 @@
                         <p class="description">- Xem điểm.</p>
                         <p class="description">- Xem học phí.</p>
                         <p class="description">- Xem tài liệu.</p>
-                        <p class="description">- Thanh toán học phí.</p>
+                        <p class="description">- Xem học phí.</p>
                     </div>
                     <div class="image-slider">
                         <app-button class="prev" (click)="prevImage()">&#10094;</app-button>
