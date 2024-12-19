@@ -37,15 +37,9 @@ export class ForgetPasswordComponent implements OnInit{
   verifyCodeForm!: FormGroup;
   isLoading = false;
   matcher = new MyErrorStateMatcher();
-
-  @ViewChild('dialogTemplate') dialogTemplate: any;
-
   hide = signal(true);
 
-  clickEvent(event: MouseEvent) {
-    this.hide.set(!this.hide());
-    event.stopPropagation();
-  }
+  @ViewChild('dialogTemplate') dialogTemplate: any;
 
   constructor(
     private fb: FormBuilder,
@@ -70,6 +64,11 @@ export class ForgetPasswordComponent implements OnInit{
     return control.get('newPassword')?.value === control.get('confirmPassword')?.value ? null : { mismatch: true };
   }
 
+  clickEvent(event: MouseEvent) {
+    this.hide.set(!this.hide());
+    event.stopPropagation();
+  }
+
   onSubmitEmail(): void {
     if (this.forgetPasswordForm.invalid) return;
 
@@ -81,14 +80,14 @@ export class ForgetPasswordComponent implements OnInit{
         if (res.success) {
           this.isLoading = false;
           this.openDialog();
-          this.showToast('success', 'Gửi mã xác thực thành công');
+          this.showToast('success', 'Gửi mã xác thực thành công.');
         }
-        else this.showToast('error', 'Gửi mail không thành công');
+        else this.showToast('error', 'Gửi mã không thành công.');
 
       },
       error: () => {
         this.isLoading = false;
-        this.showToast('error', 'Có lỗi xảy ra khi gửi mail');
+        this.showToast('error', 'Có lỗi xảy ra khi gửi mã.');
       },
     });
   }
@@ -110,19 +109,23 @@ export class ForgetPasswordComponent implements OnInit{
     const { code, newPassword } = this.verifyCodeForm.value;
 
     this.isLoading = true;
+    
     this.forgetPassService.resetPassword({email, code, newPassword}).subscribe({
       next: (res) => {
         if (res.success) {
           this.isLoading = false;
           this.dialog.closeAll();
           this.router.navigate(['/login']);
-          this.showToast('success', 'Thay đổi mật khẩu thành công');
+          this.showToast('success', 'Thay đổi mật khẩu thành công.');
         }
-        else this.showToast('error', 'Thay đổi mật khẩu không thành công');
+        else {
+          this.isLoading = false;
+          this.showToast('error', 'Thay đổi mật khẩu không thành công.');
+        }
       },
       error: () => {
         this.isLoading = false;
-        this.showToast('error', 'Có lỗi xảy ra khi đổi mật khẩu');
+        this.showToast('error', 'Có lỗi xảy ra khi đổi mật khẩu.');
       },
     });
   }

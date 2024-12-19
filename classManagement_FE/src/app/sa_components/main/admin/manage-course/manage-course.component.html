@@ -12,12 +12,12 @@
                                 <app-icon iconName="search" style="padding: 10px;"></app-icon>
                                 <mat-form-field appearance="outline" style="width: 55vh;">
                                     <mat-label>Tìm kiếm</mat-label>
-                                    <input matInput (input)="applyFilter1($event)" #input1 placeholder="Nhập từ khóa tìm kiếm">
+                                    <input matInput (input)="applyFilterPending($event)" #input1 placeholder="Nhập từ khóa tìm kiếm">
                                 </mat-form-field>
                             </div>
                         </div>
                         <hr>
-                        <table mat-table [dataSource]="dataSource1" matSort #sort1="matSort" matSortActive="id"
+                        <table mat-table [dataSource]="dataSourcePending" matSort #sortPending="matSort" matSortActive="id"
                             matSortDirection="asc" class="example-table">
                             <ng-container matColumnDef="id">
                                 <th mat-header-cell *matHeaderCellDef mat-sort-header
@@ -68,20 +68,19 @@
                                 </td>
                             </ng-container>
 
-                            <tr mat-header-row *matHeaderRowDef="displayedColumns1"></tr>
-                            <tr mat-row *matRowDef="let row; columns: displayedColumns1;"></tr>
+                            <tr mat-header-row *matHeaderRowDef="displayedColumnsPending"></tr>
+                            <tr mat-row *matRowDef="let row; columns: displayedColumnsPending;"></tr>
 
                             <tr class="mat-row" *matNoDataRow>
                                 <td class="mat-cell" colspan="3">Không có dữ liệu</td>
                             </tr>
                         </table>
-
-                        <mat-paginator #paginator1 [length]="resultsLength" [pageSizeOptions]="[5, 10, 25, 100]"
+                        <mat-paginator #paginatorPending [pageSizeOptions]="[5, 10, 25, 100]"
                             aria-label="Select page">
                         </mat-paginator>
                     </div>
-
                 </mat-tab>
+
                 <mat-tab label="Môn học đang hoạt động">
                     <div class="table">
                         <div class="header">
@@ -89,12 +88,12 @@
                                 <app-icon iconName="search" style="padding: 10px;"></app-icon>
                                 <mat-form-field appearance="outline" style="width: 55vh;">
                                     <mat-label>Tìm kiếm</mat-label>
-                                    <input matInput (input)="applyFilter2($event)" #input2 placeholder="Nhập từ khóa tìm kiếm">
+                                    <input matInput (input)="applyFilterActive($event)" #input2 placeholder="Nhập từ khóa tìm kiếm">
                                 </mat-form-field>
                             </div>
                         </div>
                         <hr>
-                        <table mat-table [dataSource]="dataSource2" matSort #sort2="matSort" matSortActive="id"
+                        <table mat-table [dataSource]="dataSourceActive" matSort #sortActive="matSort" matSortActive="id"
                             matSortDirection="asc" class="example-table">
                             <ng-container matColumnDef="id">
                                 <th mat-header-cell *matHeaderCellDef mat-sort-header
@@ -130,19 +129,17 @@
                                 </td>
                             </ng-container>
 
-                            <tr mat-header-row *matHeaderRowDef="displayedColumns2"></tr>
-                            <tr mat-row *matRowDef="let row; columns: displayedColumns2;"></tr>
+                            <tr mat-header-row *matHeaderRowDef="displayedColumnsActive"></tr>
+                            <tr mat-row *matRowDef="let row; columns: displayedColumnsActive;"></tr>
 
                             <tr class="mat-row" *matNoDataRow>
                                 <td class="mat-cell" colspan="3">Không có dữ liệu</td>
                             </tr>
                         </table>
-
-                        <mat-paginator #paginator2 [length]="resultsLength" [pageSizeOptions]="[5, 10, 25, 100]"
+                        <mat-paginator #paginatorActive [pageSizeOptions]="[5, 10, 25, 100]"
                             aria-label="Select page">
                         </mat-paginator>
                     </div>
-
                 </mat-tab>
 
                 <mat-tab label="Môn học ngừng hoạt động">
@@ -152,12 +149,12 @@
                                 <app-icon iconName="search" style="padding: 10px;"></app-icon>
                                 <mat-form-field appearance="outline" style="width: 55vh;">
                                     <mat-label>Tìm kiếm</mat-label>
-                                    <input matInput (input)="applyFilter3($event)" #input3 placeholder="Nhập từ khóa tìm kiếm">
+                                    <input matInput (input)="applyFilterDisable($event)" #input3 placeholder="Nhập từ khóa tìm kiếm">
                                 </mat-form-field>
                             </div>
                         </div>
                         <hr>
-                        <table mat-table [dataSource]="dataSource3" matSort #sort3="matSort" matSortActive="id"
+                        <table mat-table [dataSource]="dataSourceDisable" matSort #sortDisable="matSort" matSortActive="id"
                             matSortDirection="asc" class="example-table">
                             <ng-container matColumnDef="id">
                                 <th mat-header-cell *matHeaderCellDef mat-sort-header
@@ -193,15 +190,14 @@
                                 </td>
                             </ng-container>
 
-                            <tr mat-header-row *matHeaderRowDef="displayedColumns3"></tr>
-                            <tr mat-row *matRowDef="let row; columns: displayedColumns3;"></tr>
+                            <tr mat-header-row *matHeaderRowDef="displayedColumnsDisable"></tr>
+                            <tr mat-row *matRowDef="let row; columns: displayedColumnsDisable;"></tr>
 
                             <tr class="mat-row" *matNoDataRow>
                                 <td class="mat-cell" colspan="3">Không có dữ liệu</td>
                             </tr>
                         </table>
-
-                        <mat-paginator #paginator3 [length]="resultsLength" [pageSizeOptions]="[5, 10, 25, 100]"
+                        <mat-paginator #paginatorDisable [pageSizeOptions]="[5, 10, 25, 100]"
                             aria-label="Select page">
                         </mat-paginator>
                     </div>

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -18,6 +18,14 @@ import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import { EmailService } from '../../../../core/services/email/email.service';
 
+export function dateLessThanTodayValidator(): ValidatorFn {
+  return (control: AbstractControl): { [key: string]: any } | null => {
+    const today = new Date();
+    const dob = new Date(control.value);
+    return dob >= today ? { 'dateInvalid': true } : null;
+  };
+}
+
 @Component({
   selector: 'app-wish',
   standalone: true,
@@ -31,15 +39,14 @@ import { EmailService } from '../../../../core/services/email/email.service';
 
 export class WishComponent implements OnInit {
   firstFormGroup: FormGroup;
-  secondFormGroup: FormGroup;
-  thirdFormGroup: FormGroup;
-  
-  subjects: string[] = [];
-  teachers: string[] = [];
   selectedImage: string | ArrayBuffer | null = null;
-
-  fileToUpload: File | null = null;
   fileStore: FileList | null = null;
+
+  secondFormGroup: FormGroup;
+  subjects: string[] = [];
+
+  thirdFormGroup: FormGroup;
+  teachers: string[] = [];
 
   constructor(private _formBuilder: FormBuilder, private clientService: ClientService, private router: Router, private emailService: EmailService, private datePipe: DatePipe) {
     this.firstFormGroup = this._formBuilder.group({
@@ -47,8 +54,8 @@ export class WishComponent implements OnInit {
       surname: [''],
       lastName: ['', Validators.required],
       email: ['', [Validators.required, Validators.email], [this.emailService.validate.bind(this.emailService)], [this.emailService.validateWishList.bind(this.emailService)]],
-      dob: ['', Validators.required],
-      phone: ['', [Validators.required, Validators.pattern('[- +()0-9]+')]],
+      dob: ['', [Validators.required, dateLessThanTodayValidator()]],
+      phone: ['', [Validators.required, Validators.pattern('^[- +()0-9]{10}$')]],
       address: ['', Validators.required],
       image: ['', Validators.required]
     });
@@ -59,29 +66,6 @@ export class WishComponent implements OnInit {
 
     this.thirdFormGroup = this._formBuilder.group({
       teachers: ['', Validators.required],
-    });
-  }
-
-  ngOnInit(): void {
-    this.loadSubjects();
-    this.onCourseChange();
-  }
-
-  loadSubjects(): void {
-    this.clientService.getAvailableSubjects().subscribe((data) => {
-      this.subjects = data;
-    });
-  }
-
-  onCourseChange(): void {
-    this.secondFormGroup.get('subjects')?.valueChanges.subscribe((subjectName) => {
-      if (subjectName) {
-        this.clientService.getTeachersBySubject(subjectName).subscribe((data) => {
-          this.teachers = data;
-        });
-      } else {
-        this.teachers = [];
-      }
     });
   }
 
@@ -115,6 +99,29 @@ export class WishComponent implements OnInit {
     }
   }
 
+  ngOnInit(): void {
+    this.loadSubjects();
+    this.onCourseChange();
+  }
+
+  loadSubjects(): void {
+    this.clientService.getAvailableSubjects().subscribe((data) => {
+      this.subjects = data;
+    });
+  }
+
+  onCourseChange(): void {
+    this.secondFormGroup.get('subjects')?.valueChanges.subscribe((subjectName) => {
+      if (subjectName) {
+        this.clientService.getTeachersBySubject(subjectName).subscribe((data) => {
+          this.teachers = data;
+        });
+      } else {
+        this.teachers = [];
+      }
+    });
+  }
+
   submitRegistration(): void {
     if (this.firstFormGroup.valid) {
       const registrationData = this.firstFormGroup.value;
@@ -136,7 +143,7 @@ export class WishComponent implements OnInit {
   
       this.clientService.checkIfRequestExistsForClient(requestDto.email, requestDto.idClassroom!).then((exists) => {
         if (exists) {
-          Swal.fire('Thông báo', 'Bạn đã gửi yêu cầu trước đó.', 'warning');
+          Swal.fire('Thông báo', 'Bạn đã gửi yêu cầu học lớp này trước đó.', 'warning');
         } else {
           this.clientService.requestToClass(requestDto).subscribe((response) => {
             const classId = response; 

@@ -25,12 +25,7 @@ export class LoginComponent {
   
   loginForm: FormGroup;
   passwordFieldType: 'password' | 'text' = 'password';
-
   hide = signal(true);
-  clickEvent(event: MouseEvent) {
-    this.hide.set(!this.hide());
-    event.stopPropagation();
-  }
 
   constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {
     this.loginForm = this.fb.group({
@@ -38,6 +33,11 @@ export class LoginComponent {
       password: ['', Validators.required],
       rememberMe: true,
     });
+  }
+
+  clickEvent(event: MouseEvent) {
+    this.hide.set(!this.hide());
+    event.stopPropagation();
   }
 
   onLogin() {
@@ -75,7 +75,8 @@ export class LoginComponent {
               title: 'Đăng nhập thành công!',
             });
           }
-        });
+        }
+      );
     }
   }
 }

@@ -3,9 +3,7 @@
         <div class="classManagement">
             <h3 class="centered-title">Danh sách học sinh</h3>
 
-            <mat-tab-group mat-stretch-tabs class="example-stretched-tabs mat-elevation-z4"
-                style="background-color: white; border-radius: 10px;">
-
+            <mat-tab-group mat-stretch-tabs class="example-stretched-tabs mat-elevation-z4" style="background-color: white; border-radius: 10px;">
                 <mat-tab label="Tài khoản đang hoạt động">
                     <div class="table">
                         <div class="header">
@@ -13,12 +11,12 @@
                                 <app-icon iconName="search" style="padding: 10px;"></app-icon>
                                 <mat-form-field appearance="outline" style="width: 55vh;">
                                     <mat-label>Tìm kiếm</mat-label>
-                                    <input matInput (input)="applyFilter2($event)" #input2 placeholder="Nhập từ khóa tìm kiếm">
+                                    <input matInput (input)="applyFilterActive($event)" #input2 placeholder="Nhập từ khóa tìm kiếm">
                                 </mat-form-field>
                             </div>
                         </div>
                         <hr>
-                        <table mat-table [dataSource]="dataSource2" matSort #sort2="matSort" matSortActive="id"
+                        <table mat-table [dataSource]="dataSourceActive" matSort #sortActive="matSort" matSortActive="id"
                             matSortDirection="asc" class="example-table">
                             <ng-container matColumnDef="id">
                                 <th mat-header-cell *matHeaderCellDef mat-sort-header
@@ -82,37 +80,32 @@
                                 </td>
                             </ng-container>
 
-                            <tr mat-header-row *matHeaderRowDef="displayedColumns2"></tr>
-                            <tr mat-row *matRowDef="let row; columns: displayedColumns2;"></tr>
+                            <tr mat-header-row *matHeaderRowDef="displayedColumnsActive"></tr>
+                            <tr mat-row *matRowDef="let row; columns: displayedColumnsActive;"></tr>
 
                             <tr class="mat-row" *matNoDataRow>
                                 <td class="mat-cell" colspan="7">Không có dữ liệu</td>
                             </tr>
                         </table>
-
-                        <mat-paginator #paginator2 [length]="resultsLength" [pageSizeOptions]="[5, 10, 25, 100]"
+                        <mat-paginator #paginatorActive [pageSizeOptions]="[5, 10, 25, 100]"
                             aria-label="Select page">
                         </mat-paginator>
                     </div>
-
                 </mat-tab>
 
                 <mat-tab label="Tài khoản ngừng hoạt động">
-
                     <div class="table">
                         <div class="header">
                             <div class="icon-grid-1" style="padding-top: 20px">
                                 <app-icon iconName="search" style="padding: 10px;"></app-icon>
                                 <mat-form-field appearance="outline" style="width: 55vh;">
                                     <mat-label>Tìm kiếm</mat-label>
-                                    <input matInput (input)="applyFilter3($event)" #input3 placeholder="Nhập từ khóa tìm kiếm">
+                                    <input matInput (input)="applyFilterDisable($event)" #input3 placeholder="Nhập từ khóa tìm kiếm">
                                 </mat-form-field>
                             </div>
                         </div>
-
                         <hr>
-
-                        <table mat-table [dataSource]="dataSource3" matSort #sort3="matSort" matSortActive="id"
+                        <table mat-table [dataSource]="dataSourceDisable" matSort #sortDisable="matSort" matSortActive="id"
                             matSortDirection="asc" class="example-table">
                             <ng-container matColumnDef="id">
                                 <th mat-header-cell *matHeaderCellDef mat-sort-header
@@ -176,19 +169,17 @@
                                 </td>
                             </ng-container>
 
-                            <tr mat-header-row *matHeaderRowDef="displayedColumns3"></tr>
-                            <tr mat-row *matRowDef="let row; columns: displayedColumns3;"></tr>
+                            <tr mat-header-row *matHeaderRowDef="displayedColumnsDisable"></tr>
+                            <tr mat-row *matRowDef="let row; columns: displayedColumnsDisable;"></tr>
 
                             <tr class="mat-row" *matNoDataRow>
                                 <td class="mat-cell" colspan="7">Không có dữ liệu</td>
                             </tr>
                         </table>
-
-                        <mat-paginator #paginator3 [length]="resultsLength" [pageSizeOptions]="[5, 10, 25, 100]"
+                        <mat-paginator #paginatorDisable [pageSizeOptions]="[5, 10, 25, 100]"
                             aria-label="Select page">
                         </mat-paginator>
                     </div>
-
                 </mat-tab>
             </mat-tab-group>
         </div>

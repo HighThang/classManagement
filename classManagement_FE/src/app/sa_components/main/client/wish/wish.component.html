@@ -61,6 +61,9 @@
                             <mat-error *ngIf="firstFormGroup.get('dob')?.hasError('required')">
                                 Ngày sinh là <strong>bắt buộc</strong>
                             </mat-error>
+                            <mat-error *ngIf="firstFormGroup.get('dob')?.hasError('dateInvalid')">
+                                Ngày sinh không hợp lệ, phải nhỏ hơn ngày hiện tại
+                            </mat-error>
                         </mat-form-field>
 
                         <mat-form-field class="sdt" appearance="outline">
@@ -84,17 +87,17 @@
                     </div>
 
                     <div class="box">
-                        <p class="name">Ảnh gương mặt:</p>
+                        <p class="name">Hình ảnh gương mặt:</p>
 
                         <mat-form-field appearance="outline" class="file-input">
-                            <mat-label>Ảnh đầu vào</mat-label>
+                            <mat-label>Hình ảnh gương mặt</mat-label>
                             <mat-icon class="file-icon" matPrefix (click)="f_input.click()"
                                 style="padding: 5px; margin-left: 5px;">attach_file</mat-icon>
                             <input type="text" readonly matInput formControlName="image" />
                             <input type="file" multiple hidden #f_input (change)="handleFileInputChange(f_input.files)"
                                 (change)="onFileSelected($event)" accept="image/*" />
                             <img *ngIf="selectedImage" [src]="selectedImage" class="preview-image">
-                            <mat-error>Ảnh là <strong>bắt buộc</strong></mat-error>
+                            <mat-error>Ảnh gương mặt là <strong>bắt buộc</strong></mat-error>
                         </mat-form-field>
                     </div>
 
@@ -129,25 +132,24 @@
             </mat-step>
             <mat-step [stepControl]="thirdFormGroup">
                 <form [formGroup]="thirdFormGroup">
-                    <ng-template matStepLabel>Chọn giáo viên</ng-template>
+                    <ng-template matStepLabel>Chọn lớp học / giáo viên</ng-template>
 
                     <div class="box">
-                        <p class="name">Giáo viên giảng dạy:</p>
+                        <p class="name">Lớp học / giáo viên giảng dạy:</p>
                         <mat-form-field class="teacher" appearance="outline">
-                            <mat-label>Giáo viên</mat-label>
+                            <mat-label>Lớp học / giáo viên</mat-label>
                             <mat-select formControlName="teachers">
                                 <mat-option value="">-- None --</mat-option>
                                 <mat-option *ngFor="let teacher of teachers" [value]="teacher">
                                     {{ teacher }}
                                 </mat-option>
                             </mat-select>
-                            <mat-error>Giáo viên là <strong>bắt buộc</strong></mat-error>
+                            <mat-error>Lớp học / giáo viên là <strong>bắt buộc</strong></mat-error>
                         </mat-form-field>
                     </div>
 
                     <div class="btn">
-                        <button class="back" mat-button matStepperPrevious style="color: white; margin-right: 5px;">Quay
-                            lại</button>
+                        <button class="back" mat-button matStepperPrevious style="color: white; margin-right: 5px;">Quay lại</button>
                         <app-button class="submit" (click)="submitRegistration()">Xác nhận gửi đăng ký</app-button>
                     </div>
                 </form>

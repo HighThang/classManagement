@@ -19,60 +19,42 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-manage-stu',
   standalone: true,
-  imports: [
-    MatFormFieldModule,
-    MatInputModule,
-    MatTableModule,
-    MatSortModule,
-    MatPaginatorModule,
-    MatIconModule,
-    SharedModule,
-    MatButtonModule,
-    MatDialogModule,
-    FormsModule,
-    MatOptionModule,
-    ReactiveFormsModule,
-    CommonModule,
-    MatInputModule,
-    MatSelectModule,
-    MatOptionModule,
-    MatTabsModule,
-  ],
+  imports: [MatFormFieldModule, MatInputModule, MatTableModule, MatSortModule, MatPaginatorModule, MatIconModule, SharedModule,  MatButtonModule, MatDialogModule, 
+    FormsModule, MatOptionModule, ReactiveFormsModule, CommonModule, MatInputModule, MatSelectModule, MatOptionModule, MatTabsModule],
   templateUrl: './manage-stu.component.html',
   styleUrl: './manage-stu.component.scss'
 })
 export class ManageStuComponent implements AfterViewInit {
-  displayedColumns2: string[] = ['id','email','phone','lastName','surname','firstName','dob','disable',];
-  displayedColumns3: string[] = ['id','email','phone','lastName','surname','firstName','dob','active',];
+  displayedColumnsActive: string[] = ['id','email','phone','lastName','surname','firstName','dob','disable',];
+  displayedColumnsDisable: string[] = ['id','email','phone','lastName','surname','firstName','dob','active',];
 
-  dataSource2 = new MatTableDataSource<Student>();
-  dataSource3 = new MatTableDataSource<Student>();
-  resultsLength = 0;
+  dataSourceActive = new MatTableDataSource<Student>();
+  dataSourceDisable = new MatTableDataSource<Student>();
 
-  @ViewChild('paginator2') paginator2!: MatPaginator;
-  @ViewChild('paginator3') paginator3!: MatPaginator;
+  @ViewChild('paginatorActive') paginatorActive!: MatPaginator;
+  @ViewChild('paginatorDisable') paginatorDisable!: MatPaginator;
   
-  @ViewChild('sort2') sort2!: MatSort;
-  @ViewChild('sort3') sort3!: MatSort;
+  @ViewChild('sortActive') sortActive!: MatSort;
+  @ViewChild('sortDisable') sortDisable!: MatSort;
 
   constructor(private adminService: AdminService) {}
 
-  applyFilter2(event: Event): void {
+  applyFilterActive(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource2.filter = filterValue.trim().toLowerCase();
+    this.dataSourceActive.filter = filterValue.trim().toLowerCase();
   }
 
-  applyFilter3(event: Event): void {
+  applyFilterDisable(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource3.filter = filterValue.trim().toLowerCase();
+    this.dataSourceDisable.filter = filterValue.trim().toLowerCase();
   }
 
   ngAfterViewInit(): void {
-    this.dataSource2.paginator = this.paginator2;
-    this.dataSource2.sort = this.sort2;
+    this.dataSourceActive.paginator = this.paginatorActive;
+    this.dataSourceActive.sort = this.sortActive;
 
-    this.dataSource3.paginator = this.paginator3;
-    this.dataSource3.sort = this.sort3;
+    this.dataSourceDisable.paginator = this.paginatorDisable;
+    this.dataSourceDisable.sort = this.sortDisable;
 
     this.loadDataActive();
     this.loadDataDisable();
@@ -80,24 +62,24 @@ export class ManageStuComponent implements AfterViewInit {
   
   loadDataActive(): void {
     this.adminService.getActiveStudents().subscribe((data) => {
-      this.dataSource2.data = data;
+      this.dataSourceActive.data = data;
     });
   }
   
   loadDataDisable(): void {
     this.adminService.getDisabledStudents().subscribe((data) => {
-      this.dataSource3.data = data;
+      this.dataSourceDisable.data = data;
     });
   }
 
   activateStudent(studentId: number): void {
     Swal.fire({
-      title: 'Bạn có chắc chắn?',
-      text: 'Bạn muốn kích hoạt?',
+      title: 'Bạn chắc chắn?',
+      text: 'Bạn muốn kích hoạt học sinh này?',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#218838',
-      cancelButtonColor: '#d33',
+      cancelButtonColor: '#6c757d',
       confirmButtonText: 'Kích hoạt',
       cancelButtonText: 'Hủy',
     }).then((result) => {
@@ -117,8 +99,8 @@ export class ManageStuComponent implements AfterViewInit {
   
   disableStudent(studentId: number): void {
     Swal.fire({
-      title: 'Bạn có chắc chắn?',
-      text: 'Bạn muốn hủy kích hoạt?',
+      title: 'Bạn chắc chắn?',
+      text: 'Bạn muốn hủy kích hoạt học sinh này?',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#d33',

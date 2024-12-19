@@ -19,72 +19,54 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-manage-course',
   standalone: true,
-  imports: [
-    MatFormFieldModule,
-    MatInputModule,
-    MatTableModule,
-    MatSortModule,
-    MatPaginatorModule,
-    MatIconModule,
-    SharedModule,
-    MatButtonModule,
-    MatDialogModule,
-    FormsModule,
-    MatOptionModule,
-    ReactiveFormsModule,
-    CommonModule,
-    MatInputModule,
-    MatSelectModule,
-    MatOptionModule,
-    MatTabsModule,
-  ],
+  imports: [MatFormFieldModule, MatInputModule, MatTableModule, MatSortModule, MatPaginatorModule, MatIconModule, SharedModule, MatButtonModule,
+    MatDialogModule, FormsModule, MatOptionModule, ReactiveFormsModule, CommonModule, MatInputModule, MatSelectModule, MatOptionModule, MatTabsModule],
   templateUrl: './manage-course.component.html',
   styleUrl: './manage-course.component.scss'
 })
 export class ManageCourseComponent implements AfterViewInit {
-  displayedColumns1: string[] = ['id','subName','teacherName','active','deleted',];
-  displayedColumns2: string[] = ['id','subName','teacherName','disable',];
-  displayedColumns3: string[] = ['id','subName','teacherName','active',];
+  displayedColumnsPending: string[] = ['id','subName','teacherName','active','deleted'];
+  displayedColumnsActive: string[] = ['id','subName','teacherName','disable'];
+  displayedColumnsDisable: string[] = ['id','subName','teacherName','active'];
 
-  dataSource1 = new MatTableDataSource<Subject>();
-  dataSource2 = new MatTableDataSource<Subject>();
-  dataSource3 = new MatTableDataSource<Subject>();
-  resultsLength = 0;
+  dataSourcePending = new MatTableDataSource<Subject>();
+  dataSourceActive = new MatTableDataSource<Subject>();
+  dataSourceDisable = new MatTableDataSource<Subject>();
 
-  @ViewChild('paginator1') paginator1!: MatPaginator;
-  @ViewChild('paginator2') paginator2!: MatPaginator;
-  @ViewChild('paginator3') paginator3!: MatPaginator;
+  @ViewChild('paginatorPending') paginatorPending!: MatPaginator;
+  @ViewChild('paginatorActive') paginatorActive!: MatPaginator;
+  @ViewChild('paginatorDisable') paginatorDisable!: MatPaginator;
   
-  @ViewChild('sort1') sort1!: MatSort;
-  @ViewChild('sort2') sort2!: MatSort;
-  @ViewChild('sort3') sort3!: MatSort;
+  @ViewChild('sortPending') sortPending!: MatSort;
+  @ViewChild('sortActive') sortActive!: MatSort;
+  @ViewChild('sortDisable') sortDisable!: MatSort;
 
   constructor(private adminService: AdminService) {}
 
-  applyFilter1(event: Event): void {
+  applyFilterPending(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource1.filter = filterValue.trim().toLowerCase();
+    this.dataSourcePending.filter = filterValue.trim().toLowerCase();
   }
 
-  applyFilter2(event: Event): void {
+  applyFilterActive(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource2.filter = filterValue.trim().toLowerCase();
+    this.dataSourceActive.filter = filterValue.trim().toLowerCase();
   }
 
-  applyFilter3(event: Event): void {
+  applyFilterDisable(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource3.filter = filterValue.trim().toLowerCase();
+    this.dataSourceDisable.filter = filterValue.trim().toLowerCase();
   }
 
   ngAfterViewInit(): void {
-    this.dataSource1.paginator = this.paginator1;
-    this.dataSource1.sort = this.sort1;
+    this.dataSourcePending.paginator = this.paginatorPending;
+    this.dataSourcePending.sort = this.sortPending;
 
-    this.dataSource2.paginator = this.paginator2;
-    this.dataSource2.sort = this.sort2;
+    this.dataSourceActive.paginator = this.paginatorActive;
+    this.dataSourceActive.sort = this.sortActive;
 
-    this.dataSource3.paginator = this.paginator3;
-    this.dataSource3.sort = this.sort3;
+    this.dataSourceDisable.paginator = this.paginatorDisable;
+    this.dataSourceDisable.sort = this.sortDisable;
 
     this.loadDataPending();
     this.loadDataActive();
@@ -93,30 +75,30 @@ export class ManageCourseComponent implements AfterViewInit {
 
   loadDataPending(): void {
     this.adminService.getPendingSubjects().subscribe((data) => {
-      this.dataSource1.data = data;
+      this.dataSourcePending.data = data;
     });
   }
   
   loadDataActive(): void {
     this.adminService.getActiveSubjects().subscribe((data) => {
-      this.dataSource2.data = data;
+      this.dataSourceActive.data = data;
     });
   }
   
   loadDataDisable(): void {
     this.adminService.getDisabledSubjects().subscribe((data) => {
-      this.dataSource3.data = data;
+      this.dataSourceDisable.data = data;
     });
   }
 
   activateSubject(subjectId: number): void {
     Swal.fire({
-      title: 'Bạn có chắc chắn?',
-      text: 'Bạn muốn kích hoạt?',
+      title: 'Bạn chắc chắn?',
+      text: 'Bạn muốn kích hoạt môn học này?',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#218838',
-      cancelButtonColor: '#d33',
+      cancelButtonColor: '#6c757d',
       confirmButtonText: 'Kích hoạt',
       cancelButtonText: 'Hủy',
     }).then((result) => {
@@ -136,8 +118,8 @@ export class ManageCourseComponent implements AfterViewInit {
   
   deleteSubject(subjectId: number): void {
     Swal.fire({
-      title: 'Bạn có chắc chắn?',
-      text: 'Bạn muốn hủy kích hoạt?',
+      title: 'Bạn chắc chắn?',
+      text: 'Bạn muốn hủy kích hoạt môn học này?',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#d33',
