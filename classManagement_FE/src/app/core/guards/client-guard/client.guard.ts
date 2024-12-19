@@ -32,6 +32,10 @@ export const clientGuard: CanActivateFn = (route, state) => {
       }),
       catchError(() => {
         localStorage.removeItem('accessToken');
+        sessionStorage.removeItem('currentUser');
+        sessionStorage.removeItem('currentClassId');
+        window.location.reload();
+        
         return of(true);
       })
     );
