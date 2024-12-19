@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
 import { IconComponent } from "../../../../shared/components/icon/icon.component";
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { admin_EMenuLabels, client_EMenuLabels, student_EMenuLabels, teacher_EMenuLabels } from '../../../../core/enums/menuLabels.enum';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../../../core/services/auth/auth.service';
-import { UserResponse } from '../../../../core/interfaces/response.interface';
+import { UserResponse } from '../../../../core/services/user/user.service';
 import { MatMenuModule } from '@angular/material/menu';
 import Swal from 'sweetalert2';
 import { ImageService } from '../../../../core/services/image/image.service';

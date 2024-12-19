@@ -336,7 +336,7 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
+      cancelButtonColor: '#6c757d',
       confirmButtonText: 'Xóa',
       cancelButtonText: 'Hủy',
     }).then((result) => {
@@ -457,8 +457,12 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
         this.dialog.closeAll();
         this.loadSchedules(); 
       },
-      error: () => {
-        this.showToast('error', 'Có lỗi xảy ra khi tạo lịch học');
+      error: (err) => {
+        if (err.error.error) {
+          Swal.fire('Lỗi !!', err.error.error, 'error');
+        } else {
+          this.showToast('error', 'Có lỗi xảy ra khi tạo lịch học');
+        }
       },
     });
   }
@@ -470,7 +474,7 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
+      cancelButtonColor: '#6c757d',
       confirmButtonText: 'Xóa',
       cancelButtonText: 'Hủy',
     }).then((result) => {
@@ -585,7 +589,7 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
+      cancelButtonColor: '#6c757d',
       confirmButtonText: 'Xóa',
       cancelButtonText: 'Hủy',
     }).then((result) => {

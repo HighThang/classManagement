@@ -1,7 +1,19 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, tap } from 'rxjs';
-import { UserResponse } from '../../interfaces/response.interface';
+
+export interface UserResponse {
+  email: string, 
+  role: string,
+  dob: string,
+  firstName: string,
+  surname: string,
+  lastName: string,
+  phone: string,
+  business: string,
+  address: string,
+  imageURL: string
+}
 
 const default_url = ['http://localhost:8081/api/'];
 

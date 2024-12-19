@@ -1,11 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import {
-  FormBuilder,
-  FormGroup,
-  FormsModule,
-  ReactiveFormsModule,
-} from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatOptionModule, MatNativeDateModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -22,34 +17,16 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { SharedModule } from '../../../../shared/shared.module';
-import {
-  ClassDetails,
-  ClassDetailsService,
-  ScheduleData,
-} from '../../../../core/services/class-detail/class-detail.service';
-import { HttpClient } from '@angular/common/http';
+import { ClassDetails, ClassDetailsService, ScheduleData } from '../../../../core/services/class-detail/class-detail.service';
 import Swal from 'sweetalert2';
-import {
-  Classroom,
-  ClassroomService,
-} from '../../../../core/services/classroom/classroom.service';
+import { Classroom, ClassroomService } from '../../../../core/services/classroom/classroom.service';
 import { trigger, transition, style, animate } from '@angular/animations';
-import {
-  ChartComponent,
-  ApexChart,
-  ApexLegend,
-  ApexDataLabels,
-  ApexResponsive,
-} from 'ng-apexcharts';
-import {
-  Attendance,
-  ClassAttendanceService,
-} from '../../../../core/services/class-attendance/class-attendance.service';
+import { ChartComponent, ApexChart, ApexLegend, ApexDataLabels, ApexResponsive } from 'ng-apexcharts';
+import { Attendance, ClassAttendanceService } from '../../../../core/services/class-attendance/class-attendance.service';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import saveAs from 'file-saver';
-import { ClassScheduleService } from '../../../../core/services/class-schedule/class-schedule.service';
 import { ImageService } from '../../../../core/services/image/image.service';
 import { FaceRecognitionService } from '../../../../core/services/face-recognition/face-recognition.service';
 

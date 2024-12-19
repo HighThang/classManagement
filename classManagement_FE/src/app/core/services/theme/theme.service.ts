@@ -1,6 +1,10 @@
 import { Injectable } from '@angular/core';
-import { ITheme } from '../../interfaces/theme.interface';
 import { EThemeColors, EThemeNames } from '../../enums/theme.enum';
+
+export interface ITheme {
+  nameTheme: string;
+  color: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -16,6 +20,7 @@ export class ThemeService {
   
   constructor() {
       const storedTheme = localStorage.getItem('theme');
+      
       if (!storedTheme) {
         localStorage.setItem('theme', JSON.stringify(this.defaultTheme));
       } else {

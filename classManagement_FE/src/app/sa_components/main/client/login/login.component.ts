@@ -5,7 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { SharedModule } from '../../../../shared/shared.module';
 import { MatCardModule } from '@angular/material/card';
 import { ReactiveFormsModule, FormGroup, FormBuilder, Validators, FormsModule } from '@angular/forms';
-import { ITheme } from '../../../../core/interfaces/theme.interface';
+import { ITheme } from '../../../../core/services/theme/theme.service';
 import { MatInputModule } from '@angular/material/input';
 import { AuthService } from '../../../../core/services/auth/auth.service';
 import { Router, RouterModule } from '@angular/router';

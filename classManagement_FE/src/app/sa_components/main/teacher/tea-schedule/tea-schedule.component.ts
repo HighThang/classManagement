@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { CalendarEvent, CalendarModule, CalendarView, DAYS_OF_WEEK } from 'angular-calendar';
 import { setHours, setMinutes } from 'date-fns';
 import { Subject } from 'rxjs';
-
 import { ViewChild, TemplateRef } from '@angular/core';
 import { isSameDay, isSameMonth } from 'date-fns';
 import { CommonModule, registerLocaleData } from '@angular/common';
@@ -10,9 +9,8 @@ import { FormsModule } from '@angular/forms';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-
 import localeVi from '@angular/common/locales/vi';
-import { ClassScheduleService } from '../../../../core/services/class-schedule/class-schedule.service';
+import { CalendarService } from '../../../../core/services/calendar/calendar.service';
 registerLocaleData(localeVi);
 
 @Component({
@@ -45,7 +43,7 @@ export class TeaScheduleComponent {
 
   activeDayIsOpen: boolean = false;
 
-  constructor(private classScheduleService: ClassScheduleService) {}
+  constructor(private calendarService: CalendarService) {}
 
   ngOnInit(): void {
     this.fetchAllSchedules();
@@ -65,7 +63,7 @@ export class TeaScheduleComponent {
   }
   
   private fetchAllSchedules(): void {
-    this.classScheduleService.getAllClass().subscribe((response) => {
+    this.calendarService.getAllClass().subscribe((response) => {
       this.events = response.content.map((item: any) => {
         const { startHour, endHour } = this.mapPeriodToTime(item.periodInDay);
   

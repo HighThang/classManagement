@@ -1,7 +1,7 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { ThemeService } from '../../../../core/services/theme/theme.service';
-import { ITheme } from '../../../../core/interfaces/theme.interface';
+import { ITheme } from '../../../../core/services/theme/theme.service';
 import { CommonModule } from '@angular/common';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatMenuModule } from '@angular/material/menu';

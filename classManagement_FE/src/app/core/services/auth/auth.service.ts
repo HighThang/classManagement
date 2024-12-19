@@ -2,8 +2,13 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, Observable, Subject, tap, throwError } from 'rxjs';
-import { AuthResponse, UserResponse } from '../../interfaces/response.interface';
+import { UserResponse } from '../user/user.service';
 import Swal from 'sweetalert2';
+
+export interface AuthResponse {
+  accessToken: string;
+  tokenType: string;
+}
 
 const default_url = ['http://localhost:8081/api/'];
 

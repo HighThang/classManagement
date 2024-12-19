@@ -88,6 +88,9 @@
                                     <mat-error *ngIf="registerForm.get('dob')?.hasError('required')">
                                         Ngày sinh là <strong>bắt buộc</strong>
                                     </mat-error>
+                                    <mat-error *ngIf="registerForm.get('dob')?.hasError('dateInvalid')">
+                                        Ngày sinh không hợp lệ, phải nhỏ hơn ngày hiện tại
+                                    </mat-error>
                                 </mat-form-field>
                             </div>
                         </div>

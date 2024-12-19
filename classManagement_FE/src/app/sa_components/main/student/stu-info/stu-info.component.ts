@@ -4,7 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { SharedModule } from '../../../../shared/shared.module';
 import { MatCardModule } from '@angular/material/card';
-import { ReactiveFormsModule, FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormGroup, FormBuilder, Validators, AbstractControl, ValidatorFn } from '@angular/forms';
 import { ChangeDetectionStrategy } from '@angular/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatInputModule } from '@angular/material/input';
@@ -13,9 +13,17 @@ import { MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/cor
 import { DatePipe } from '@angular/common';
 import { UserService } from '../../../../core/services/user/user.service';
 import Swal from 'sweetalert2';
-import { UserResponse } from '../../../../core/interfaces/response.interface';
+import { UserResponse } from '../../../../core/services/user/user.service';
 import { AuthService } from '../../../../core/services/auth/auth.service';
 import { ImageService } from '../../../../core/services/image/image.service';
+
+export function dateLessThanTodayValidator(): ValidatorFn {
+  return (control: AbstractControl): { [key: string]: any } | null => {
+    const today = new Date();
+    const dob = new Date(control.value);
+    return dob >= today ? { 'dateInvalid': true } : null;
+  };
+}
 
 @Component({
   selector: 'app-stu-info',
@@ -44,9 +52,9 @@ export class StuInfoComponent implements OnInit {
       surname: [{ value: '', disabled: true }],
       lastName: [{ value: '', disabled: true }, [Validators.required]],
       email: [{ value: '', disabled: true }],
-      phone: [{ value: '', disabled: true }, [Validators.required, Validators.pattern('[- +()0-9]+')]],
+      phone: [{ value: '', disabled: true }, [Validators.required, Validators.pattern('^[- +()0-9]{10}$')]],
       role: [{ value: '', disabled: true }],
-      dob: [{ value: '', disabled: true }, Validators.required],
+      dob: [{ value: '', disabled: true }, [Validators.required, dateLessThanTodayValidator()]],
       address: [{ value: '', disabled: true }, Validators.required],
       imageURL: [{ value: '', disabled: true }],
     });
