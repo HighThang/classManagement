@@ -64,6 +64,9 @@
                                     <mat-error *ngIf="registerForm.get('dob')?.hasError('required')">
                                         Ngày sinh là <strong>bắt buộc</strong>
                                     </mat-error>
+                                    <mat-error *ngIf="registerForm.get('dob')?.hasError('dateInvalid')">
+                                        Ngày sinh không hợp lệ, phải nhỏ hơn ngày hiện tại
+                                    </mat-error>
                                 </mat-form-field>
                             </div>
                         </div>
@@ -161,36 +164,6 @@
                             (click)="onRegister()">
                             Gửi yêu cầu đăng ký
                         </app-button>
-
-                        <ng-template #dialogTemplate>
-                            <div class="dialog-container">
-                                <h2 mat-dialog-title style="color: var(--theme-background); font-weight: bold;">Xác minh
-                                    email</h2>
-                                <hr />
-                                <mat-dialog-content [formGroup]="verificationForm">
-                                    <p>Chúng tôi đã gửi mã xác minh đến email <strong>{{ email }}</strong>. Vui lòng
-                                        nhập mã để tiếp tục.</p>
-                                    <mat-form-field appearance="outline" style="width: 100%; margin-bottom: 15px;">
-                                        <mat-label>Mã xác minh</mat-label>
-                                        <input matInput formControlName="verificationCode"
-                                            placeholder="Nhập mã xác minh" />
-                                        <mat-error
-                                            *ngIf="verificationForm.get('verificationCode')?.hasError('required')">
-                                            Mã xác minh không được để trống.
-                                        </mat-error>
-                                    </mat-form-field>
-                                </mat-dialog-content>
-
-                                <mat-dialog-actions align="end">
-                                    <button mat-button mat-dialog-close
-                                        style="background-color: rgb(235, 235, 235);">Hủy</button>
-                                    <button mat-raised-button color="primary" [disabled]="verificationForm.invalid"
-                                        (click)="verifyCode()" style="color: white;">
-                                        Xác minh
-                                    </button>
-                                </mat-dialog-actions>
-                            </div>
-                        </ng-template>
                     </div>
                 </form>
             </mat-card-content>
@@ -201,3 +174,32 @@
 <div *ngIf="isLoading" class="loading-overlay">
     <mat-spinner></mat-spinner>
 </div>
+
+<ng-template #dialogTemplate>
+    <div class="dialog-container">
+        <h2 mat-dialog-title style="color: var(--theme-background); font-weight: bold;">Xác minh email</h2>
+        <hr>
+        <mat-dialog-content [formGroup]="verificationForm" style="padding-bottom: 0px;">
+            <p>Chúng tôi đã gửi mã xác minh đến email <strong>{{ email }}</strong>. Vui lòng
+                nhập mã để tiếp tục.</p>
+            <mat-form-field appearance="outline" style="width: 100%; margin-bottom: 15px;">
+                <mat-label>Mã xác minh</mat-label>
+                <input matInput formControlName="verificationCode"
+                    placeholder="Nhập mã xác minh" />
+                <mat-error
+                    *ngIf="verificationForm.get('verificationCode')?.hasError('required')">
+                    Mã xác minh không được để trống.
+                </mat-error>
+            </mat-form-field>
+        </mat-dialog-content>
+
+        <mat-dialog-actions align="end">
+            <button mat-button mat-dialog-close
+                style="background-color: rgb(235, 235, 235);">Hủy</button>
+            <button mat-raised-button color="primary" [disabled]="verificationForm.invalid"
+                (click)="verifyCode()" style="color: white;">
+                Xác minh
+            </button>
+        </mat-dialog-actions>
+    </div>
+</ng-template>
