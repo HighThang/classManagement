@@ -4,7 +4,7 @@
         <mat-card class="register-card">
 
             <mat-card-content>
-                <form [formGroup]="registerForm">
+                <form [formGroup]="userInfoForm">
                     <mat-card-header>
                         <mat-card-title>Chức vụ: <u>Học sinh</u></mat-card-title>
                         <app-button *ngIf="!isEditing" [type]="'primary'" class="edit-button" (click)="enableEdit()">
@@ -28,7 +28,7 @@
                                 <mat-form-field appearance="outline" style="margin-bottom: 10px;">
                                     <mat-label>Tên</mat-label>
                                     <input matInput formControlName="firstName" [placeholder]="'Điền tên'">
-                                    <mat-error *ngIf="registerForm.get('firstName')?.hasError('required')">
+                                    <mat-error *ngIf="userInfoForm.get('firstName')?.hasError('required')">
                                         Tên là <strong>bắt buộc</strong>
                                     </mat-error>
                                 </mat-form-field>
@@ -47,7 +47,7 @@
                                 <mat-form-field appearance="outline" style="margin-bottom: 10px;">
                                     <mat-label>Họ</mat-label>
                                     <input matInput formControlName="lastName" [placeholder]="'Điền họ'">
-                                    <mat-error *ngIf="registerForm.get('lastName')?.hasError('required')">
+                                    <mat-error *ngIf="userInfoForm.get('lastName')?.hasError('required')">
                                         Họ là <strong>bắt buộc</strong>
                                     </mat-error>
                                 </mat-form-field>
@@ -67,10 +67,10 @@
                                 <mat-form-field appearance="outline" style="margin-bottom: 10px;">
                                     <mat-label>Số điện thoại</mat-label>
                                     <input matInput formControlName="phone" [placeholder]="'Vd: 0987654321'">
-                                    <mat-error *ngIf="registerForm.get('phone')?.hasError('required')">
+                                    <mat-error *ngIf="userInfoForm.get('phone')?.hasError('required')">
                                         Số điện thoại là <strong>bắt buộc</strong>
                                     </mat-error>
-                                    <mat-error *ngIf="registerForm.get('phone')?.hasError('pattern')">
+                                    <mat-error *ngIf="userInfoForm.get('phone')?.hasError('pattern')">
                                         Vui lòng nhập số điện thoại hợp lệ
                                     </mat-error>
                                 </mat-form-field>
@@ -83,10 +83,10 @@
                                     <input matInput [matDatepicker]="picker" formControlName="dob">
                                     <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
                                     <mat-datepicker #picker></mat-datepicker>
-                                    <mat-error *ngIf="registerForm.get('dob')?.hasError('required')">
+                                    <mat-error *ngIf="userInfoForm.get('dob')?.hasError('required')">
                                         Ngày sinh là <strong>bắt buộc</strong>
                                     </mat-error>
-                                    <mat-error *ngIf="registerForm.get('dob')?.hasError('dateInvalid')">
+                                    <mat-error *ngIf="userInfoForm.get('dob')?.hasError('dateInvalid')">
                                         Ngày sinh không hợp lệ, phải nhỏ hơn ngày hiện tại
                                     </mat-error>
                                 </mat-form-field>
@@ -126,7 +126,7 @@
                                 <mat-form-field appearance="outline" style="margin-bottom: 10px;">
                                     <mat-label>Địa chỉ</mat-label>
                                     <input matInput formControlName="address" [placeholder]="'Điền địa chỉ'">
-                                    <mat-error *ngIf="registerForm.get('address')?.hasError('required')">
+                                    <mat-error *ngIf="userInfoForm.get('address')?.hasError('required')">
                                         Địa chỉ là <strong>bắt buộc</strong>
                                     </mat-error>
                                 </mat-form-field>

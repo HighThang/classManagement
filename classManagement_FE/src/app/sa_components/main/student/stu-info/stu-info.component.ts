@@ -35,7 +35,7 @@ export function dateLessThanTodayValidator(): ValidatorFn {
   styleUrl: './stu-info.component.scss'
 })
 export class StuInfoComponent implements OnInit {
-  registerForm!: FormGroup;
+  userInfoForm!: FormGroup;
   isEditing = false;
   selectedImage: string | null = null;
   file_store: FileList | null = null;
@@ -47,7 +47,7 @@ export class StuInfoComponent implements OnInit {
     private authService: AuthService,
     private imageService: ImageService
   ) {
-    this.registerForm = this.fb.group({
+    this.userInfoForm = this.fb.group({
       firstName: [{ value: '', disabled: true }, [Validators.required]],
       surname: [{ value: '', disabled: true }],
       lastName: [{ value: '', disabled: true }, [Validators.required]],
@@ -67,7 +67,7 @@ export class StuInfoComponent implements OnInit {
   getUserInfo(): void {
     this.authService.setCurrentUser().subscribe(
       (response: UserResponse) => {
-        this.registerForm.patchValue(response);
+        this.userInfoForm.patchValue(response);
         this.loadImage(response.imageURL);
       },
       () => {
@@ -92,20 +92,20 @@ export class StuInfoComponent implements OnInit {
 
   enableEdit(): void {
     this.isEditing = true;
-    this.registerForm.enable();
-    this.registerForm.get('role')?.disable();
-    this.registerForm.get('email')?.disable();
+    this.userInfoForm.enable();
+    this.userInfoForm.get('role')?.disable();
+    this.userInfoForm.get('email')?.disable();
   }
 
   disableEdit(): void {
     this.isEditing = false;
     this.getUserInfo();
-    this.registerForm.disable();
+    this.userInfoForm.disable();
   }
 
   saveInfo(): void {
-    if (this.registerForm.valid) {
-      const formData = this.registerForm.getRawValue();
+    if (this.userInfoForm.valid) {
+      const formData = this.userInfoForm.getRawValue();
 
       if (formData.dob) {
         formData.dob = this.datePipe.transform(formData.dob, 'yyyy-MM-dd');
@@ -119,11 +119,11 @@ export class StuInfoComponent implements OnInit {
   private updateUserInfo(formData: any): void {
     this.userService.updateUserInfo(formData).subscribe(
       (response) => {
-        this.registerForm.patchValue(response);
+        this.userInfoForm.patchValue(response);
         this.isEditing = false;
-        this.registerForm.disable();
+        this.userInfoForm.disable();
 
-        this.authService.updateUser(this.registerForm.value);
+        this.authService.updateUser(this.userInfoForm.value);
 
         Swal.fire({
           icon: 'success',
@@ -189,11 +189,11 @@ export class StuInfoComponent implements OnInit {
     if (files && files[0]) {
       const file = files[0];
       const count = files.length > 1 ? `(+${files.length - 1} files)` : '';
-      this.registerForm.patchValue({
+      this.userInfoForm.patchValue({
         imageURL: `${file.name}${count}`,
       });
     } else {
-      this.registerForm.patchValue({
+      this.userInfoForm.patchValue({
         imageURL: '',
       });
     }

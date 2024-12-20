@@ -24,7 +24,6 @@ import { CommonModule } from '@angular/common';
 export class TeaCourseComponent implements AfterViewInit {
   displayedColumns: string[] = ['id', 'subName', 'teacherName'];
   dataSource = new MatTableDataSource<Course>();
-  resultsLength = 0;
 
   subjectName!: string;
   idTeacher!: number;
@@ -41,7 +40,6 @@ export class TeaCourseComponent implements AfterViewInit {
   loadCourses() {
     this.courseService.getCourses().subscribe((courses) => {
       this.dataSource.data = courses;
-      this.resultsLength = courses.length;
       this.dataSource.paginator = this.paginator;
       this.dataSource.sort = this.sort;
     });

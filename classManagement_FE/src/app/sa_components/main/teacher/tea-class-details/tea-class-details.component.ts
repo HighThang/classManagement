@@ -12,46 +12,36 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatInputModule } from '@angular/material/input';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { FormBuilder, FormGroup, FormsModule, NgModel, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, FormsModule, NgModel, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { SharedModule } from '../../../../shared/shared.module';
 import { Student } from '../../../../core/services/admin/admin.service';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import Swal from 'sweetalert2';
-import { HttpClient } from '@angular/common/http';
 import { MatNativeDateModule, MatOptionModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import saveAs from 'file-saver';
 
+export function dateRangeValidator(startDateKey: string, endDateKey: string): ValidatorFn {
+  return (control: AbstractControl): { [key: string]: any } | null => {
+    const startDate = control.get(startDateKey)?.value;
+    const endDate = control.get(endDateKey)?.value;
+
+    if (startDate && endDate && new Date(endDate) < new Date(startDate)) {
+      return { dateRangeInvalid: true };
+    }
+    return null;
+  };
+}
+
 @Component({
   selector: 'app-tea-class-details',
   standalone: true,
-  imports: [
-    MatTabsModule,
-    MatListModule,
-    MatIconModule,
-    MatButtonModule,
-    CommonModule,
-    MatProgressSpinnerModule,
-    MatDialogModule,
-    MatSnackBarModule,
-    MatTableModule,
-    MatInputModule,
-    MatToolbarModule,
-    RouterModule,
-    FormsModule,
-    MatPaginatorModule,
-    SharedModule,
-    MatSortModule,
-    ReactiveFormsModule,
-    MatOptionModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatFormFieldModule,
-    MatSelectModule,
-  ],
+  imports: [MatTabsModule, MatListModule, MatIconModule, MatButtonModule, CommonModule, MatProgressSpinnerModule, MatDialogModule, MatSnackBarModule,
+    MatTableModule, MatInputModule, MatToolbarModule, RouterModule, FormsModule, MatPaginatorModule, SharedModule, MatSortModule, ReactiveFormsModule,
+    MatOptionModule, MatDatepickerModule, MatNativeDateModule, MatFormFieldModule, MatSelectModule],
   templateUrl: './tea-class-details.component.html',
   styleUrls: ['./tea-class-details.component.scss'],
 })
@@ -63,48 +53,46 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
   isLoading: boolean = false;
   isEditing: boolean = false;
   formGroup: FormGroup;
-
-  displayedColumns1: string[] = ['id', 'email', 'lastName', 'surname', 'firstName', 'phone', 'dob', 'deleted'];
-  dataSource1 = new MatTableDataSource<Student>();
-  displayedColumns11: string[] = ['id', 'email', 'lastName', 'surname', 'firstName', 'phone', 'dob', 'active', 'deleted'];
-  dataSource11 = new MatTableDataSource<Student>();
-  displayedColumns12: string[] = ['id', 'email', 'lastName', 'surname', 'firstName', 'phone', 'dob', 'active'];
-  dataSource12 = new MatTableDataSource<Student>();
-
-  displayedColumns2: string[] = ['id', 'day', 'periodInDay', 'dayInWeek', 'createdDate', 'deleted'];
-  dataSource2 = new MatTableDataSource<ScheduleData>();
-
-  displayedColumns3: string[] = ['id', 'documentName', 'createdDate', 'download', 'delete'];
-  dataSource3 = new MatTableDataSource<DocumentData>();
-
-  @ViewChild('paginator1') paginator1!: MatPaginator;
-  @ViewChild('sort1') sort1!: MatSort;
-  @ViewChild('paginator11') paginator11!: MatPaginator;
-  @ViewChild('sort11') sort11!: MatSort;
-  @ViewChild('paginator12') paginator12!: MatPaginator;
-  @ViewChild('sort12') sort12!: MatSort;
-  @ViewChild('paginator2') paginator2!: MatPaginator;
-  @ViewChild('sort2') sort2!: MatSort;
-  @ViewChild('paginator3') paginator3!: MatPaginator;
-  @ViewChild('sort3') sort3!: MatSort;
-  @ViewChild('dialogTemplate1') dialogTemplate1: any;
-  @ViewChild('dialogTemplate2') dialogTemplate2: any;
-  @ViewChild('dialogTemplate3') dialogTemplate3: any;
-  @ViewChild('dialogTemplate4') dialogTemplate4: any;
-
-  @ViewChild('input11') searchInput!: ElementRef<HTMLInputElement>;
-  @ViewChild('input12') searchInput2!: ElementRef<HTMLInputElement>;
-
-  @ViewChild('inputDoc') inputDoc!: ElementRef<HTMLInputElement>;
-
+  daysInWeek: { value: string, viewValue: string }[] = [];
   selectedFile: File | null = null;
+
+  displayedColumnsStudent: string[] = ['id', 'email', 'lastName', 'surname', 'firstName', 'phone', 'dob', 'deleted'];
+  dataSourceStudent = new MatTableDataSource<Student>();
+  @ViewChild('paginatorStudent') paginatorStudent!: MatPaginator;
+  @ViewChild('sortStudent') sortStudent!: MatSort;
+
+  @ViewChild('dialogTemplatePendingStudent') dialogTemplatePendingStudent: any;
+  displayedColumnsPendingStudent: string[] = ['id', 'email', 'lastName', 'surname', 'firstName', 'phone', 'dob', 'active', 'deleted'];
+  dataSourcePendingStudent = new MatTableDataSource<Student>();
+  @ViewChild('inputPendingStudent') searchInputPendingStudent!: ElementRef<HTMLInputElement>;
+  @ViewChild('paginatorPendingStudent') paginatorPendingStudent!: MatPaginator;
+  @ViewChild('sortPendingStudent') sortPendingStudent!: MatSort;
+  
+  @ViewChild('dialogTemplateDisabledStudent') dialogTemplateDisabledStudent: any;
+  displayedColumnsDisabledStudent: string[] = ['id', 'email', 'lastName', 'surname', 'firstName', 'phone', 'dob', 'active'];
+  dataSourceDisabledStudent = new MatTableDataSource<Student>();
+  @ViewChild('inputDisabledStudent') searchInputDisabledStudent!: ElementRef<HTMLInputElement>;
+  @ViewChild('paginatorDisabledStudent') paginatorDisabledStudent!: MatPaginator;
+  @ViewChild('sortDisabledStudent') sortDisabledStudent!: MatSort;
+
+  displayedColumnsSchedule: string[] = ['id', 'day', 'periodInDay', 'dayInWeek', 'createdDate', 'deleted'];
+  dataSourceSchedule = new MatTableDataSource<ScheduleData>();
+  @ViewChild('paginatorSchedule') paginatorSchedule!: MatPaginator;
+  @ViewChild('sortSchedule') sortSchedule!: MatSort;
+  @ViewChild('dialogTemplateSchedule') dialogTemplateSchedule: any;
+
+  displayedColumnsDocument: string[] = ['id', 'documentName', 'createdDate', 'download', 'delete'];
+  dataSourceDocument = new MatTableDataSource<DocumentData>();
+  @ViewChild('paginatorDocument') paginatorDocument!: MatPaginator;
+  @ViewChild('sortDocument') sortDocument!: MatSort;
+  @ViewChild('dialogTemplateDocument') dialogTemplateDocument: any;
+  @ViewChild('inputDoc') inputDoc!: ElementRef<HTMLInputElement>;
 
   constructor(
     private classDetailsService: ClassDetailsService,
     private route: ActivatedRoute,
     public dialog: MatDialog,
     private fb: FormBuilder,
-    private http: HttpClient,
     private router: Router
   ) {
     this.formGroup = this.fb.group({
@@ -112,7 +100,7 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
       endDate: [null, Validators.required],
       periodInDay: [null, Validators.required],
       dayInWeek: [null, Validators.required],
-    });
+    }, { validators: dateRangeValidator('startDate', 'endDate') });
   }
 
   ngOnInit(): void {
@@ -122,16 +110,7 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
     const user = JSON.parse(userData!);
     const teacherId = user.id;
 
-    this.classDetails = {
-      id: 0,
-      subjectName: '',
-      createdDate: '',
-      note: '',
-      className: '',
-      teacherName: '',
-      teacherEmail: '',
-      teacherPhone: ''
-    };
+    this.classDetails = { id: 0, subjectName: '', createdDate: '', note: '', className: '', teacherName: '', teacherEmail: '', teacherPhone: '' };
     
     this.classDetailsService.checkPermission(teacherId, this.classId).subscribe({
       next: (hasPermission) => {
@@ -155,12 +134,12 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.dataSource1.paginator = this.paginator1;
-    this.dataSource1.sort = this.sort1;
-    this.dataSource2.paginator = this.paginator2;
-    this.dataSource2.sort = this.sort2;
-    this.dataSource3.paginator = this.paginator3;
-    this.dataSource3.sort = this.sort3;
+    this.dataSourceStudent.paginator = this.paginatorStudent;
+    this.dataSourceStudent.sort = this.sortStudent;
+    this.dataSourceSchedule.paginator = this.paginatorSchedule;
+    this.dataSourceSchedule.sort = this.sortSchedule;
+    this.dataSourceDocument.paginator = this.paginatorDocument;
+    this.dataSourceDocument.sort = this.sortDocument;
   }
 
   // classDetails
@@ -205,33 +184,33 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
   }
 
   // Students
-  applyFilter1(event: Event): void {
+  applyFilterStudent(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource1.filter = filterValue.trim().toLowerCase();
+    this.dataSourceStudent.filter = filterValue.trim().toLowerCase();
   }
 
-  applyFilter11(event: Event): void {
+  applyFilterPendingStudent(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource11.filter = filterValue.trim().toLowerCase();
+    this.dataSourcePendingStudent.filter = filterValue.trim().toLowerCase();
   }
 
-  applyFilter12(event: Event): void {
+  applyFilterDisabledStudent(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource12.filter = filterValue.trim().toLowerCase();
+    this.dataSourceDisabledStudent.filter = filterValue.trim().toLowerCase();
   }
 
   resetFilter(): void {
-    if (this.searchInput) {
-      this.searchInput.nativeElement.value = '';
+    if (this.searchInputPendingStudent) {
+      this.searchInputPendingStudent.nativeElement.value = '';
     }
-    this.applyFilter11({ target: { value: '' } } as unknown as Event);
+    this.applyFilterPendingStudent({ target: { value: '' } } as unknown as Event);
   }
 
   resetFilter2(): void {
-    if (this.searchInput2) {
-      this.searchInput2.nativeElement.value = '';
+    if (this.searchInputDisabledStudent) {
+      this.searchInputDisabledStudent.nativeElement.value = '';
     }
-    this.applyFilter12({ target: { value: '' } } as unknown as Event);
+    this.applyFilterDisabledStudent({ target: { value: '' } } as unknown as Event);
   }
 
   private loadStudents(): void {
@@ -273,9 +252,9 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
             dob: new Date(item.dob).toLocaleDateString('vi-VN'),
           }));
   
-        this.dataSource1.data = activeData; 
-        this.dataSource11.data = inactiveData;
-        this.dataSource12.data = deletedData;
+        this.dataSourceStudent.data = activeData; 
+        this.dataSourcePendingStudent.data = inactiveData;
+        this.dataSourceDisabledStudent.data = deletedData;
       },
       error: () => {
         this.showToast('error', 'Lỗi khi tải danh sách học sinh');
@@ -284,13 +263,13 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
   }
 
   openWaitingListDialog() {
-    const dialog2 = this.dialog.open(this.dialogTemplate1, {
+    const dialog2 = this.dialog.open(this.dialogTemplatePendingStudent, {
       width: '77%',  maxHeight: '77vh'
     });
 
     dialog2.afterOpened().subscribe(() => {
-      this.dataSource11.paginator = this.paginator11;
-      this.dataSource11.sort = this.sort11;
+      this.dataSourcePendingStudent.paginator = this.paginatorPendingStudent;
+      this.dataSourcePendingStudent.sort = this.sortPendingStudent;
     });
 
     dialog2.afterClosed().subscribe(() => {
@@ -299,13 +278,13 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
   }
 
   openDeletedStudentDialog() {
-    const dialog3 = this.dialog.open(this.dialogTemplate4, {
+    const dialog3 = this.dialog.open(this.dialogTemplateDisabledStudent, {
       width: '77%',  maxHeight: '77vh'
     });
 
     dialog3.afterOpened().subscribe(() => {
-      this.dataSource12.paginator = this.paginator12;
-      this.dataSource12.sort = this.sort12;
+      this.dataSourceDisabledStudent.paginator = this.paginatorDisabledStudent;
+      this.dataSourceDisabledStudent.sort = this.sortDisabledStudent;
     });
 
     dialog3.afterClosed().subscribe(() => {
@@ -385,19 +364,9 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
     { value: 'PERIOD_6', viewValue: 'Ca học 6' },
   ];
 
-  daysInWeek = [
-    { value: 'MONDAY', viewValue: 'Thứ Hai' },
-    { value: 'TUESDAY', viewValue: 'Thứ Ba' },
-    { value: 'WEDNESDAY', viewValue: 'Thứ Tư' },
-    { value: 'THURSDAY', viewValue: 'Thứ Năm' },
-    { value: 'FRIDAY', viewValue: 'Thứ Sáu' },
-    { value: 'SATURDAY', viewValue: 'Thứ Bảy' },
-    { value: 'SUNDAY', viewValue: 'Chủ Nhật' },
-  ];
-
-  applyFilter2(event: Event): void {
+  applyFilterSchedule(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource2.filter = filterValue.trim().toLowerCase();
+    this.dataSourceSchedule.filter = filterValue.trim().toLowerCase();
   }
 
   private loadSchedules(): void {
@@ -410,7 +379,7 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
           dayInWeek: this.mapDayInWeek(item.dayInWeek),
           createdDate: item.createdDate, 
         }));
-        this.dataSource2.data = mappedData;
+        this.dataSourceSchedule.data = mappedData;
       },
       error: () => {
         this.showToast('error', 'Lỗi khi tải danh sách lịch học');
@@ -431,13 +400,49 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
   }
 
   openAddScheduleDialog() {
-    const dialogRef = this.dialog.open(this.dialogTemplate2, {
-      width: '55%',  maxHeight: '77vh'
+    const dialogRef = this.dialog.open(this.dialogTemplateSchedule, {
+      width: '66%',  maxHeight: '77vh'
+    });
+
+    this.formGroup.get('startDate')?.valueChanges.subscribe(() => {
+      this.updateDaysInWeek();
+    });
+
+    this.formGroup.get('endDate')?.valueChanges.subscribe(() => {
+      this.updateDaysInWeek();
     });
 
     dialogRef.afterClosed().subscribe(() => {
       this.formGroup.reset();
     });
+  }
+
+  updateDaysInWeek(): void {
+    const startDate = new Date(this.formGroup.get('startDate')?.value);
+    const endDate = new Date(this.formGroup.get('endDate')?.value);
+  
+    if (startDate && endDate && endDate >= startDate) {
+      this.daysInWeek = this.calculateDaysInWeek(startDate, endDate);
+    } else {
+      this.daysInWeek = [];
+    }
+  }
+
+  calculateDaysInWeek(startDate: Date, endDate: Date): { value: string, viewValue: string }[] {
+    const days = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
+    const daysInVietnamese = ['Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy', 'Chủ Nhật'];
+    const daysInWeek: Set<{ value: string, viewValue: string }> = new Set();
+  
+    for (let i = 0; i < days.length; i++) {
+      daysInWeek.add({ value: days[i], viewValue: daysInVietnamese[i] });
+    }
+  
+    const existingDaysInWeek: Set<string> = new Set();
+    for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+      existingDaysInWeek.add(days[(d.getDay() + 6) % 7]);
+    }
+  
+    return Array.from(daysInWeek).filter(day => existingDaysInWeek.has(day.value));
   }
 
   saveSchedule() {
@@ -451,11 +456,11 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
       classId: this.classId,
     };
   
-    this.http.post('http://localhost:8081/api/class-schedule', payload).subscribe({
+    this.classDetailsService.createSchedule(payload).subscribe({
       next: () => {
         this.showToast('success', 'Tạo lịch học thành công');
         this.dialog.closeAll();
-        this.loadSchedules(); 
+        this.loadSchedules();
       },
       error: (err) => {
         if (err.error.error) {
@@ -527,7 +532,7 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
           documentLink: item.documentLink,
           createdDate: item.createdDate, 
         }));
-        this.dataSource3.data = mappedData;
+        this.dataSourceDocument.data = mappedData;
       },
       error: () => {
         this.showToast('error', 'Lỗi khi tải danh sách tài liệu');
@@ -535,13 +540,13 @@ export class TeaClassDetailsComponent implements OnInit, AfterViewInit {
     });
   }
 
-  applyFilter3(event: Event): void {
+  applyFilterDocument(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource3.filter = filterValue.trim().toLowerCase();
+    this.dataSourceDocument.filter = filterValue.trim().toLowerCase();
   }
 
   openUploadDocumentDialog() {
-    const dialogRef = this.dialog.open(this.dialogTemplate3, {
+    const dialogRef = this.dialog.open(this.dialogTemplateDocument, {
       width: '40%',  maxHeight: '55vh'
     });
 

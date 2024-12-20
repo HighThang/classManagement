@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder,FormsModule,ReactiveFormsModule } from '@angular/forms';
+import { FormsModule,ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatOptionModule, MatNativeDateModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -17,66 +17,34 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { SharedModule } from '../../../../shared/shared.module';
-import { ClassDetails, ClassDetailsService, ScheduleData } from '../../../../core/services/class-detail/class-detail.service';
 import Swal from 'sweetalert2';
-import { Classroom, ClassroomService } from '../../../../core/services/classroom/classroom.service';
-import { trigger, transition, style, animate } from '@angular/animations';
-import { Attendance, ClassAttendanceService } from '../../../../core/services/class-attendance/class-attendance.service';
+import { ClassroomService } from '../../../../core/services/classroom/classroom.service';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { FeeService } from '../../../../core/services/fee/fee.service';
 
 @Component({
   selector: 'app-tea-payment',
   standalone: true,
-  imports: [
-    MatTabsModule,
-    MatListModule,
-    MatIconModule,
-    MatButtonModule,
-    CommonModule,
-    MatProgressSpinnerModule,
-    MatSnackBarModule,
-    MatDialogModule,
-    MatSnackBarModule,
-    MatTableModule,
-    MatButtonModule,
-    MatInputModule,
-    MatIconModule,
-    MatTabsModule,
-    MatToolbarModule,
-    RouterModule,
-    FormsModule,
-    MatPaginatorModule,
-    SharedModule,
-    MatSortModule,
-    ReactiveFormsModule,
-    MatOptionModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatFormFieldModule,
-    MatSelectModule,
-    MatCheckboxModule,
-  ],
+  imports: [MatTabsModule, MatListModule, CommonModule, MatProgressSpinnerModule, MatDialogModule, MatSnackBarModule, MatTableModule, MatButtonModule,
+    MatInputModule, MatIconModule, MatToolbarModule, RouterModule, FormsModule, MatPaginatorModule, SharedModule, MatSortModule, ReactiveFormsModule, 
+    MatOptionModule, MatDatepickerModule, MatNativeDateModule, MatFormFieldModule, MatSelectModule, MatCheckboxModule],
   templateUrl: './tea-payment.component.html',
   styleUrl: './tea-payment.component.scss',
 })
 export class TeaPaymentComponent implements OnInit, AfterViewInit {
   isEditing = false;
-
   classId!: number;
-
   availableClasses: string[] = [];
-  // filters: Record<string, string> = {};
   filters: { [key: string]: string } = {};
   originalData: any[] = [];
 
-  displayedColumns1: string[] = ['id', 'year', 'month', 'className', 'lastName', 'surname', 'firstName', 'email', 'phone', 'feeNotSubmitted', 'pay'];
-  dataSource1 = new MatTableDataSource<any>();
+  displayedColumns: string[] = ['id', 'year', 'month', 'className', 'lastName', 'surname', 'firstName', 'email', 'phone', 'feeNotSubmitted', 'pay'];
+  dataSource = new MatTableDataSource<any>();
 
-  @ViewChild('paginator1') paginator1!: MatPaginator;
-  @ViewChild('sort1') sort1!: MatSort;
+  @ViewChild('paginator') paginator!: MatPaginator;
+  @ViewChild('sort') sort!: MatSort;
 
   constructor(
     private classroomService: ClassroomService,
@@ -91,8 +59,8 @@ export class TeaPaymentComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.dataSource1.paginator = this.paginator1;
-    this.dataSource1.sort = this.sort1;
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
   }
 
   loadClassrooms(): void {
@@ -106,12 +74,12 @@ export class TeaPaymentComponent implements OnInit, AfterViewInit {
     this.feeService.getStudentNotSubmittedTutorFee(params).subscribe({
       next: (response: any) => {
         this.originalData = response.data;
-        this.dataSource1.data = response.data;
+        this.dataSource.data = response.data;
 
         this.reapplyFilters();
       },
-      error: (err) => {
-        console.error('Error fetching tutor fee details:', err);
+      error: () => {
+        this.showToast('error', 'Lỗi khi tải dữ liệu học phí');
       },
     });
   }
@@ -129,7 +97,7 @@ export class TeaPaymentComponent implements OnInit, AfterViewInit {
       this.filters[key] = value?.trim().toLowerCase();
     }  
 
-    this.dataSource1.data = this.originalData.filter((item) => {
+    this.dataSource.data = this.originalData.filter((item) => {
       return Object.keys(this.filters).every((filterKey) => {
         if (!this.filters[filterKey]) return true;
   
@@ -146,7 +114,7 @@ export class TeaPaymentComponent implements OnInit, AfterViewInit {
   }
 
   reapplyFilters(): void {
-    this.dataSource1.data = this.originalData.filter((item) => {
+    this.dataSource.data = this.originalData.filter((item) => {
       return Object.keys(this.filters).every((filterKey) => {
         if (!this.filters[filterKey]) return true;
   

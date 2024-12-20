@@ -21,13 +21,16 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-tea-manage-class',
   standalone: true,
-  imports: [ MatFormFieldModule, MatInputModule, MatTableModule, MatSortModule, MatPaginatorModule, MatIconModule, SharedModule, DatePipe,
-    MatButtonModule, MatDialogModule, FormsModule, MatOptionModule, ReactiveFormsModule, CommonModule, MatInputModule, MatSelectModule, MatOptionModule ],
+  imports: [MatFormFieldModule, MatInputModule, MatTableModule, MatSortModule, MatPaginatorModule, MatIconModule, SharedModule, DatePipe,
+    MatButtonModule, MatDialogModule, FormsModule, MatOptionModule, ReactiveFormsModule, CommonModule, MatInputModule, MatSelectModule, MatOptionModule],
   templateUrl: './tea-manage-class.component.html',
   styleUrl: './tea-manage-class.component.scss',
 })
 export class TeaManageClassComponent implements OnInit, AfterViewInit {
   private router = inject(Router);
+
+  formGroup!: FormGroup;
+  subjects: Course[] = [];
 
   displayedColumns: string[] = ['id','className','subjectName','note','createdDate','attendance','score','fee','details'];
   dataSource = new MatTableDataSource<Classroom>();
@@ -35,11 +38,8 @@ export class TeaManageClassComponent implements OnInit, AfterViewInit {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
+  
   @ViewChild('dialogTemplate') dialogTemplate: any;
-
-  formGroup!: FormGroup;
-
-  subjects: Course[] = [];
 
   constructor(
     private classroomService: ClassroomService,
@@ -88,14 +88,11 @@ export class TeaManageClassComponent implements OnInit, AfterViewInit {
     if (this.formGroup.invalid) {
       return;
     }
-
     const formValues = this.formGroup.value;
     const classData: Classroom = {
       className: formValues.className,
       subjectName:
-        this.subjects.find((s) => s.id === +formValues.selectedSubject)
-          ?.subName || '',
-      note: formValues.notes || '',
+        this.subjects.find((s) => s.id === +formValues.selectedSubject) ?.subName || '', note: formValues.notes || '',
     };
 
     this.classroomService.createClassroom(classData).subscribe({
@@ -112,7 +109,9 @@ export class TeaManageClassComponent implements OnInit, AfterViewInit {
   }
 
   openDialog(): void {
-    const dialogRef = this.dialog.open(this.dialogTemplate);
+    const dialogRef = this.dialog.open(this.dialogTemplate, {
+      width: '40%', maxHeight: '60vh'
+    });
 
     dialogRef.afterClosed().subscribe(() => {
       this.formGroup.reset();
@@ -124,8 +123,8 @@ export class TeaManageClassComponent implements OnInit, AfterViewInit {
       next: (courses) => {
         this.subjects = courses;
       },
-      error: (err) => {
-        console.error('Error fetching subjects:', err);
+      error: () => {
+        this.showToast('error', 'Lỗi khi tải danh sách môn học');
       },
     });
   }

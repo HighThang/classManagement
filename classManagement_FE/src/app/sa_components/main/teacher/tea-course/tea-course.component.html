@@ -14,30 +14,9 @@
                     </div>
                     <button mat-raised-button (click)="openDialog(dialogTemplate)" style="background-color: var(--theme-background); color: white;">
                         <mat-icon>add</mat-icon>
-                        Đăng ký môn giảng dạy</button>
+                        Đăng ký môn giảng dạy
+                    </button>
                 </div>
-
-                <ng-template #dialogTemplate>
-                    <div class="dialog-container">
-                        <h2 mat-dialog-title style="color: var(--theme-background); font-weight: bold;">Đăng ký môn
-                            giảng dạy</h2>
-                        <hr>
-                        <mat-form-field appearance="outline" class="input-field"
-                            style="width: 92%; padding-top: 15px; display: flex; justify-self: center; padding-bottom: 20px;">
-                            <mat-label>Tên môn học</mat-label>
-                            <input matInput [(ngModel)]="subjectName" name="subjectName" #subjectNameCtrl="ngModel"
-                                placeholder="Nhập tên môn học" required>
-                            <mat-error *ngIf="subjectNameCtrl.invalid">Tên môn học không được
-                                để trống</mat-error>
-                        </mat-form-field>
-                        <hr>
-                        <mat-dialog-actions align="end" class="dialog-footer">
-                            <button mat-button mat-dialog-close style="background-color: gainsboro;">Hủy</button>
-                            <button mat-raised-button style="background-color: var(--theme-background); color: white;" (click)="submitRequest(subjectNameCtrl)">Gửi yêu
-                                cầu</button>
-                        </mat-dialog-actions>
-                    </div>
-                </ng-template>
 
                 <hr>
 
@@ -45,22 +24,22 @@
                     class="example-table">
                     <ng-container matColumnDef="id">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header
-                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">ID
-                        </th>
+                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                            ID</th>
                         <td mat-cell *matCellDef="let row">{{ row.id }}</td>
                     </ng-container>
 
                     <ng-container matColumnDef="subName">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header
-                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">Tên
-                            môn học</th>
+                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                            Tên môn học</th>
                         <td mat-cell *matCellDef="let row">{{ row.subName }}</td>
                     </ng-container>
 
                     <ng-container matColumnDef="teacherName">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header
-                            style="justify-items: center; padding-left: 29px; background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">Giáo
-                            viên tạo môn</th>
+                            style="justify-items: center; padding-left: 29px; background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                            Giáo viên tạo môn</th>
                         <td mat-cell *matCellDef="let row" style="text-align: center;">{{ row.teacherName }}</td>
                     </ng-container>
 
@@ -71,10 +50,30 @@
                         <td class="mat-cell" colspan="3">Không có dữ liệu</td>
                     </tr>
                 </table>
-
-                <mat-paginator [length]="resultsLength" [pageSizeOptions]="[5, 25, 50, 100]"
-                    aria-label="Select page"></mat-paginator>
+                
+                <mat-paginator [pageSizeOptions]="[5, 25, 50, 100]" aria-label="Select page"></mat-paginator>
             </div>
         </div>
     </div>
 </div>
+
+<ng-template #dialogTemplate>
+    <div class="dialog-container">
+        <h2 mat-dialog-title style="color: var(--theme-background); font-weight: bold;">Đăng ký môn giảng dạy</h2>
+        <hr>
+        <mat-form-field appearance="outline" class="input-field"
+            style="width: 92%; padding-top: 15px; display: flex; justify-self: center; padding-bottom: 20px;">
+            <mat-label>Tên môn học</mat-label>
+            <input matInput [(ngModel)]="subjectName" name="subjectName" #subjectNameCtrl="ngModel"
+                placeholder="Nhập tên môn học" required>
+            <mat-error *ngIf="subjectNameCtrl.invalid">Tên môn học không được để trống</mat-error>
+        </mat-form-field>
+        <hr>
+        <mat-dialog-actions align="end" class="dialog-footer">
+            <button mat-button mat-dialog-close style="background-color: gainsboro;">Hủy</button>
+            <button mat-raised-button style="background-color: var(--theme-background); color: white;" (click)="submitRequest(subjectNameCtrl)">
+                Gửi yêu cầu
+            </button>
+        </mat-dialog-actions>
+    </div>
+</ng-template>

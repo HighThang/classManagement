@@ -1,12 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import {
-  FormBuilder,
-  FormGroup,
-  FormsModule,
-  NgModel,
-  ReactiveFormsModule,
-} from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, NgModel, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatOptionModule, MatNativeDateModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -23,31 +17,13 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { SharedModule } from '../../../../shared/shared.module';
-import {
-  ClassDetails,
-  ClassDetailsService,
-  ScheduleData,
-} from '../../../../core/services/class-detail/class-detail.service';
-import { HttpClient } from '@angular/common/http';
+import { ClassDetails, ClassDetailsService } from '../../../../core/services/class-detail/class-detail.service';
 import Swal from 'sweetalert2';
-import {
-  Classroom,
-  ClassroomService,
-} from '../../../../core/services/classroom/classroom.service';
+import { Classroom, ClassroomService } from '../../../../core/services/classroom/classroom.service';
 import { trigger, transition, style, animate } from '@angular/animations';
-import {
-  ChartComponent,
-  ApexChart,
-  ApexLegend,
-  ApexDataLabels,
-  ApexResponsive,
-} from 'ng-apexcharts';
-import {
-  Attendance,
-  ClassAttendanceService,
-} from '../../../../core/services/class-attendance/class-attendance.service';
+import { ChartComponent, ApexChart, ApexLegend } from 'ng-apexcharts';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { Exam, ExamScoreService, ScoreDetail } from '../../../../core/services/exam-score/exam-score.service';
 import { saveAs } from 'file-saver'
@@ -65,36 +41,9 @@ export type ChartOptions = {
 @Component({
   selector: 'app-tea-score',
   standalone: true,
-  imports: [
-    MatTabsModule,
-    MatListModule,
-    MatIconModule,
-    MatButtonModule,
-    CommonModule,
-    MatProgressSpinnerModule,
-    MatSnackBarModule,
-    MatDialogModule,
-    MatSnackBarModule,
-    MatTableModule,
-    MatButtonModule,
-    MatInputModule,
-    MatIconModule,
-    MatTabsModule,
-    MatToolbarModule,
-    RouterModule,
-    FormsModule,
-    MatPaginatorModule,
-    SharedModule,
-    MatSortModule,
-    ReactiveFormsModule,
-    MatOptionModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatFormFieldModule,
-    MatSelectModule,
-    ChartComponent,
-    MatCheckboxModule,
-  ],
+  imports: [MatTabsModule, MatListModule, MatIconModule, MatButtonModule, CommonModule, MatProgressSpinnerModule, MatSnackBarModule, MatDialogModule,
+    MatTableModule, MatInputModule, MatToolbarModule, RouterModule, FormsModule, MatPaginatorModule, SharedModule, MatSortModule, ReactiveFormsModule,
+    MatOptionModule, MatDatepickerModule, MatNativeDateModule, MatFormFieldModule, MatSelectModule, ChartComponent, MatCheckboxModule],
   templateUrl: './tea-score.component.html',
   styleUrl: './tea-score.component.scss',
   animations: [
@@ -109,33 +58,29 @@ export type ChartOptions = {
 })
 export class TeaScoreComponent implements OnInit, AfterViewInit {
   formGroup!: FormGroup;
-  registerForm!: FormGroup;
-
   classrooms: Classroom[] = [];
   showDetails: boolean = false;
-
   activeBtn = true;
   isEditing = false;
-
   classId!: number;
   examName!: string;
   examId!: number;
   classDetails!: ClassDetails;
   examDetail!: Exam;
 
-  displayedColumns1: string[] = ['id', 'examName', 'createdDate', 'edit'];
-  dataSource1 = new MatTableDataSource<Exam>();
+  displayedColumnsExam: string[] = ['id', 'examName', 'createdDate', 'edit'];
+  dataSourceExam = new MatTableDataSource<Exam>();
 
-  displayedColumns11: string[] = ['id', 'email', 'name', 'score'];
-  dataSource11 = new MatTableDataSource<ScoreDetail>();
+  displayedColumnsScore: string[] = ['id', 'email', 'name', 'score'];
+  dataSourceScore = new MatTableDataSource<ScoreDetail>();
 
-  @ViewChild('paginator1') paginator1!: MatPaginator;
-  @ViewChild('sort1') sort1!: MatSort;
-  @ViewChild('paginator11') paginator11!: MatPaginator;
-  @ViewChild('sort11') sort11!: MatSort;
+  @ViewChild('paginatorExam') paginatorExam!: MatPaginator;
+  @ViewChild('sortExam') sortExam!: MatSort;
+  @ViewChild('paginatorScore') paginatorScore!: MatPaginator;
+  @ViewChild('sortScore') sortScore!: MatSort;
 
-  @ViewChild('dialogTemplate1') dialogTemplate1: any;
-  @ViewChild('input11') searchInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('dialogTemplateScore') dialogTemplateScore: any;
+  @ViewChild('inputScore') searchInput!: ElementRef<HTMLInputElement>;
 
   chartOptions!: Partial<ChartOptions>;
 
@@ -182,8 +127,8 @@ export class TeaScoreComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.dataSource1.paginator = this.paginator1;
-    this.dataSource1.sort = this.sort1;
+    this.dataSourceExam.paginator = this.paginatorExam;
+    this.dataSourceExam.sort = this.sortExam;
   }
 
   loadClassrooms(): void {
@@ -222,21 +167,21 @@ export class TeaScoreComponent implements OnInit, AfterViewInit {
     });
   }
 
-  applyFilter1(event: Event): void {
+  applyFilterExam(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource1.filter = filterValue.trim().toLowerCase();
+    this.dataSourceExam.filter = filterValue.trim().toLowerCase();
   }
 
-  applyFilter11(event: Event): void {
+  applyFilterScore(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource11.filter = filterValue.trim().toLowerCase();
+    this.dataSourceScore.filter = filterValue.trim().toLowerCase();
   }
 
   resetFilter(): void {
     if (this.searchInput) {
       this.searchInput.nativeElement.value = '';
     }
-    this.applyFilter11({ target: { value: '' } } as unknown as Event);
+    this.applyFilterScore({ target: { value: '' } } as unknown as Event);
   }
 
   openDialogCreateExam(templateRef: any): void {
@@ -293,7 +238,7 @@ export class TeaScoreComponent implements OnInit, AfterViewInit {
           examName: item.name,
           createdDate: item.createdDate,
         }));
-        this.dataSource1.data = mappedData;
+        this.dataSourceExam.data = mappedData;
       },
       error: () => {
         this.showToast('error', 'Lỗi khi tải danh sách kiểm tra');
@@ -303,19 +248,19 @@ export class TeaScoreComponent implements OnInit, AfterViewInit {
 
   openStudentListDialog(examId: number) {
     this.examId = examId;
-    const dialog1 = this.dialog.open(this.dialogTemplate1, {
+    const dialog1 = this.dialog.open(this.dialogTemplateScore, {
       width: '95vw',
       maxHeight: '95vh',
     });
 
     dialog1.afterOpened().subscribe(() => {
-      this.dataSource11.paginator = this.paginator11;
-      this.dataSource11.sort = this.sort11;
+      this.dataSourceScore.paginator = this.paginatorScore;
+      this.dataSourceScore.sort = this.sortScore;
     });
 
     this.loadStudents(examId);
 
-    const selectedExam = this.dataSource1.data
+    const selectedExam = this.dataSourceExam.data
       .filter((item: any) => item.id === examId)
       .map((item) => ({
         id: item.id,
@@ -346,7 +291,7 @@ export class TeaScoreComponent implements OnInit, AfterViewInit {
         }
 
         else {
-          this.dataSource11.data = activeData;
+          this.dataSourceScore.data = activeData;
           this.updateChartData();
         }
       },
@@ -356,10 +301,14 @@ export class TeaScoreComponent implements OnInit, AfterViewInit {
     });
   }
 
+  enableEditing() {
+    this.isEditing = true;
+  }
+
   updateChartData() {
     const distribution = Array(11).fill(0);
 
-    this.dataSource11.data.forEach((student: any) => {
+    this.dataSourceScore.data.forEach((student: any) => {
       const score = student.score;
       
       if (score !== null && score >= 0 && score <= 10) {
@@ -370,7 +319,7 @@ export class TeaScoreComponent implements OnInit, AfterViewInit {
 
     let maxCount = 0;
 
-    distribution.forEach((count, index) => {
+    distribution.forEach((count) => {
       if (count > maxCount) {
         maxCount = count;
       }
@@ -415,12 +364,24 @@ export class TeaScoreComponent implements OnInit, AfterViewInit {
     };
   }
 
-  enableEditing() {
-    this.isEditing = true;
+  validateScore(row: any): void {
+    if (row.score < 0) {
+      row.score = 0;
+    } else if (row.score > 10) {
+      row.score = 10;
+    }
+  }
+
+  limitInputLength(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const maxLength = parseInt(input.getAttribute('maxLength') || '0', 10);
+    if (input.value.length > maxLength) {
+      input.value = input.value.slice(0, maxLength);
+    }
   }
 
   saveChanges() {
-    this.examScoreService.editExamScores(this.dataSource11.data).subscribe(
+    this.examScoreService.editExamScores(this.dataSourceScore.data).subscribe(
       () => {
         this.isEditing = false;
         this.loadStudents(this.examId);

@@ -100,6 +100,10 @@ export class ClassDetailsService {
     return this.http.get(`${this.baseUrl}/class-schedule?classId=${classId}`);
   }
 
+  createSchedule(payload: any): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/class-schedule`, payload);
+  }
+
   deleteSchdule(scheduleId: number): Observable<any> {
     return this.http.put(`${this.baseUrl}/class-schedule/delete/${scheduleId}`, null);
   }

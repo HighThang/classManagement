@@ -42,36 +42,9 @@ export type ChartOptions = {
 @Component({
   selector: 'app-tea-attendance',
   standalone: true,
-  imports: [
-    MatTabsModule,
-    MatListModule,
-    MatIconModule,
-    MatButtonModule,
-    CommonModule,
-    MatProgressSpinnerModule,
-    MatSnackBarModule,
-    MatDialogModule,
-    MatSnackBarModule,
-    MatTableModule,
-    MatButtonModule,
-    MatInputModule,
-    MatIconModule,
-    MatTabsModule,
-    MatToolbarModule,
-    RouterModule,
-    FormsModule,
-    MatPaginatorModule,
-    SharedModule,
-    MatSortModule,
-    ReactiveFormsModule,
-    MatOptionModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatFormFieldModule,
-    MatSelectModule,
-    ChartComponent,
-    MatCheckboxModule,
-  ],
+  imports: [MatTabsModule, MatListModule, MatIconModule, MatButtonModule, CommonModule, MatProgressSpinnerModule, MatSnackBarModule, MatDialogModule,
+    MatTableModule, MatInputModule, MatToolbarModule, RouterModule, FormsModule, MatPaginatorModule, SharedModule, MatSortModule, ReactiveFormsModule,
+    MatOptionModule, MatDatepickerModule, MatNativeDateModule, MatFormFieldModule, MatSelectModule, ChartComponent, MatCheckboxModule],
   templateUrl: './tea-attendance.component.html',
   styleUrl: './tea-attendance.component.scss',
   animations: [
@@ -86,41 +59,37 @@ export type ChartOptions = {
 })
 export class TeaAttendanceComponent implements OnInit, AfterViewInit {
   formGroup!: FormGroup;
-  registerForm!: FormGroup;
-
+  attendanceImageForm!: FormGroup;
   classrooms: Classroom[] = [];
   showDetails: boolean = false;
-
   activeBtn = true;
   isEditing = false;
   isEditing2 = false;
   isLoading: boolean = false;
-
   selectedImage: string | null = null;
   file_store: FileList | null = null;
-
   classId!: number;
   scheduleId!: number;
   classDetails!: ClassDetails;
   scheduleDetails!: ScheduleData;
   attendedResponses!: any;
+  withoutEncodingNames: string = '';
 
-  displayedColumns1: string[] = ['id', 'day', 'periodInDay', 'dayInWeek', 'createdDate', 'edit'];
-  dataSource1 = new MatTableDataSource<ScheduleData>();
+  displayedColumnsSchedule: string[] = ['id', 'day', 'periodInDay', 'dayInWeek', 'createdDate', 'edit'];
+  dataSourceSchedule = new MatTableDataSource<ScheduleData>();
 
-  displayedColumns11: string[] = ['id', 'email', 'name', 'attend'];
-  dataSource11 = new MatTableDataSource<Attendance>();
+  displayedColumnsAttendance: string[] = ['id', 'email', 'name', 'attend'];
+  dataSourceAttendance = new MatTableDataSource<Attendance>();
 
-  @ViewChild('paginator1') paginator1!: MatPaginator;
-  @ViewChild('sort1') sort1!: MatSort;
-  @ViewChild('paginator11') paginator11!: MatPaginator;
-  @ViewChild('sort11') sort11!: MatSort;
+  @ViewChild('paginatorSchedule') paginatorSchedule!: MatPaginator;
+  @ViewChild('sortSchedule') sortSchedule!: MatSort;
+  @ViewChild('paginatorAttendance') paginatorAttendance!: MatPaginator;
+  @ViewChild('sortAttendance') sortAttendance!: MatSort;
 
-  @ViewChild('dialogTemplate1') dialogTemplate1: any;
-  @ViewChild('input11') searchInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('dialogTemplateAttendance') dialogTemplateAttendance: any;
+  @ViewChild('inputAttendance') searchInput!: ElementRef<HTMLInputElement>;
 
   @ViewChild('attendedByImage') attendedByImage: any;
-  withoutEncodingNames: string = '';
 
   chartOptions: Partial<ChartOptions> = {
     chart: {
@@ -159,7 +128,7 @@ export class TeaAttendanceComponent implements OnInit, AfterViewInit {
     private imageSerive: ImageService,
     private faceRecognitionService: FaceRecognitionService
   ) {
-    this.registerForm = this.fb.group({
+    this.attendanceImageForm = this.fb.group({
       imageURL: [{ value: '', disabled: true }],
     });
   }
@@ -195,8 +164,8 @@ export class TeaAttendanceComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.dataSource1.paginator = this.paginator1;
-    this.dataSource1.sort = this.sort1;
+    this.dataSourceSchedule.paginator = this.paginatorSchedule;
+    this.dataSourceSchedule.sort = this.sortSchedule;
   }
 
   loadClassrooms(): void {
@@ -235,21 +204,21 @@ export class TeaAttendanceComponent implements OnInit, AfterViewInit {
     });
   }
 
-  applyFilter1(event: Event): void {
+  applyFilterSchedule(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource1.filter = filterValue.trim().toLowerCase();
+    this.dataSourceSchedule.filter = filterValue.trim().toLowerCase();
   }
 
-  applyFilter11(event: Event): void {
+  applyFilterAttendance(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource11.filter = filterValue.trim().toLowerCase();
+    this.dataSourceAttendance.filter = filterValue.trim().toLowerCase();
   }
 
   resetFilter(): void {
     if (this.searchInput) {
       this.searchInput.nativeElement.value = '';
     }
-    this.applyFilter11({ target: { value: '' } } as unknown as Event);
+    this.applyFilterAttendance({ target: { value: '' } } as unknown as Event);
   }
 
   downloadAttendanceTable() {
@@ -284,7 +253,7 @@ export class TeaAttendanceComponent implements OnInit, AfterViewInit {
           createdDate: item.createdDate,
           imageClassAttendance: item.imageClassAttendance
         }));
-        this.dataSource1.data = mappedData;
+        this.dataSourceSchedule.data = mappedData;
       },
       error: () => {
         this.showToast('error', 'Tải lịch học không thành công');
@@ -332,29 +301,29 @@ export class TeaAttendanceComponent implements OnInit, AfterViewInit {
   openStudentListDialog(scheduleId: number) {
     this.scheduleId = scheduleId;
 
-    const dialog1 = this.dialog.open(this.dialogTemplate1, {
+    const dialog1 = this.dialog.open(this.dialogTemplateAttendance, {
       width: '85%',
       maxHeight: '95vh',
     });
 
     dialog1.afterOpened().subscribe(() => {
-      this.dataSource11.paginator = this.paginator11;
-      this.dataSource11.sort = this.sort11;
+      this.dataSourceAttendance.paginator = this.paginatorAttendance;
+      this.dataSourceAttendance.sort = this.sortAttendance;
     });
 
-    const selectedSchedule = this.dataSource1.data
-    .filter((item: any) => item.id === scheduleId)
-    .map((item) => ({
-      id: item.id,
-      day: new Date(item.day).toLocaleDateString('vi-VN'),
-      periodInDay: item.periodInDay,
-      dayInWeek: item.dayInWeek,
-      createdDate: item.createdDate,
-      imageClassAttendance: item.imageClassAttendance
-    })
-  );
+    const selectedSchedule = this.dataSourceSchedule.data
+      .filter((item: any) => item.id === scheduleId)
+      .map((item) => ({
+        id: item.id,
+        day: new Date(item.day).toLocaleDateString('vi-VN'),
+        periodInDay: item.periodInDay,
+        dayInWeek: item.dayInWeek,
+        createdDate: item.createdDate,
+        imageClassAttendance: item.imageClassAttendance
+      })
+    );
 
-  this.scheduleDetails = selectedSchedule[0];
+    this.scheduleDetails = selectedSchedule[0];
 
     this.loadStudents(scheduleId);
 
@@ -362,8 +331,8 @@ export class TeaAttendanceComponent implements OnInit, AfterViewInit {
       this.isEditing = false;
       this.isEditing2 = false;
       this.resetFilter();
-      this.registerForm.reset();
-      this.registerForm.disable();
+      this.attendanceImageForm.reset();
+      this.attendanceImageForm.disable();
       this.selectedImage = null;
     });
   }
@@ -378,7 +347,7 @@ export class TeaAttendanceComponent implements OnInit, AfterViewInit {
           isAttended: item.isAttended,
         }));
 
-        const selectedSchedule = this.dataSource1.data
+        const selectedSchedule = this.dataSourceSchedule.data
           .filter((item: any) => item.id === scheduleId)
           .map((item) => ({
             id: item.id,
@@ -398,13 +367,13 @@ export class TeaAttendanceComponent implements OnInit, AfterViewInit {
 
         else {
           this.activeBtn = true;
-          this.dataSource11.data = activeData;
+          this.dataSourceAttendance.data = activeData;
           this.totalCount = response.content.length;
           this.updateChartData();
         }
 
         if (this.scheduleDetails.imageClassAttendance !== null) {
-          this.registerForm.patchValue({ imageURL: this.scheduleDetails.imageClassAttendance });
+          this.attendanceImageForm.patchValue({ imageURL: this.scheduleDetails.imageClassAttendance });
           this.loadImage(this.scheduleDetails.imageClassAttendance);
         }
       },
@@ -415,7 +384,7 @@ export class TeaAttendanceComponent implements OnInit, AfterViewInit {
   }
 
   updateChartData() {
-    const attendedCount = this.dataSource11.data.filter(
+    const attendedCount = this.dataSourceAttendance.data.filter(
       (row) => row.isAttended
     ).length;
     const absentCount = this.totalCount - attendedCount;
@@ -428,16 +397,16 @@ export class TeaAttendanceComponent implements OnInit, AfterViewInit {
 
   enableEditing2() {
     this.isEditing2 = true;
-    this.registerForm.enable();
+    this.attendanceImageForm.enable();
   }
 
   markAllAttended() {
-    this.dataSource11.data.forEach((row) => (row.isAttended = true));
+    this.dataSourceAttendance.data.forEach((row) => (row.isAttended = true));
     this.updateChartData();
   }
 
   saveChanges() {
-    this.classAttendance.updateAttendance(this.dataSource11.data).subscribe(
+    this.classAttendance.updateAttendance(this.dataSourceAttendance.data).subscribe(
       () => {
         this.isEditing = false;
         this.showToast('success', 'Điểm danh thành công');
@@ -457,8 +426,8 @@ export class TeaAttendanceComponent implements OnInit, AfterViewInit {
 
   cancelEditing2() {
     this.isEditing2 = false;
-    this.registerForm.disable();
-    this.registerForm.reset();
+    this.attendanceImageForm.disable();
+    this.attendanceImageForm.reset();
     this.loadStudents(this.scheduleId);
     this.updateChartData();
     this.selectedImage = null;
@@ -466,7 +435,7 @@ export class TeaAttendanceComponent implements OnInit, AfterViewInit {
   }
 
   saveImageClassAttendance() {
-    if (this.registerForm.valid && this.file_store && this.file_store[0]) this.uploadImage();
+    if (this.attendanceImageForm.valid && this.file_store && this.file_store[0]) this.uploadImage();
   }
 
   loadImage(imagePath: string | null): void {
@@ -532,7 +501,7 @@ export class TeaAttendanceComponent implements OnInit, AfterViewInit {
         },
         () => {
           this.isEditing2 = false;
-          this.registerForm.disable();
+          this.attendanceImageForm.disable();
           this.showToast('error', 'Có lỗi xảy ra khi tải ảnh')
         }
       );
@@ -543,7 +512,7 @@ export class TeaAttendanceComponent implements OnInit, AfterViewInit {
     this.loadSchedules(this.classId);
     this.loadStudents(this.scheduleId);
     this.isEditing2 = false;
-    this.registerForm.disable();
+    this.attendanceImageForm.disable();
     this.selectedImage = null;
     this.file_store = null;
   }
@@ -553,11 +522,11 @@ export class TeaAttendanceComponent implements OnInit, AfterViewInit {
     if (files && files[0]) {
       const file = files[0];
       const count = files.length > 1 ? `(+${files.length - 1} files)` : '';
-      this.registerForm.patchValue({
+      this.attendanceImageForm.patchValue({
         imageURL: `${file.name}${count}`,
       });
     } else {
-      this.registerForm.patchValue({
+      this.attendanceImageForm.patchValue({
         imageURL: '',
       });
     }
