@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ptit.d20.do_an.class_management.domain.Classroom;
 import ptit.d20.do_an.class_management.dto.ClassroomStatusForStudentDto;
-import ptit.d20.do_an.class_management.dto.classroom.ClassroomDto;
-import ptit.d20.do_an.class_management.dto.classroom.NewClassRequest;
+import ptit.d20.do_an.class_management.dto.ClassroomDto;
+import ptit.d20.do_an.class_management.dto.NewClassRequest;
 import ptit.d20.do_an.class_management.service.ClassroomService;
 
 import java.util.List;
