@@ -100,12 +100,12 @@ public class ClassScheduleService {
         });
     }
 
-
     public ApiResponse createClassSchedule(NewClassScheduleRequest request) {
         Classroom classroom = classroomRepository.findById(request.getClassId())
                 .orElseThrow(() -> new ResourceNotFoundException("Not found classroom"));
+
         List<ClassSchedule> classSchedules = new ArrayList<>();
-        for (LocalDate date = request.getStartDate(); !date.isAfter(request.getEndDate()); date = date.plusDays(1)) {
+        for (LocalDate date = request.getStartDate(); !date.isAfter(request.getEndDate().plusDays(1)); date = date.plusDays(1)) {
             // Check if the current date matches the specified day of the week
             if (date.getDayOfWeek().name().equals(request.getDayInWeek())) {
                 // Create a new ClassSchedule object for the current date

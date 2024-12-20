@@ -179,7 +179,23 @@ public class UserService {
             List<ClassRegistration> registrationsToUpdate =
                     classRegistrationRepository.findAllByEmailAndStudentIsNull(student.getEmail());
 
-            registrationsToUpdate.forEach(registration -> registration.setStudent(savedUser));
+//            registrationsToUpdate.forEach(registration -> registration.setStudent(savedUser));
+
+            registrationsToUpdate.forEach(registration -> {
+                registration.setStudent(savedUser);
+                registration.setFirstName(savedUser.getFirstName());
+                registration.setSurname(savedUser.getSurname());
+                registration.setLastName(savedUser.getLastName());
+                registration.setPhone(savedUser.getPhone());
+                registration.setAddress(savedUser.getAddress());
+                if (savedUser.getDob() != null) {
+                    registration.setDob(Date.from(savedUser.getDob()
+                            .atStartOfDay(ZoneId.systemDefault())
+                            .toInstant()));
+                }
+                registration.setImgURLRequest(savedUser.getImageURL());
+            });
+
             classRegistrationRepository.saveAll(registrationsToUpdate);
         }
     }

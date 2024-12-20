@@ -205,7 +205,11 @@ public class StudentService {
                 row.createCell(2).setCellValue(student.getSurname());
                 row.createCell(3).setCellValue(student.getFirstName());
                 row.createCell(4).setCellValue(student.getEmail());
-                row.createCell(5).setCellValue(student.getDob());
+                if (student.getStudent() != null && student.getStudent().getDob() != null) {
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                    String dobFormatted = student.getStudent().getDob().format(formatter);
+                    row.createCell(5).setCellValue(dobFormatted);
+                }
                 row.createCell(6).setCellValue(student.getPhone());
                 row.createCell(7).setCellValue(student.getAddress());
             }
@@ -266,7 +270,6 @@ public class StudentService {
 
         // Kiểm tra tồn tại trong Attendance hoặc TutorFee
         boolean hasRelevantAttendance = classAttendanceRepository.existsByClassRegistrationIdAndIsAttended(studentId, true);
-        boolean hasRelevantTutorFee = tutorFeeDetailRepository.existsByClassRegistrationIdAndNumberOfAttendedLessonNot(studentId, 0);
 
         try {
             if (hasRelevantAttendance) {
@@ -328,5 +331,4 @@ public class StudentService {
     public boolean isExistingRequestInWishList(Long studentId, Long classroomId) {
         return classRegistrationRepository.existsByStudentIdAndClassroomId(studentId, classroomId);
     }
-
 }

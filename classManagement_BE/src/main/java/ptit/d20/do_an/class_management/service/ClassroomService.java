@@ -15,18 +15,15 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ptit.d20.do_an.class_management.domain.User;
-import ptit.d20.do_an.class_management.dto.ClassroomStatusForStudentDto;
+import ptit.d20.do_an.class_management.dto.*;
 import ptit.d20.do_an.class_management.exception.BusinessException;
 import ptit.d20.do_an.class_management.exception.ResourceNotFoundException;
 import ptit.d20.do_an.class_management.repository.ClassRegistrationRepository;
 import ptit.d20.do_an.class_management.security.SecurityUtils;
 import ptit.d20.do_an.class_management.domain.ClassRegistration;
 import ptit.d20.do_an.class_management.domain.Classroom;
-import ptit.d20.do_an.class_management.dto.ApiResponse;
-import ptit.d20.do_an.class_management.dto.RequestRegistrationDto;
 import ptit.d20.do_an.class_management.dto.classroom.ClassroomDto;
 import ptit.d20.do_an.class_management.dto.classroom.NewClassRequest;
-import ptit.d20.do_an.class_management.dto.StudentDto;
 import ptit.d20.do_an.class_management.enumeration.RoleName;
 import ptit.d20.do_an.class_management.repository.ClassScheduleRepository;
 import ptit.d20.do_an.class_management.repository.ClassroomRepository;
@@ -453,10 +450,11 @@ public class ClassroomService {
             classroom.setNote(classroomDto.getNote());
         }
 
-        boolean classExists = classroomRepository.existsByTeacherIdAndClassNameAndSubjectName(
+        boolean classExists = classroomRepository.existsByTeacherIdAndClassNameAndSubjectNameAndIdNot(
                 classroom.getTeacher().getId(),
                 classroom.getClassName(),
-                classroom.getSubjectName()
+                classroom.getSubjectName(),
+                classroom.getId()
         );
         if (classExists) {
             throw new BusinessException("Lớp học của bạn đã tồn tại!");
@@ -471,17 +469,28 @@ public class ClassroomService {
         return classroomRepository.findDistinctSubjectNames();
     }
 
-    public List<String> getAvailableTeachers(String subjectName) {
+    public List<AvailableTeachersDto> getAvailableTeachers(String subjectName) {
         List<Classroom> classrooms = classroomRepository.findAllBySubjectName(subjectName);
-        List<String> availableClasses = new ArrayList<>();
+        List<AvailableTeachersDto> availableClasses = new ArrayList<>();
+
         for (Classroom classroom : classrooms) {
             if (classroom.getTeacher().getActive() == false) {
                 continue;
             }
+
             User teacher = classroom.getTeacher();
-            String classNameAndTeacherName = classroom.getId() + " - " + classroom.getClassName() + " - "
+
+            String basicInfo = classroom.getId() + " - " + classroom.getClassName() + " - "
                     + teacher.getLastName() + " " + teacher.getSurname() + " " + teacher.getFirstName();
-            availableClasses.add(classNameAndTeacherName);
+
+            Map<String, String> additionalInfo = Map.of(
+                    "note", classroom.getNote() != null ? classroom.getNote() : "N/A",
+                    "phone", teacher.getPhone(),
+                    "email", teacher.getEmail(),
+                    "business", teacher.getBusiness()
+            );
+
+            availableClasses.add(new AvailableTeachersDto(basicInfo, additionalInfo));
         }
 
         return availableClasses;

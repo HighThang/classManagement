@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import ptit.d20.do_an.class_management.dto.AvailableTeachersDto;
 import ptit.d20.do_an.class_management.dto.RequestRegistrationDto;
 import ptit.d20.do_an.class_management.service.ClassroomService;
 import ptit.d20.do_an.class_management.service.SubjectService;
@@ -29,8 +30,8 @@ public class ClientController {
     }
 
     @GetMapping("/available-teacher")
-    public ResponseEntity<List<String>> getAvailableTeachers(String subjectName) {
-        List<String> availableTeachers = classroomService.getAvailableTeachers(subjectName);
+    public ResponseEntity<List<AvailableTeachersDto>> getAvailableTeachers(@RequestParam("subjectName") String subjectName) {
+        List<AvailableTeachersDto> availableTeachers = classroomService.getAvailableTeachers(subjectName);
         return ResponseEntity.ok(availableTeachers);
     }
 
