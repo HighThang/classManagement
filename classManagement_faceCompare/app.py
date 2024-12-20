@@ -50,7 +50,6 @@ def recognize_faces():
     if not os.path.exists(input_image_path):
         return jsonify({"error": f"Ảnh điểm danh không tồn tại: {input_image_path}"}), 404
 
-    # Lấy danh sách học sinh từ bảng class_attendance và class_registration
     cursor.execute(""" 
         SELECT ca.id AS attendance_id, ca.class_registration_id, cr.imgurlrequest, cr.last_name, cr.surname, cr.first_name
         FROM class_attendance ca 
@@ -60,21 +59,7 @@ def recognize_faces():
 
     if not students:
         return jsonify({"error": "Không có học sinh cần điểm danh trong lịch học này"}), 404
-
-    # Tạo danh sách thông tin và đường dẫn ảnh học sinh
-    student_images = [
-        {
-            "class_registration_id": student["class_registration_id"],
-            "image_path": os.path.join(BASE_FOLDER_STUDENT, student["imgurlrequest"]),
-            "student_name": student["last_name"] + ' ' + student["surname"] + ' ' + student["first_name"]
-        }
-        for student in students if student["imgurlrequest"] and os.path.exists(os.path.join(BASE_FOLDER_STUDENT, student["imgurlrequest"]))
-    ]
-
-    if not student_images:
-        return jsonify({"error": "Không tìm thấy hình ảnh hợp lệ của học sinh"}), 404
     
-    # Tạo danh sách encoding khuôn mặt học sinh
     student_encodings = []
     student_metadata = []
     students_without_encoding = []
@@ -91,7 +76,6 @@ def recognize_faces():
                 student_encodings.append(encodings[0])
                 student_metadata.append({
                     "student_id": student["class_registration_id"],
-                    "student_name": f"{student['last_name']} {student['surname']} {student['first_name']}"
                 })
             else: 
                 students_without_encoding.append({
@@ -116,23 +100,22 @@ def recognize_faces():
 
     # So sánh khuôn mặt tách ra với danh sách học sinh và cập nhật điểm danh
     matched_students = []
-    unmatched_faces = list(range(len(faces)))
-    students_not_in_photo = student_metadata + students_without_encoding
+    unmatched_faces = faces.copy()
+    students_not_in_photo = student_metadata.copy()
 
     for face in faces:
-        matches = face_recognition.compare_faces(student_encodings, face["encoding"], tolerance=0.6)
-        face_distances = face_recognition.face_distance(student_encodings, face["encoding"])
+        best_match_index = None
+        best_match_distance = 0.6
 
-        if any(matches):
-            best_match_index = face_distances.argmin()
-            matched_student = student_metadata[best_match_index]
+        for idx, student_encoding in enumerate(student_encodings):
+            distance = face_recognition.face_distance([student_encoding], face["encoding"])[0]
+            if distance < best_match_distance:
+                best_match_distance = distance
+                best_match_index = idx
 
-            # Thêm học sinh vào danh sách đã khớp
-            matched_students.append({
-                "student_id": matched_student["student_id"],
-                "student_name": matched_student["student_name"],
-                "face_index": face["index"]
-            })
+        if best_match_index is not None:
+            matched_student = students_not_in_photo.pop(best_match_index)
+            matched_students.append(matched_student)
 
             # Cập nhật trạng thái điểm danh
             cursor.execute("""
@@ -142,24 +125,26 @@ def recognize_faces():
             """, (matched_student["student_id"], schedule_id))
             conn.commit()
 
-            # Loại bỏ khuôn mặt và học sinh khỏi danh sách
-            unmatched_faces.remove(face["index"])
-            students_not_in_photo.remove(matched_student)
+            unmatched_faces.remove(face)
+            student_encodings.pop(best_match_index)
 
-    # Tạo một mảng chứa tất cả student_id từ students_not_in_photo
-    student_ids_not_in_photo = [student["student_id"] for student in students_not_in_photo]
-
-    # Duyệt qua tất cả student_id và cập nhật trạng thái điểm danh
-    for student_id in student_ids_not_in_photo:
+    # Cập nhật trạng thái điểm danh cho các học sinh không có trong ảnh
+    for student in students_not_in_photo:
         cursor.execute("""
             UPDATE class_attendance
             SET is_attended = FALSE
             WHERE class_registration_id = %s AND schedule_id = %s
-        """, (student_id, schedule_id))
+        """, (student["student_id"], schedule_id))
         conn.commit()
 
-    cursor.close()
-    conn.close()
+    # Cập nhật trạng thái điểm danh cho các học sinh có ảnh không hợp lệ
+    for student in students_without_encoding:
+        cursor.execute("""
+            UPDATE class_attendance
+            SET is_attended = FALSE
+            WHERE class_registration_id = %s AND schedule_id = %s
+        """, (student["student_id"], schedule_id))
+        conn.commit()
 
     response = {
         "matched_students": matched_students,
