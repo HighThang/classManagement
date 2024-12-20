@@ -1,11 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import {
-  FormBuilder,
-  FormGroup,
-  FormsModule,
-  ReactiveFormsModule,
-} from '@angular/forms';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatOptionModule, MatNativeDateModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -22,33 +17,15 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { SharedModule } from '../../../../shared/shared.module';
-import {
-  ClassDetails,
-  ClassDetailsService,
-  ScheduleData,
-} from '../../../../core/services/class-detail/class-detail.service';
-import { HttpClient } from '@angular/common/http';
+import { ClassDetails, ClassDetailsService } from '../../../../core/services/class-detail/class-detail.service';
 import Swal from 'sweetalert2';
-import {
-  Classroom,
-  ClassroomService,
-} from '../../../../core/services/classroom/classroom.service';
+import { Classroom, ClassroomService } from '../../../../core/services/classroom/classroom.service';
 import { trigger, transition, style, animate } from '@angular/animations';
-import {
-  ChartComponent,
-  ApexChart,
-  ApexLegend,
-  ApexDataLabels,
-  ApexResponsive,
-} from 'ng-apexcharts';
-import {
-  Attendance,
-  ClassAttendanceService,
-} from '../../../../core/services/class-attendance/class-attendance.service';
+import { ChartComponent, ApexChart, ApexLegend, ApexDataLabels, ApexResponsive } from 'ng-apexcharts';
+import { ClassAttendanceService } from '../../../../core/services/class-attendance/class-attendance.service';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import saveAs from 'file-saver';
 
 export type ChartOptions = {
   chart: ApexChart;
@@ -62,36 +39,9 @@ export type ChartOptions = {
 @Component({
   selector: 'app-stu-attendance',
   standalone: true,
-  imports: [
-    MatTabsModule,
-    MatListModule,
-    MatIconModule,
-    MatButtonModule,
-    CommonModule,
-    MatProgressSpinnerModule,
-    MatSnackBarModule,
-    MatDialogModule,
-    MatSnackBarModule,
-    MatTableModule,
-    MatButtonModule,
-    MatInputModule,
-    MatIconModule,
-    MatTabsModule,
-    MatToolbarModule,
-    RouterModule,
-    FormsModule,
-    MatPaginatorModule,
-    SharedModule,
-    MatSortModule,
-    ReactiveFormsModule,
-    MatOptionModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatFormFieldModule,
-    MatSelectModule,
-    ChartComponent,
-    MatCheckboxModule,
-  ],
+  imports: [MatTabsModule, MatListModule, MatIconModule, MatButtonModule, CommonModule, MatProgressSpinnerModule, MatSnackBarModule, MatDialogModule,
+    MatTableModule, MatInputModule, MatToolbarModule, RouterModule, FormsModule, MatPaginatorModule, SharedModule, MatSortModule, ReactiveFormsModule,
+    MatOptionModule, MatDatepickerModule, MatNativeDateModule, MatFormFieldModule, MatSelectModule, ChartComponent, MatCheckboxModule],
   templateUrl: './stu-attendance.component.html',
   styleUrl: './stu-attendance.component.scss',
   animations: [
@@ -106,19 +56,17 @@ export type ChartOptions = {
 })
 export class StuAttendanceComponent implements OnInit, AfterViewInit {
   formGroup!: FormGroup;
-
   activeClassrooms: Classroom[] = [];
   deletedClassrooms: Classroom[] = [];
   showDetails: boolean = false;
-
   classId!: number;
   classDetails!: ClassDetails;
 
-  displayedColumns1: string[] = [ 'day', 'dayInWeek', 'periodInDay', 'attend' ];
-  dataSource1 = new MatTableDataSource<any>();
+  displayedColumnsSchedule: string[] = [ 'day', 'dayInWeek', 'periodInDay', 'attend' ];
+  dataSourceSchedule = new MatTableDataSource<any>();
 
-  @ViewChild('paginator1') paginator1!: MatPaginator;
-  @ViewChild('sort1') sort1!: MatSort;
+  @ViewChild('paginatorSchedule') paginatorSchedule!: MatPaginator;
+  @ViewChild('sortSchedule') sortSchedule!: MatSort;
 
   chartOptions: Partial<ChartOptions> = {
     chart: {
@@ -168,16 +116,7 @@ export class StuAttendanceComponent implements OnInit, AfterViewInit {
       classroomId: [this.classId || null],
     });
 
-    this.classDetails = {
-      id: 0,
-      subjectName: '',
-      createdDate: '',
-      note: '',
-      className: '',
-      teacherName: '',
-      teacherEmail: '',
-      teacherPhone: ''
-    };
+    this.classDetails = { id: 0, subjectName: '', createdDate: '', note: '', className: '', teacherName: '', teacherEmail: '', teacherPhone: '' };
 
     this.loadClassrooms();
 
@@ -195,8 +134,8 @@ export class StuAttendanceComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.dataSource1.paginator = this.paginator1;
-    this.dataSource1.sort = this.sort1;
+    this.dataSourceSchedule.paginator = this.paginatorSchedule;
+    this.dataSourceSchedule.sort = this.sortSchedule;
   }
 
   loadClassrooms(): void {
@@ -248,9 +187,9 @@ export class StuAttendanceComponent implements OnInit, AfterViewInit {
     });
   }
 
-  applyFilter1(event: Event): void {
+  applyFilterSchedule(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource1.filter = filterValue.trim().toLowerCase();
+    this.dataSourceSchedule.filter = filterValue.trim().toLowerCase();
   }
 
   isToday(date: string | Date): boolean {
@@ -275,7 +214,7 @@ export class StuAttendanceComponent implements OnInit, AfterViewInit {
           isAttended: item.attended
         }));
 
-        this.dataSource1.data = activeData;
+        this.dataSourceSchedule.data = activeData;
         this.totalCount = response.content.length;
         this.updateChartData();
       },
@@ -283,6 +222,12 @@ export class StuAttendanceComponent implements OnInit, AfterViewInit {
         this.showToast('error', 'Lỗi khi tải dữ liệu')
       },
     });
+  }
+
+  updateChartData() {
+    const attendedCount = this.dataSourceSchedule.data.filter((row) => row.isAttended).length;
+    const absentCount = this.totalCount - attendedCount;
+    this.chartSeries = [attendedCount, absentCount];
   }
 
   private mapPeriodInDay(periodInDay: string): string {
@@ -305,12 +250,6 @@ export class StuAttendanceComponent implements OnInit, AfterViewInit {
     const dayIndex = date.getDay();
   
     return daysOfWeek[dayIndex];
-  }
-
-  updateChartData() {
-    const attendedCount = this.dataSource1.data.filter((row) => row.isAttended).length;
-    const absentCount = this.totalCount - attendedCount;
-    this.chartSeries = [attendedCount, absentCount];
   }
 
   showToast(icon: 'success' | 'error' | 'info' | 'warning', title: string) {

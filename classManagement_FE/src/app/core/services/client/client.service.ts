@@ -14,9 +14,9 @@ export class ClientService {
     return this.http.get<string[]>(`${this.apiUrl}/available-subject`);
   }
 
-  getTeachersBySubject(subjectName: string): Observable<string[]> {
+  getTeachersBySubject(subjectName: string): Observable<any[]> {
     const url = `${this.apiUrl}/available-teacher?subjectName=${encodeURIComponent(subjectName)}`;
-    return this.http.get<string[]>(url);
+    return this.http.get<any[]>(url);
   }
 
   requestToClass(requestRegistrationDto: any): Observable<number> {
@@ -27,13 +27,5 @@ export class ClientService {
   uploadImageToClass(id: number, formData: FormData): Observable<boolean> {
     const url = `${this.apiUrl}/image-to-class/${id}`;
     return this.http.put<boolean>(url, formData);
-  }
-
-  checkIfRequestExistsForClient(email: number, classroomId: number): Promise<boolean> {
-    const apiUrl = `http://localhost:8081/api/auth/isExistingRequestInWishList?email=${email}&classroomId=${classroomId}`;
-    return this.http
-      .get<boolean>(apiUrl).toPromise()
-      .then((response) => response || false)
-      .catch(() => false);
   }
 }

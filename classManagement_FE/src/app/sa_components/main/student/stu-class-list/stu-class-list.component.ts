@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, inject, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, inject, ViewChild } from '@angular/core';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -9,13 +9,11 @@ import { SharedModule } from '../../../../shared/shared.module';
 import { CommonModule, DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatDialogModule } from '@angular/material/dialog';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatOptionModule } from '@angular/material/core';
-import { Course, CourseService } from '../../../../core/services/course/course.service';
 import { MatSelectModule } from '@angular/material/select';
 import { Classroom, ClassroomService } from '../../../../core/services/classroom/classroom.service';
-import { Validators } from '@angular/forms';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -29,25 +27,25 @@ import Swal from 'sweetalert2';
 export class StuClassListComponent implements AfterViewInit {
   private router = inject(Router);
 
-  displayedColumns: string[] = ['id','className','subjectName','note','createdDate','attendance','score','fee','details'];
-  dataSource = new MatTableDataSource<Classroom>();
-  displayedColumns2: string[] = ['id','className','subjectName','note','createdDate','attendance','score','fee','details'];
-  dataSource2 = new MatTableDataSource<Classroom>();
+  displayedColumnsActive: string[] = ['id','className','subjectName','note','createdDate','attendance','score','fee','details'];
+  dataSourceActive = new MatTableDataSource<Classroom>();
+  displayedColumnsDisable: string[] = ['id','className','subjectName','note','createdDate','attendance','score','fee','details'];
+  dataSourceDisable = new MatTableDataSource<Classroom>();
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
-  @ViewChild('paginator2') paginator2!: MatPaginator;
-  @ViewChild('sort2') sort2!: MatSort;
+  @ViewChild('paginatorDisable') paginatorDisable!: MatPaginator;
+  @ViewChild('sortDisable') sortDisable!: MatSort;
 
   constructor(
     private classroomService: ClassroomService,
   ) {}
 
   ngAfterViewInit(): void {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
-    this.dataSource2.paginator = this.paginator2;
-    this.dataSource2.sort = this.sort2;
+    this.dataSourceActive.paginator = this.paginator;
+    this.dataSourceActive.sort = this.sort;
+    this.dataSourceDisable.paginator = this.paginatorDisable;
+    this.dataSourceDisable.sort = this.sortDisable;
     this.loadData();
   }
 
@@ -62,8 +60,8 @@ export class StuClassListComponent implements AfterViewInit {
           .filter((item: any) => item.active === false && item.deleted === true)
           .map((item: any) => (item.classroom));
 
-        this.dataSource.data = activeData; 
-        this.dataSource2.data = inactiveData; 
+        this.dataSourceActive.data = activeData; 
+        this.dataSourceDisable.data = inactiveData; 
       },
       error: () => {
         this.showToast('error', 'Lỗi khi tải dữ liệu lớp học')
@@ -71,14 +69,14 @@ export class StuClassListComponent implements AfterViewInit {
     });
   }
 
-  applyFilter(event: Event): void {
+  applyFilterActive(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
+    this.dataSourceActive.filter = filterValue.trim().toLowerCase();
   }
 
-  applyFilter2(event: Event): void {
+  applyFilterDisable(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource2.filter = filterValue.trim().toLowerCase();
+    this.dataSourceDisable.filter = filterValue.trim().toLowerCase();
   }
 
   navigateTo(path: string, id: number): void {

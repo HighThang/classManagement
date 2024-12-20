@@ -1,17 +1,6 @@
 import { CommonModule } from '@angular/common';
-import {
-  AfterViewInit,
-  ChangeDetectorRef,
-  Component,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
-import {
-  FormBuilder,
-  FormGroup,
-  FormsModule,
-  ReactiveFormsModule,
-} from '@angular/forms';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatOptionModule, MatNativeDateModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -30,62 +19,19 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { Router, RouterModule } from '@angular/router';
 import { SharedModule } from '../../../../shared/shared.module';
-import {
-  ClassDetails,
-  ClassDetailsService,
-} from '../../../../core/services/class-detail/class-detail.service';
+import { ClassDetails, ClassDetailsService } from '../../../../core/services/class-detail/class-detail.service';
 import Swal from 'sweetalert2';
-import {
-  Classroom,
-  ClassroomService,
-} from '../../../../core/services/classroom/classroom.service';
+import { Classroom, ClassroomService } from '../../../../core/services/classroom/classroom.service';
 import { trigger, transition, style, animate } from '@angular/animations';
-import {
-  ApexChart,
-  ApexAxisChartSeries,
-  ChartComponent,
-  ApexDataLabels,
-  ApexPlotOptions,
-  ApexYAxis,
-  ApexLegend,
-} from "ng-apexcharts";
-
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { ExamScoreService } from '../../../../core/services/exam-score/exam-score.service';
 import { FeeService, TutorFeeDetailDto } from '../../../../core/services/fee/fee.service';
 
 @Component({
   selector: 'app-stu-fee',
   standalone: true,
-  imports: [
-    MatTabsModule,
-    MatListModule,
-    MatIconModule,
-    MatButtonModule,
-    CommonModule,
-    MatProgressSpinnerModule,
-    MatSnackBarModule,
-    MatDialogModule,
-    MatSnackBarModule,
-    MatTableModule,
-    MatButtonModule,
-    MatInputModule,
-    MatIconModule,
-    MatTabsModule,
-    MatToolbarModule,
-    RouterModule,
-    FormsModule,
-    MatPaginatorModule,
-    SharedModule,
-    MatSortModule,
-    ReactiveFormsModule,
-    MatOptionModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatFormFieldModule,
-    MatSelectModule,
-    MatCheckboxModule,
-  ],
+  imports: [MatTabsModule, MatListModule, CommonModule, MatProgressSpinnerModule, MatDialogModule, MatSnackBarModule, MatTableModule, MatButtonModule,
+    MatInputModule, MatIconModule,  MatToolbarModule, RouterModule, FormsModule, MatPaginatorModule, SharedModule, MatSortModule, ReactiveFormsModule,
+    MatOptionModule, MatDatepickerModule, MatNativeDateModule, MatFormFieldModule, MatSelectModule, MatCheckboxModule],
   templateUrl: './stu-fee.component.html',
   styleUrl: './stu-fee.component.scss',
   animations: [
@@ -108,11 +54,11 @@ export class StuFeeComponent implements OnInit, AfterViewInit {
   classId!: number;
   classDetails!: ClassDetails;
 
-  displayedColumns1: string[] = ['year', 'month', 'totalNumberOfClasses', "numberOfClassesAttended", "lessonPrice", "feeAmount", "feeSubmitted", "feeNotSubmitted", "createdDate"];
-  dataSource1 = new MatTableDataSource<TutorFeeDetailDto>();
+  displayedColumnsFee: string[] = ['year', 'month', 'totalNumberOfClasses', "numberOfClassesAttended", "lessonPrice", "feeAmount", "feeSubmitted", "feeNotSubmitted", "createdDate"];
+  dataSourceFee = new MatTableDataSource<TutorFeeDetailDto>();
 
-  @ViewChild('paginator1') paginator1!: MatPaginator;
-  @ViewChild('sort1') sort1!: MatSort;
+  @ViewChild('paginatorFee') paginatorFee!: MatPaginator;
+  @ViewChild('sortFee') sortFee!: MatSort;
 
   constructor(
     private classDetailsService: ClassDetailsService,
@@ -135,16 +81,7 @@ export class StuFeeComponent implements OnInit, AfterViewInit {
       classroomId: [this.classId || null],
     });
 
-    this.classDetails = {
-      id: 0,
-      subjectName: '',
-      createdDate: '',
-      note: '',
-      className: '',
-      teacherName: '',
-      teacherEmail: '',
-      teacherPhone: ''
-    };
+    this.classDetails = { id: 0, subjectName: '', createdDate: '', note: '', className: '', teacherName: '', teacherEmail: '', teacherPhone: '' };
 
     this.loadClassrooms();
 
@@ -162,8 +99,8 @@ export class StuFeeComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.dataSource1.paginator = this.paginator1;
-    this.dataSource1.sort = this.sort1;
+    this.dataSourceFee.paginator = this.paginatorFee;
+    this.dataSourceFee.sort = this.sortFee;
   }
 
   loadClassrooms(): void {
@@ -217,9 +154,9 @@ export class StuFeeComponent implements OnInit, AfterViewInit {
     });
   }
 
-  applyFilter1(event: Event): void {
+  applyFilterFee(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource1.filter = filterValue.trim().toLowerCase();
+    this.dataSourceFee.filter = filterValue.trim().toLowerCase();
   }
 
   private loadTutorFeeForStudent(classId: number): void {
@@ -238,7 +175,7 @@ export class StuFeeComponent implements OnInit, AfterViewInit {
             createdDate: item.time
           }));
   
-        this.dataSource1.data = activeData;
+        this.dataSourceFee.data = activeData;
       },
       error: () => {
         this.showToast('error', 'Lỗi khi tải dữ liệu');

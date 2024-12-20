@@ -11,8 +11,7 @@
                         <div class="form-section">
                             <form [formGroup]="formGroup">
                                 <div class="icon-grid-1">
-                                    <app-icon iconName="classroom"></app-icon>
-                                    
+                                    <app-icon iconName="classroom"></app-icon>           
                                     <mat-form-field class="form-field" appearance="outline">
                                         <mat-label>Chọn lớp học</mat-label>
                                         <mat-select formControlName="classroomId">
@@ -88,12 +87,12 @@
                         <app-icon iconName="search" style="padding: 10px; margin-bottom: 0px;"></app-icon>
                         <mat-form-field appearance="outline" style="width: 29vw;">
                             <mat-label>Tìm kiếm</mat-label>
-                            <input matInput #input1 (input)="applyFilter1($event)" placeholder="Nhập từ khóa tìm kiếm">
+                            <input matInput #input1 (input)="applyFilterSchedule($event)" placeholder="Nhập từ khóa tìm kiếm">
                         </mat-form-field>
                     </div>
                 </div>
                 <hr>
-                <table mat-table [dataSource]="dataSource1" matSort #sort1="matSort" matSortActive="id"
+                <table mat-table [dataSource]="dataSourceSchedule" matSort #sortSchedule="matSort" matSortActive="id"
                     matSortDirection="asc" class="example-table">
                     <ng-container matColumnDef="day">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header
@@ -128,8 +127,8 @@
                         </td>
                     </ng-container>
 
-                    <tr mat-header-row *matHeaderRowDef="displayedColumns1"></tr>
-                    <tr mat-row *matRowDef="let row; columns: displayedColumns1;"
+                    <tr mat-header-row *matHeaderRowDef="displayedColumnsSchedule"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumnsSchedule;"
                         [class.highlight-row]="isToday(row.day)">
                     </tr>
 
@@ -137,8 +136,7 @@
                         <td class="mat-cell" colspan="5">Không có dữ liệu</td>
                     </tr>
                 </table>
-
-                <mat-paginator #paginator1 [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page">
+                <mat-paginator #paginatorSchedule [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page">
                 </mat-paginator>
             </div>
         </div>

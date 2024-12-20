@@ -17,6 +17,8 @@ import { ClientService } from '../../../../core/services/client/client.service';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import { EmailService } from '../../../../core/services/email/email.service';
+import { CheckJoinClassRequestService } from '../../../../core/services/check-join-class-request/check-join-class-request.service';
+import { trigger, transition, style, animate } from '@angular/animations';
 
 export function dateLessThanTodayValidator(): ValidatorFn {
   return (control: AbstractControl): { [key: string]: any } | null => {
@@ -31,10 +33,23 @@ export function dateLessThanTodayValidator(): ValidatorFn {
   standalone: true,
   imports: [MatIconModule, MatToolbarModule, CommonModule, MatStepperModule, FormsModule, 
     ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatOptionModule, MatSelectModule, SharedModule, MatDatepickerModule],
-  providers: [provideNativeDateAdapter(), {provide: MAT_DATE_LOCALE, useValue: 'vi-VN'}, DatePipe],
+  providers: [
+    provideNativeDateAdapter(), 
+    {provide: MAT_DATE_LOCALE, useValue: 'vi-VN'}, 
+    DatePipe
+  ],
   changeDetection: ChangeDetectionStrategy.Default,
   templateUrl: './wish.component.html',
-  styleUrl: './wish.component.scss'
+  styleUrl: './wish.component.scss',
+  animations: [
+    trigger('fadeInOut', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('300ms ease-in', style({ opacity: 1 })),
+      ]),
+      transition(':leave', [animate('300ms ease-out', style({ opacity: 0 }))]),
+    ]),
+  ],
 })
 
 export class WishComponent implements OnInit {
@@ -47,9 +62,19 @@ export class WishComponent implements OnInit {
 
   thirdFormGroup: FormGroup;
   teachers: string[] = [];
+  classDetails: any[] = [];
+  showDetails: boolean = false;
+  selectedTeacher: any;
 
-  constructor(private _formBuilder: FormBuilder, private clientService: ClientService, private router: Router, private emailService: EmailService, private datePipe: DatePipe) {
-    this.firstFormGroup = this._formBuilder.group({
+  constructor(
+    private fb: FormBuilder, 
+    private clientService: ClientService, 
+    private router: Router, 
+    private emailService: EmailService, 
+    private datePipe: DatePipe,
+    private checkJoinClassRequestService: CheckJoinClassRequestService
+  ) {
+    this.firstFormGroup = this.fb.group({
       firstName: ['', Validators.required],
       surname: [''],
       lastName: ['', Validators.required],
@@ -60,11 +85,11 @@ export class WishComponent implements OnInit {
       image: ['', Validators.required]
     });
 
-    this.secondFormGroup = this._formBuilder.group({
+    this.secondFormGroup = this.fb.group({
       subjects: ['', Validators.required],
     });
 
-    this.thirdFormGroup = this._formBuilder.group({
+    this.thirdFormGroup = this.fb.group({
       teachers: ['', Validators.required],
     });
   }
@@ -114,12 +139,27 @@ export class WishComponent implements OnInit {
     this.secondFormGroup.get('subjects')?.valueChanges.subscribe((subjectName) => {
       if (subjectName) {
         this.clientService.getTeachersBySubject(subjectName).subscribe((data) => {
-          this.teachers = data;
+          this.showDetails = false;
+          this.selectedTeacher = null;
+          this.teachers = data.map(item => item.basicInfo);
+          this.classDetails = data.map(item => item.additionalInfo);
         });
       } else {
         this.teachers = [];
+        this.classDetails = [];
       }
     });
+  }
+
+  onTeacherSelect(teacher: string): void {
+    if (teacher === '') {
+      this.showDetails = false;
+      this.selectedTeacher = null;
+    } else {
+      this.showDetails = true;
+      const index = this.teachers.indexOf(teacher);
+      this.selectedTeacher = this.classDetails[index];
+    }
   }
 
   submitRegistration(): void {
@@ -141,7 +181,7 @@ export class WishComponent implements OnInit {
         idClassroom: this.extractClassId(this.thirdFormGroup.get('teachers')?.value) 
       };
   
-      this.clientService.checkIfRequestExistsForClient(requestDto.email, requestDto.idClassroom!).then((exists) => {
+      this.checkJoinClassRequestService.checkIfRequestExistsForClient(requestDto.email, requestDto.idClassroom!).then((exists) => {
         if (exists) {
           Swal.fire('Thông báo', 'Bạn đã gửi yêu cầu học lớp này trước đó.', 'warning');
         } else {

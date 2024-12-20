@@ -16,15 +16,32 @@ import { provideNativeDateAdapter } from '@angular/material/core';
 import Swal from 'sweetalert2';
 import { ClientService } from '../../../../core/services/client/client.service';
 import { HttpClient } from '@angular/common/http';
+import { CheckJoinClassRequestService } from '../../../../core/services/check-join-class-request/check-join-class-request.service';
+import { UserService } from '../../../../core/services/user/user.service';
+import { animate, style, transition, trigger } from '@angular/animations';
 
 @Component({
   selector: 'app-stu-course',
   standalone: true,
-  imports: [MatIconModule, MatToolbarModule, CommonModule, MatStepperModule, FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatOptionModule, MatSelectModule, SharedModule, MatDatepickerModule],
-  providers: [provideNativeDateAdapter(), {provide: MAT_DATE_LOCALE, useValue: 'vi-VN'}, DatePipe],
+  imports: [MatIconModule, MatToolbarModule, CommonModule, MatStepperModule, FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, 
+    MatButtonModule, MatOptionModule, MatSelectModule, SharedModule, MatDatepickerModule],
+  providers: [
+    provideNativeDateAdapter(), 
+    {provide: MAT_DATE_LOCALE, useValue: 'vi-VN'}, 
+    DatePipe
+  ],
   changeDetection: ChangeDetectionStrategy.Default,
   templateUrl: './stu-course.component.html',
-  styleUrl: './stu-course.component.scss'
+  styleUrl: './stu-course.component.scss',
+  animations: [
+    trigger('fadeInOut', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('300ms ease-in', style({ opacity: 1 })),
+      ]),
+      transition(':leave', [animate('300ms ease-out', style({ opacity: 0 }))]),
+    ]),
+  ],
 })
 
 export class StuCourseComponent implements OnInit {
@@ -35,34 +52,58 @@ export class StuCourseComponent implements OnInit {
   currentUser: any;
   subjects: string[] = [];
   teachers: string[] = [];
-  selectedImage: string | ArrayBuffer | null = null;
 
-  fileToUpload: File | null = null;
-  fileStore: FileList | null = null;
+  classDetails: any[] = [];
+  showDetails: boolean = false;
+  selectedTeacher: any;
 
-  constructor(private _formBuilder: FormBuilder, private clientService: ClientService, private datePipe: DatePipe, private http: HttpClient) {
-    this.currentUser = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
-    this.firstFormGroup = this._formBuilder.group({
-      firstName: [this.currentUser?.firstName || ''],
-      surname: [this.currentUser?.surname || ''],
-      lastName: [this.currentUser?.lastName || ''],
-      email: [this.currentUser?.email || ''],
-      dob: [this.currentUser?.dob || ''],
-      phone: [this.currentUser?.phone || ''],
-      address: [this.currentUser?.address || ''],
-      image: [this.currentUser?.imageURL || ''],
+  constructor(
+    private fb: FormBuilder, 
+    private clientService: ClientService, 
+    private datePipe: DatePipe, 
+    private checkJoinClassRequestService: CheckJoinClassRequestService,
+    private userService: UserService
+  ) {
+    this.firstFormGroup = this.fb.group({
+      firstName: [''],
+      surname: [''],
+      lastName: [''],
+      email: [''],
+      dob: [''],
+      phone: [''],
+      address: [''],
+      image: [''],
     });
 
-    this.secondFormGroup = this._formBuilder.group({
+    this.secondFormGroup = this.fb.group({
       subjects: ['', Validators.required],
     });
 
-    this.thirdFormGroup = this._formBuilder.group({
+    this.thirdFormGroup = this.fb.group({
       teachers: ['', Validators.required],
     });
   }
 
   ngOnInit(): void {
+    this.userService.getUserInfo().subscribe({
+      next: (user) => {
+        this.currentUser = user;
+        this.firstFormGroup.patchValue({
+          firstName: user.firstName,
+          surname: user.surname,
+          lastName: user.lastName,
+          email: user.email,
+          dob: user.dob,
+          phone: user.phone,
+          address: user.address,
+          image: user.imageURL,
+        });
+      },
+      error: () => {
+        this.showToast('error', 'Không thể tải thông tin người dùng.');
+      }
+    });
+
     this.loadSubjects();
     this.onCourseChange();
   }
@@ -77,12 +118,27 @@ export class StuCourseComponent implements OnInit {
     this.secondFormGroup.get('subjects')?.valueChanges.subscribe((subjectName) => {
       if (subjectName) {
         this.clientService.getTeachersBySubject(subjectName).subscribe((data) => {
-          this.teachers = data;
+          this.showDetails = false;
+          this.selectedTeacher = null;
+          this.teachers = data.map(item => item.basicInfo);
+          this.classDetails = data.map(item => item.additionalInfo);
         });
       } else {
         this.teachers = [];
+        this.classDetails = [];
       }
     });
+  }
+
+  onTeacherSelect(teacher: string): void {
+    if (teacher === '') {
+      this.showDetails = false;
+      this.selectedTeacher = null;
+    } else {
+      this.showDetails = true;
+      const index = this.teachers.indexOf(teacher);
+      this.selectedTeacher = this.classDetails[index];
+    }
   }
 
   submitRegistration(): void {
@@ -107,9 +163,9 @@ export class StuCourseComponent implements OnInit {
         idClassroom: this.extractClassId(this.thirdFormGroup.get('teachers')?.value) 
       };
 
-      this.checkIfRequestExists(this.currentUser.id, requestDto.idClassroom!).then((exists) => {
+      this.checkJoinClassRequestService.checkIfRequestExistsForStudent(this.currentUser.id, requestDto.idClassroom!).then((exists) => {
         if (exists) {
-          Swal.fire('Thông báo', 'Bạn đã gửi yêu cầu trước đó.', 'warning');
+          Swal.fire('Thông báo', 'Bạn đã gửi yêu cầu vào lớp này trước đó.', 'warning');
         } else {
           this.clientService.requestToClass(requestDto).subscribe({
             next: () => {
@@ -123,15 +179,6 @@ export class StuCourseComponent implements OnInit {
       });
     }
   }
-  
-  checkIfRequestExists(studentId: number, classroomId: number): Promise<boolean> {
-    const apiUrl = `http://localhost:8081/api/student/isExistingRequestInWishList?studentId=${studentId}&classroomId=${classroomId}`;
-    return this.http
-      .get<boolean>(apiUrl).toPromise()
-      .then((response) => response || false) // Nếu không có phản hồi, trả về false
-      .catch(() => false); // Xử lý lỗi, trả về false
-  }
-  
 
   extractClassId(classroomName: string | undefined): number | null { 
     if (classroomName) {
@@ -139,5 +186,19 @@ export class StuCourseComponent implements OnInit {
       return parts.length > 0 ? Number(parts[0]) : null;
     }
     return null;
+  }
+
+  showToast(icon: 'success' | 'error' | 'info' | 'warning', title: string) {
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'bottom-end',
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+    });
+    Toast.fire({
+      icon: icon,
+      title: title,
+    });
   }
 }

@@ -1,17 +1,6 @@
 import { CommonModule } from '@angular/common';
-import {
-  AfterViewInit,
-  ChangeDetectorRef,
-  Component,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
-import {
-  FormBuilder,
-  FormGroup,
-  FormsModule,
-  ReactiveFormsModule,
-} from '@angular/forms';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatOptionModule, MatNativeDateModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -30,26 +19,11 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { Router, RouterModule } from '@angular/router';
 import { SharedModule } from '../../../../shared/shared.module';
-import {
-  ClassDetails,
-  ClassDetailsService,
-} from '../../../../core/services/class-detail/class-detail.service';
+import { ClassDetails, ClassDetailsService } from '../../../../core/services/class-detail/class-detail.service';
 import Swal from 'sweetalert2';
-import {
-  Classroom,
-  ClassroomService,
-} from '../../../../core/services/classroom/classroom.service';
+import { Classroom, ClassroomService } from '../../../../core/services/classroom/classroom.service';
 import { trigger, transition, style, animate } from '@angular/animations';
-import {
-  ApexChart,
-  ApexAxisChartSeries,
-  ChartComponent,
-  ApexDataLabels,
-  ApexPlotOptions,
-  ApexYAxis,
-  ApexLegend,
-} from "ng-apexcharts";
-
+import { ApexChart, ApexAxisChartSeries, ChartComponent, ApexDataLabels, ApexPlotOptions, ApexYAxis, ApexLegend } from "ng-apexcharts";
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { ExamScoreService } from '../../../../core/services/exam-score/exam-score.service';
 
@@ -67,36 +41,9 @@ export type ChartOptions = {
 @Component({
   selector: 'app-stu-score',
   standalone: true,
-  imports: [
-    MatTabsModule,
-    MatListModule,
-    MatIconModule,
-    MatButtonModule,
-    CommonModule,
-    MatProgressSpinnerModule,
-    MatSnackBarModule,
-    MatDialogModule,
-    MatSnackBarModule,
-    MatTableModule,
-    MatButtonModule,
-    MatInputModule,
-    MatIconModule,
-    MatTabsModule,
-    MatToolbarModule,
-    RouterModule,
-    FormsModule,
-    MatPaginatorModule,
-    SharedModule,
-    MatSortModule,
-    ReactiveFormsModule,
-    MatOptionModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatFormFieldModule,
-    MatSelectModule,
-    ChartComponent,
-    MatCheckboxModule,
-  ],
+  imports: [MatTabsModule, MatListModule, MatIconModule, MatButtonModule, CommonModule, MatProgressSpinnerModule, MatSnackBarModule, MatDialogModule, MatTableModule, MatInputModule,
+    MatToolbarModule, RouterModule, FormsModule, MatPaginatorModule, SharedModule, MatSortModule, ReactiveFormsModule, MatOptionModule, MatDatepickerModule,
+    MatNativeDateModule, MatFormFieldModule, MatSelectModule, ChartComponent, MatCheckboxModule],
   templateUrl: './stu-score.component.html',
   styleUrl: './stu-score.component.scss',
   animations: [
@@ -119,11 +66,11 @@ export class StuScoreComponent implements OnInit, AfterViewInit {
   classId!: number;
   classDetails!: ClassDetails;
 
-  displayedColumns1: string[] = ['examName', 'score'];
-  dataSource1 = new MatTableDataSource<any>();
+  displayedColumnsExam: string[] = ['examName', 'score'];
+  dataSourceExam = new MatTableDataSource<any>();
 
-  @ViewChild('paginator1') paginator1!: MatPaginator;
-  @ViewChild('sort1') sort1!: MatSort;
+  @ViewChild('paginatorExam') paginatorExam!: MatPaginator;
+  @ViewChild('sortExam') sortExam!: MatSort;
 
   chartOptions!: Partial<ChartOptions>;
 
@@ -153,16 +100,7 @@ export class StuScoreComponent implements OnInit, AfterViewInit {
       classroomId: [this.classId || null],
     });
 
-    this.classDetails = {
-      id: 0,
-      subjectName: '',
-      createdDate: '',
-      note: '',
-      className: '',
-      teacherName: '',
-      teacherEmail: '',
-      teacherPhone: ''
-    };
+    this.classDetails = { id: 0, subjectName: '', createdDate: '', note: '', className: '', teacherName: '', teacherEmail: '', teacherPhone: '' };
 
     this.loadClassrooms();
 
@@ -180,8 +118,8 @@ export class StuScoreComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.dataSource1.paginator = this.paginator1;
-    this.dataSource1.sort = this.sort1;
+    this.dataSourceExam.paginator = this.paginatorExam;
+    this.dataSourceExam.sort = this.sortExam;
   }
 
   loadClassrooms(): void {
@@ -206,8 +144,7 @@ export class StuScoreComponent implements OnInit, AfterViewInit {
 
   checkPermissionAndLoadData(studentId: number, classId: number): void {
     this.classDetailsService
-      .checkPermissionForStudent(studentId, classId)
-      .subscribe({
+      .checkPermissionForStudent(studentId, classId).subscribe({
         next: (hasPermission) => {
           if (hasPermission) {
             sessionStorage.setItem('currentClassId', classId.toString());
@@ -226,7 +163,8 @@ export class StuScoreComponent implements OnInit, AfterViewInit {
           this.showDetails = false;
           this.router.navigate(['student/class']);
         },
-      });
+      }
+    );
   }
 
   loadClassDetails(classId: number): void {
@@ -235,24 +173,22 @@ export class StuScoreComponent implements OnInit, AfterViewInit {
     });
   }
 
-  applyFilter1(event: Event): void {
+  applyFilterExam(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource1.filter = filterValue.trim().toLowerCase();
+    this.dataSourceExam.filter = filterValue.trim().toLowerCase();
   }
 
   private loadExamResultForStudent(classId: number): void {
     this.examScoreService.getAllExamsForStudent(classId).subscribe({
       next: (response: any) => {
-        const activeData = response.content
-          // .filter((item: any) => item.score !== null)
-          .map((item: any) => ({
+        const activeData = response.content.map((item: any) => ({
             examName: item.examName,
             score: item.score,
-          }));
+        }));
   
-        this.dataSource1.data = activeData;
+        this.dataSourceExam.data = activeData;
   
-        if (this.dataSource1.data.length > 0) {
+        if (this.dataSourceExam.data.length > 0) {
           this.updateChartData();
         } else {
           this.removeChart();
@@ -269,7 +205,7 @@ export class StuScoreComponent implements OnInit, AfterViewInit {
     const categories: string[] = [];
     const scores: number[] = [];
   
-    this.dataSource1.data.forEach((test: any) => {
+    this.dataSourceExam.data.forEach((test: any) => {
       categories.push(test.examName);
       scores.push(test.score);
     });

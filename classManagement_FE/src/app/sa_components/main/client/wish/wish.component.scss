@@ -127,6 +127,41 @@
             }
         }
 
+        .class-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+            align-items: start;
+
+            .form-section {
+                display: grid;
+                grid-template-columns: 1fr;
+                column-gap: 10px;
+                align-items: center;
+
+                .icon-grid-1 {
+                    display: grid;
+                    grid-template-columns: auto 1fr;
+                    column-gap: 10px;
+                    align-items: center;
+                }
+            }
+        }
+
+        .form-section2 {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            align-items: center;
+
+            .icon-grid-1 {
+                display: grid;
+                grid-template-columns: auto 1fr;
+                column-gap: 10px;
+                align-items: center;
+            }
+        }
+
         .btn {
             display: flex;
         }
@@ -174,6 +209,12 @@
 
 mat-stepper {
     border-radius: 15px;
+}
+
+app-icon {
+    padding: 5px;
+    margin-bottom: 29px;
+    color: var(--theme-background);
 }
 
 @keyframes slideIn1 {

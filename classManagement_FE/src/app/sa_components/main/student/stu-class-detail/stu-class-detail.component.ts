@@ -26,30 +26,9 @@ import { MatSelectModule } from '@angular/material/select';
 @Component({
   selector: 'app-stu-class-detail',
   standalone: true,
-  imports: [
-    MatTabsModule,
-    MatListModule,
-    MatIconModule,
-    MatButtonModule,
-    CommonModule,
-    MatProgressSpinnerModule,
-    MatSnackBarModule,
-    MatDialogModule,
-    MatTableModule,
-    MatInputModule,
-    MatToolbarModule,
-    RouterModule,
-    FormsModule,
-    MatPaginatorModule,
-    SharedModule,
-    MatSortModule,
-    ReactiveFormsModule,
-    MatOptionModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatFormFieldModule,
-    MatSelectModule,
-  ],
+  imports: [MatTabsModule, MatListModule, MatIconModule, MatButtonModule, CommonModule, MatProgressSpinnerModule, MatSnackBarModule, MatDialogModule, MatTableModule,
+    MatInputModule, MatToolbarModule, RouterModule, FormsModule, MatPaginatorModule, SharedModule, MatSortModule, ReactiveFormsModule, MatOptionModule,
+    MatDatepickerModule, MatNativeDateModule, MatFormFieldModule, MatSelectModule],
   templateUrl: './stu-class-detail.component.html',
   styleUrl: './stu-class-detail.component.scss'
 })
@@ -58,21 +37,20 @@ export class StuClassDetailComponent implements OnInit, AfterViewInit {
   classDetails!: ClassDetails;
   isEditing = false;
 
-  displayedColumns1: string[] = ['id', 'email', 'lastName', 'surname', 'firstName', 'phone', 'dob'];
-  dataSource1 = new MatTableDataSource<Student>();
+  displayedColumnsStudent: string[] = ['id', 'email', 'lastName', 'surname', 'firstName', 'phone', 'dob'];
+  dataSourceStudent = new MatTableDataSource<Student>();
+  @ViewChild('paginatorStudent') paginatorStudent!: MatPaginator;
+  @ViewChild('sortStudent') sortStudent!: MatSort;
 
-  displayedColumns2: string[] = ['id', 'day', 'periodInDay', 'dayInWeek', 'createdDate'];
-  dataSource2 = new MatTableDataSource<ScheduleData>();
+  displayedColumnsSchedule: string[] = ['id', 'day', 'periodInDay', 'dayInWeek', 'createdDate'];
+  dataSourceSchedule = new MatTableDataSource<ScheduleData>();
+  @ViewChild('paginatorSchedule') paginatorSchedule!: MatPaginator;
+  @ViewChild('sortSchedule') sortSchedule!: MatSort;
 
-  displayedColumns3: string[] = ['id', 'documentName', 'createdDate', 'download'];
-  dataSource3 = new MatTableDataSource<DocumentData>();
-
-  @ViewChild('paginator1') paginator1!: MatPaginator;
-  @ViewChild('sort1') sort1!: MatSort;
-  @ViewChild('paginator2') paginator2!: MatPaginator;
-  @ViewChild('sort2') sort2!: MatSort;
-  @ViewChild('paginator3') paginator3!: MatPaginator;
-  @ViewChild('sort3') sort3!: MatSort;
+  displayedColumnsDocument: string[] = ['id', 'documentName', 'createdDate', 'download'];
+  dataSourceDocument = new MatTableDataSource<DocumentData>();
+  @ViewChild('paginatorDocument') paginatorDocument!: MatPaginator;
+  @ViewChild('sortDocument') sortDocument!: MatSort;
 
   constructor(
     private classDetailsService: ClassDetailsService,
@@ -88,22 +66,12 @@ export class StuClassDetailComponent implements OnInit, AfterViewInit {
     const user = JSON.parse(userData!);
     const studentId = user.id;
 
-    this.classDetails = {
-      id: 0,
-      subjectName: '',
-      createdDate: '',
-      note: '',
-      className: '',
-      teacherName: '',
-      teacherEmail: '',
-      teacherPhone: ''
-    };
+    this.classDetails = {id: 0, subjectName: '', createdDate: '', note: '', className: '', teacherName: '', teacherEmail: '', teacherPhone: ''};
 
     this.classDetailsService.checkPermissionForStudent(studentId, this.classId).subscribe({
       next: (hasPermission) => {
         if (hasPermission) {
           sessionStorage.setItem('currentClassId', this.classId.toString());
-
           this.loadClassDetails();
           this.loadStudents();
           this.loadSchedules();
@@ -121,12 +89,12 @@ export class StuClassDetailComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.dataSource1.paginator = this.paginator1;
-    this.dataSource1.sort = this.sort1;
-    this.dataSource2.paginator = this.paginator2;
-    this.dataSource2.sort = this.sort2;
-    this.dataSource3.paginator = this.paginator3;
-    this.dataSource3.sort = this.sort3;
+    this.dataSourceStudent.paginator = this.paginatorStudent;
+    this.dataSourceStudent.sort = this.sortStudent;
+    this.dataSourceSchedule.paginator = this.paginatorSchedule;
+    this.dataSourceSchedule.sort = this.sortSchedule;
+    this.dataSourceDocument.paginator = this.paginatorDocument;
+    this.dataSourceDocument.sort = this.sortDocument;
   }
 
   // classDetails
@@ -136,10 +104,10 @@ export class StuClassDetailComponent implements OnInit, AfterViewInit {
     });
   }
 
-  // Students
-  applyFilter1(event: Event): void {
+  // students
+  applyFilterStudent(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource1.filter = filterValue.trim().toLowerCase();
+    this.dataSourceStudent.filter = filterValue.trim().toLowerCase();
   }
 
   private loadStudents(): void {
@@ -157,37 +125,18 @@ export class StuClassDetailComponent implements OnInit, AfterViewInit {
             dob: new Date(item.student.dob).toLocaleDateString('vi-VN'),
           }));
   
-        this.dataSource1.data = activeData; 
+        this.dataSourceStudent.data = activeData; 
       },
-      error: (err) => {
-        console.error('Error fetching students:', err);
+      error: () => {
+        this.showToast('error', 'Lỗi khi tải danh sách học viên');
       },
     });
   }
 
-  // Schedules
-  periods = [
-    { value: 'PERIOD_1', viewValue: 'Ca học 1' },
-    { value: 'PERIOD_2', viewValue: 'Ca học 2' },
-    { value: 'PERIOD_3', viewValue: 'Ca học 3' },
-    { value: 'PERIOD_4', viewValue: 'Ca học 4' },
-    { value: 'PERIOD_5', viewValue: 'Ca học 5' },
-    { value: 'PERIOD_6', viewValue: 'Ca học 6' },
-  ];
-
-  daysInWeek = [
-    { value: 'MONDAY', viewValue: 'Thứ Hai' },
-    { value: 'TUESDAY', viewValue: 'Thứ Ba' },
-    { value: 'WEDNESDAY', viewValue: 'Thứ Tư' },
-    { value: 'THURSDAY', viewValue: 'Thứ Năm' },
-    { value: 'FRIDAY', viewValue: 'Thứ Sáu' },
-    { value: 'SATURDAY', viewValue: 'Thứ Bảy' },
-    { value: 'SUNDAY', viewValue: 'Chủ Nhật' },
-  ];
-
-  applyFilter2(event: Event): void {
+  // schedules
+  applyFilterSchedule(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource2.filter = filterValue.trim().toLowerCase();
+    this.dataSourceSchedule.filter = filterValue.trim().toLowerCase();
   }
 
   private loadSchedules(): void {
@@ -200,10 +149,10 @@ export class StuClassDetailComponent implements OnInit, AfterViewInit {
           dayInWeek: this.mapDayInWeek(item.dayInWeek),
           createdDate: item.createdDate, 
         }));
-        this.dataSource2.data = mappedData;
+        this.dataSourceSchedule.data = mappedData;
       },
-      error: (err) => {
-        console.error('Error fetching schedules:', err);
+      error: () => {
+        this.showToast('error', 'Lỗi khi tải danh sách lịch học');
       },
     });
   }
@@ -233,7 +182,12 @@ export class StuClassDetailComponent implements OnInit, AfterViewInit {
     return dayMap[dayInWeek] || dayInWeek;
   }
 
-  // Documents
+  // documents
+  applyFilterDocument(event: Event): void {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSourceDocument.filter = filterValue.trim().toLowerCase();
+  }
+
   loadDocuments(): void {
     this.classDetailsService.getDocuments(this.classId).subscribe({
       next: (response: any) => {
@@ -243,24 +197,18 @@ export class StuClassDetailComponent implements OnInit, AfterViewInit {
           documentLink: item.documentLink,
           createdDate: item.createdDate, 
         }));
-        this.dataSource3.data = mappedData;
+        this.dataSourceDocument.data = mappedData;
       },
       error: () => {
         this.showToast('error', 'Lỗi khi tải danh sách tài liệu');
       },
     });
   }
-
-  applyFilter3(event: Event): void {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource3.filter = filterValue.trim().toLowerCase();
-  }
   
   downloadDocument(documentId: number): void {
     this.classDetailsService.downloadDocument(documentId).subscribe({
       next: (blob) => {
         const filename = this.getFilenameFromBlob(blob);
-
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
@@ -280,7 +228,6 @@ export class StuClassDetailComponent implements OnInit, AfterViewInit {
     if ((blob as any).name) {
       return (blob as any).name;
     }
-  
     return 'downloaded_file.xlsx';
   }
 

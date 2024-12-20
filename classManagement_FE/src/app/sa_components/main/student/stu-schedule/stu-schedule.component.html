@@ -1,45 +1,53 @@
 <div class="container">
     <div class="content">
-      <h3 class="centered-title">Thời gian biểu</h3>
-      <div class="calendar">
-        <div class="row text-center" style="display: flex; justify-content: space-between;">
-          <div class="ntp">
-            <div class="btn-group" style="display: flex;">        
-              <button class="pre" mwlCalendarPreviousView [view]="view" [(viewDate)]="viewDate"
-                (viewDateChange)="closeOpenMonthViewDay()">
-                <mat-icon>keyboard_arrow_left</mat-icon>
-              </button>
-              <button class="td" mwlCalendarToday [(viewDate)]="viewDate">
-                <mat-icon>today</mat-icon>
-              </button>
-              <button class="next" mwlCalendarNextView [view]="view" [(viewDate)]="viewDate"
-                (viewDateChange)="closeOpenMonthViewDay()">
-                <mat-icon>keyboard_arrow_right</mat-icon>
-              </button>
+        <h3 class="centered-title">Thời gian biểu</h3>
+
+        <div class="calendar">
+            <div class="row text-center" style="display: flex; justify-content: space-between;">
+                <div class="ntp">
+                    <div class="btn-group" style="display: flex;">
+                        <button class="pre" mwlCalendarPreviousView [view]="view" [(viewDate)]="viewDate"
+                            (viewDateChange)="closeOpenMonthViewDay()">
+                            <mat-icon>keyboard_arrow_left</mat-icon>
+                        </button>
+                        <button class="td" mwlCalendarToday [(viewDate)]="viewDate">
+                            <mat-icon>today</mat-icon>
+                        </button>
+                        <button class="next" mwlCalendarNextView [view]="view" [(viewDate)]="viewDate"
+                            (viewDateChange)="closeOpenMonthViewDay()">
+                            <mat-icon>keyboard_arrow_right</mat-icon>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="today">
+                    <h3>{{ viewDate | calendarDate:(view + 'ViewTitle'):locale:weekStartsOn }}</h3>
+                </div>
+
+                <div class="setview">
+                    <div class="btn-group" style="display: flex;">
+                        <mat-button-toggle-group name="fontStyle" aria-label="Font Style" [(ngModel)]="view">
+                            <mat-button-toggle value="month"
+                                (click)="setView(CalendarView.Month)">Tháng</mat-button-toggle>
+                            <mat-button-toggle value="week"
+                                (click)="setView(CalendarView.Week)">Tuần</mat-button-toggle>
+                        </mat-button-toggle-group>
+                    </div>
+                </div>
             </div>
-          </div>
-          <div class="today">
-            <h3>{{ viewDate | calendarDate:(view + 'ViewTitle'):locale:weekStartsOn }}</h3>
-          </div>
-          <div class="setview">
-            <div class="btn-group" style="display: flex;">
-              <mat-button-toggle-group name="fontStyle" aria-label="Font Style" [(ngModel)]="view">
-                <mat-button-toggle value="month" (click)="setView(CalendarView.Month)">Tháng</mat-button-toggle>
-                <mat-button-toggle value="week" (click)="setView(CalendarView.Week)">Tuần</mat-button-toggle>
-              </mat-button-toggle-group>
+
+            <div [ngSwitch]="view" class="timetable">
+                <mwl-calendar-month-view *ngSwitchCase="CalendarView.Month" [viewDate]="viewDate" [events]="events"
+                    [locale]="locale" [weekStartsOn]="weekStartsOn" [weekendDays]="weekendDays" [refresh]="refresh"
+                    [activeDayIsOpen]="activeDayIsOpen" (dayClicked)="dayClicked($event.day)">
+                </mwl-calendar-month-view>
+
+                <mwl-calendar-week-view *ngSwitchCase="CalendarView.Week" [viewDate]="viewDate" [events]="events"
+                    [locale]="locale" [weekStartsOn]="weekStartsOn" [weekendDays]="weekendDays" [refresh]="refresh"
+                    [dayStartHour]="dayStartHour" [dayEndHour]="dayEndHour" [hourDuration]="hourDuration"
+                    [hourSegments]="hourSegments">
+                </mwl-calendar-week-view>
             </div>
-          </div>
         </div>
-        <div [ngSwitch]="view" class="timetable">
-          <mwl-calendar-month-view *ngSwitchCase="CalendarView.Month" [viewDate]="viewDate" [events]="events" [locale]="locale" 
-            [weekStartsOn]="weekStartsOn" [weekendDays]="weekendDays" [refresh]="refresh" [activeDayIsOpen]="activeDayIsOpen" 
-            (dayClicked)="dayClicked($event.day)">
-          </mwl-calendar-month-view>
-          <mwl-calendar-week-view *ngSwitchCase="CalendarView.Week" [viewDate]="viewDate" [events]="events" [locale]="locale"
-            [weekStartsOn]="weekStartsOn" [weekendDays]="weekendDays" [refresh]="refresh" [dayStartHour]="dayStartHour" [dayEndHour]="dayEndHour" 
-            [hourDuration]="hourDuration" [hourSegments]="hourSegments">
-          </mwl-calendar-week-view>
-        </div>
-      </div>
     </div>
-  </div>
+</div>

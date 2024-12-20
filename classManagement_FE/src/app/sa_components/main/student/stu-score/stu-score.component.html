@@ -96,13 +96,12 @@
                         <app-icon iconName="search" style="padding: 10px; margin-bottom: 0px;"></app-icon>
                         <mat-form-field appearance="outline" style="width: 29vw;">
                             <mat-label>Tìm kiếm</mat-label>
-                            <input matInput #input1 (input)="applyFilter1($event)" placeholder="Nhập từ khóa tìm kiếm">
+                            <input matInput #input1 (input)="applyFilterExam($event)" placeholder="Nhập từ khóa tìm kiếm">
                         </mat-form-field>
                     </div>
                 </div>
                 <hr>
-                <table mat-table [dataSource]="dataSource1" matSort #sort1="matSort" matSortActive="id"
-                    matSortDirection="asc" class="example-table">
+                <table mat-table [dataSource]="dataSourceExam" matSort #sortExam="matSort" matSortActive="id" matSortDirection="asc" class="example-table">
                     <ng-container matColumnDef="examName">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header
                             style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%); justify-items: center; padding-left: 29px;">
@@ -120,15 +119,15 @@
                         </td>
                     </ng-container>
 
-                    <tr mat-header-row *matHeaderRowDef="displayedColumns1"></tr>
-                    <tr mat-row *matRowDef="let row; columns: displayedColumns1;"></tr>
+                    <tr mat-header-row *matHeaderRowDef="displayedColumnsExam"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumnsExam;"></tr>
 
                     <tr class="mat-row" *matNoDataRow>
-                        <td class="mat-cell" colspan="5">Không có dữ liệu</td>
+                        <td class="mat-cell" colspan="2">Không có dữ liệu</td>
                     </tr>
                 </table>
 
-                <mat-paginator #paginator1 [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page">
+                <mat-paginator #paginatorExam [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page">
                 </mat-paginator>
             </div>
         </div>

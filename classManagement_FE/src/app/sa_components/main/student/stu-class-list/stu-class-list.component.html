@@ -9,19 +9,15 @@
                         <app-icon iconName="search" style="padding: 10px; color: var(--theme-background);"></app-icon>
                         <mat-form-field appearance="outline" style="width: 29vw;">
                             <mat-label>Tìm kiếm lớp học</mat-label>
-                            <input matInput (input)="applyFilter($event)" placeholder="Nhập từ khóa tìm kiếm">
+                            <input matInput (input)="applyFilterActive($event)" placeholder="Nhập từ khóa tìm kiếm">
                         </mat-form-field>
                     </div>
-
                     <h5 mat-dialog-title style="color: var(--theme-background); font-weight: bold; margin-bottom: 0px; padding-right: 15px; padding-top: 5px; align-self: center;">
                         Danh sách lớp đang theo học
                     </h5>
                 </div>
-
                 <hr>
-
-                <table mat-table [dataSource]="dataSource" matSort matSortActive="id" matSortDirection="asc"
-                    class="example-table">
+                <table mat-table [dataSource]="dataSourceActive" matSort matSortActive="id" matSortDirection="asc" class="example-table">
                     <ng-container matColumnDef="id">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header
                             style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">ID
@@ -31,37 +27,37 @@
 
                     <ng-container matColumnDef="className">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header
-                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">Tên
-                            lớp</th>
+                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">Tên lớp
+                        </th>
                         <td mat-cell *matCellDef="let row">{{ row.className }}</td>
                     </ng-container>
 
                     <ng-container matColumnDef="subjectName">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header
-                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">Tên
-                            môn</th>
+                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">Tên môn
+                        </th>
                         <td mat-cell *matCellDef="let row">{{ row.subjectName }}</td>
                     </ng-container>
 
                     <ng-container matColumnDef="note">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header
-                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">Ghi
-                            chú</th>
+                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">Ghi chú
+                        </th>
                         <td mat-cell *matCellDef="let row">{{ row.note }}</td>
                     </ng-container>
 
                     <ng-container matColumnDef="createdDate">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header
-                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">Ngày
-                            tạo</th>
-                        <td mat-cell *matCellDef="let row" style="max-width: 123px;">{{ row.createdDate | date:
-                            'dd/MM/yyyy, HH:mm a' }}</td>
+                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">Ngày tạo
+                        </th>
+                        <td mat-cell *matCellDef="let row" style="max-width: 123px;">{{ row.createdDate | date: 'dd/MM/yyyy, HH:mm a' }}</td>
                     </ng-container>
 
                     <ng-container matColumnDef="attendance">
                         <th mat-header-cell *matHeaderCellDef
                             style="text-align: center; background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
-                            Điểm danh</th>
+                            Điểm danh
+                        </th>
                         <td mat-cell *matCellDef="let row" style="height: 88px; text-align: center;">
                             <button mat-mini-fab (click)="navigateTo('student/attendance', row.id)"
                                 style="border-radius: 15%; color: white; background-color: var(--theme-background);">
@@ -72,8 +68,8 @@
 
                     <ng-container matColumnDef="score">
                         <th mat-header-cell *matHeaderCellDef
-                            style="text-align: center; background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
-                            Điểm</th>
+                            style="text-align: center; background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">Điểm
+                        </th>
                         <td mat-cell *matCellDef="let row" style="text-align: center;">
                             <button mat-mini-fab (click)="navigateTo('student/score', row.id)"
                                 style="border-radius: 15%; color: white; background-color: var(--theme-background);">
@@ -84,8 +80,8 @@
 
                     <ng-container matColumnDef="fee">
                         <th mat-header-cell *matHeaderCellDef
-                            style="text-align: center; background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
-                            Học phí</th>
+                            style="text-align: center; background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">Học phí
+                        </th>
                         <td mat-cell *matCellDef="let row" style="text-align: center;">
                             <button mat-mini-fab (click)="navigateTo('student/fee', row.id)"
                                 style="border-radius: 15%; color: white; background-color: var(--theme-background);">
@@ -96,8 +92,8 @@
 
                     <ng-container matColumnDef="details">
                         <th mat-header-cell *matHeaderCellDef
-                            style="text-align: center; background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
-                            Chi tiết</th>
+                            style="text-align: center; background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">Chi tiết
+                        </th>
                         <td mat-cell *matCellDef="let row" style="text-align: center;">
                             <button mat-mini-fab (click)="navigateTo('student/class/' + row.id, row.id)"
                                 style="border-radius: 15%; color: white; background-color: var(--theme-background);">
@@ -106,38 +102,34 @@
                         </td>
                     </ng-container>
 
-                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                    <tr mat-header-row *matHeaderRowDef="displayedColumnsActive"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumnsActive;"></tr>
 
                     <tr class="mat-row" *matNoDataRow>
                         <td class="mat-cell" colspan="5">Không có dữ liệu</td>
                     </tr>
                 </table>
-
                 <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page">
                 </mat-paginator>
             </div>
 
             <br>
 
-            <div class="table mat-elevation-z8" *ngIf="dataSource2.data.length > 0">
+            <div class="table mat-elevation-z8" *ngIf="dataSourceDisable.data.length > 0">
                 <div class="header">
                     <div class="icon-grid-1" style="padding-top: 20px">
                         <app-icon iconName="search" style="padding: 10px; color: var(--theme-background);"></app-icon>
                         <mat-form-field appearance="outline" style="width: 29vw;">
                             <mat-label>Tìm kiếm lớp học</mat-label>
-                            <input matInput (input)="applyFilter2($event)" placeholder="Nhập từ khóa tìm kiếm">
+                            <input matInput (input)="applyFilterDisable($event)" placeholder="Nhập từ khóa tìm kiếm">
                         </mat-form-field>
                     </div>
-
                     <h5 mat-dialog-title style="color: var(--theme-background); font-weight: bold; margin-bottom: 0px; padding-right: 15px; padding-top: 5px; align-self: center;">
                         Danh sách lớp đã thôi học
                     </h5>
                 </div>
-
                 <hr>
-
-                <table mat-table [dataSource]="dataSource2" matSort #sort2="matSort" matSortActive="id" matSortDirection="asc"
+                <table mat-table [dataSource]="dataSourceDisable" matSort #sortDisable="matSort" matSortActive="id" matSortDirection="asc"
                     class="example-table">
                     <ng-container matColumnDef="id">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header
@@ -148,37 +140,36 @@
 
                     <ng-container matColumnDef="className">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header
-                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">Tên
-                            lớp</th>
+                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">Tên lớp
+                        </th>
                         <td mat-cell *matCellDef="let row">{{ row.className }}</td>
                     </ng-container>
 
                     <ng-container matColumnDef="subjectName">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header
-                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">Tên
-                            môn</th>
+                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">Tên môn
+                        </th>
                         <td mat-cell *matCellDef="let row">{{ row.subjectName }}</td>
                     </ng-container>
 
                     <ng-container matColumnDef="note">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header
-                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">Ghi
-                            chú</th>
+                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">Ghi chú
+                        </th>
                         <td mat-cell *matCellDef="let row">{{ row.note }}</td>
                     </ng-container>
 
                     <ng-container matColumnDef="createdDate">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header
-                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">Ngày
-                            tạo</th>
-                        <td mat-cell *matCellDef="let row" style="max-width: 123px;">{{ row.createdDate | date:
-                            'dd/MM/yyyy, HH:mm a' }}</td>
+                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">Ngày tạo
+                        </th>
+                        <td mat-cell *matCellDef="let row" style="max-width: 123px;">{{ row.createdDate | date: 'dd/MM/yyyy, HH:mm a' }}</td>
                     </ng-container>
 
                     <ng-container matColumnDef="attendance">
                         <th mat-header-cell *matHeaderCellDef
-                            style="text-align: center; background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
-                            Điểm danh</th>
+                            style="text-align: center; background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">Điểm danh
+                        </th>
                         <td mat-cell *matCellDef="let row" style="height: 88px; text-align: center;">
                             <button mat-mini-fab (click)="navigateTo('student/attendance', row.id)"
                                 style="border-radius: 15%; color: white; background-color: var(--theme-background);">
@@ -189,8 +180,8 @@
 
                     <ng-container matColumnDef="score">
                         <th mat-header-cell *matHeaderCellDef
-                            style="text-align: center; background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
-                            Điểm</th>
+                            style="text-align: center; background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">Điểm
+                        </th>
                         <td mat-cell *matCellDef="let row" style="text-align: center;">
                             <button mat-mini-fab (click)="navigateTo('student/score', row.id)"
                                 style="border-radius: 15%; color: white; background-color: var(--theme-background);">
@@ -201,8 +192,8 @@
 
                     <ng-container matColumnDef="fee">
                         <th mat-header-cell *matHeaderCellDef
-                            style="text-align: center; background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
-                            Học phí</th>
+                            style="text-align: center; background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">Học phí
+                        </th>
                         <td mat-cell *matCellDef="let row" style="text-align: center;">
                             <button mat-mini-fab (click)="navigateTo('student/fee', row.id)"
                                 style="border-radius: 15%; color: white; background-color: var(--theme-background);">
@@ -213,8 +204,8 @@
 
                     <ng-container matColumnDef="details">
                         <th mat-header-cell *matHeaderCellDef
-                            style="text-align: center; background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
-                            Chi tiết</th>
+                            style="text-align: center; background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">Chi tiết
+                        </th>
                         <td mat-cell *matCellDef="let row" style="text-align: center;">
                             <button mat-mini-fab (click)="navigateTo('student/class/' + row.id, row.id)"
                                 style="border-radius: 15%; color: white; background-color: var(--theme-background);">
@@ -223,15 +214,14 @@
                         </td>
                     </ng-container>
 
-                    <tr mat-header-row *matHeaderRowDef="displayedColumns2"></tr>
-                    <tr mat-row *matRowDef="let row; columns: displayedColumns2;"></tr>
+                    <tr mat-header-row *matHeaderRowDef="displayedColumnsDisable"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumnsDisable;"></tr>
 
                     <tr class="mat-row" *matNoDataRow>
                         <td class="mat-cell" colspan="5">Không có dữ liệu</td>
                     </tr>
                 </table>
-
-                <mat-paginator #paginator2 [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page">
+                <mat-paginator #paginatorDisable [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page">
                 </mat-paginator>
             </div>
         </div>

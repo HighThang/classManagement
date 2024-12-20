@@ -9,9 +9,9 @@ import { FormsModule } from '@angular/forms';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-
 import localeVi from '@angular/common/locales/vi';
 import { CalendarService } from '../../../../core/services/calendar/calendar.service';
+
 registerLocaleData(localeVi);
 
 @Component({
