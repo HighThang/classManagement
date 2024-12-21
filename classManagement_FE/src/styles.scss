@@ -1,0 +1,123 @@
+@use '@angular/material' as mat;
+
+mat.$theme-ignore-duplication-warnings: true;
+
+// @include mat.core();
+// @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+@import '../node_modules/angular-calendar/css/angular-calendar.css';
+
+.swal2-popup {
+  font-family: 'Roboto', sans-serif !important;
+  font-size: 14px;
+}
+
+.swal2-popup .swal2-title,
+.swal2-popup .swal2-content {
+  font-weight: 600 !important;
+}
+
+.mat-mdc-checkbox-ripple,
+.mdc-checkbox__ripple {
+  display: none;
+}
+
+.mdc-text-field--outlined.mdc-text-field--disabled .mdc-text-field__input {
+  color: rgba(0, 0, 0, 0.55) !important;
+}
+
+.mdc-text-field--outlined.mdc-text-field--disabled .mdc-floating-label {
+  color: rgba(0, 0, 0, 0.55) !important;
+}
+
+.mdc-text-field--outlined.mdc-text-field--disabled .mat-mdc-notch-piece {
+  border-color: rgba(0, 0, 0, 0.11) !important;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+:root {
+  --color-primary: #409EFF;
+  --color-success: #67C23A;
+  --color-warning: #ffb74b;
+  --color-danger: #F56C6C;
+  --text-button-color: white;
+  --text-disable-color: rgb(167, 167, 167);
+
+  --mdc-outlined-text-field-outline-color: var(--theme-background) !important;
+}
+
+@mixin custom-material-theme($primary, $accent, $warn) {
+  $theme: mat.m2-define-light-theme((color: (primary: $primary,
+          accent: $accent,
+          warn: $warn,
+        ),
+      ));
+
+  @include mat.all-component-themes($theme);
+}
+
+.theme-cornflowerblue {
+  --theme-background: cornflowerblue;
+  --theme-primary: cornflowerblue;
+  --theme-accent: cornflowerblue;
+  --theme-warn: cornflowerblue;
+
+  --theme-color-sidebar: cornflowerblue;
+  --theme-color-icon: cornflowerblue;
+  --theme-background-hover: cornflowerblue;
+  --theme-checked: cornflowerblue;
+  --theme-border-input: cornflowerblue;
+
+  --mdc-outlined-text-field-hover-outline-color: #0021df !important;
+
+  @include custom-material-theme(mat.m2-define-palette(mat.$m2-indigo-palette, 500),
+    mat.m2-define-palette(mat.$m2-pink-palette, A200),
+    mat.m2-define-palette(mat.$m2-red-palette));
+}
+
+.theme-orange {
+  --theme-background: rgb(255, 170, 67);
+  --theme-primary: rgb(255, 170, 67);
+  --theme-accent: rgb(255, 170, 67);
+  --theme-warn: rgb(255, 170, 67);
+
+  --theme-color-sidebar: #c8ca43;
+  --theme-color-icon: rgb(255, 170, 67);
+  --theme-background-hover: rgb(255, 170, 67);
+  --theme-checked: rgb(255, 170, 67);
+  --theme-border-input: rgb(255, 170, 67);
+
+  --mdc-outlined-text-field-hover-outline-color: rgb(226, 124, 0) !important;
+
+  @include custom-material-theme(mat.m2-define-palette(mat.$m2-orange-palette, 500),
+    mat.m2-define-palette(mat.$m2-pink-palette, A200),
+    mat.m2-define-palette(mat.$m2-red-palette));
+}
+
+.theme-lightgreen {
+  --theme-background: #8bc34a;
+  --theme-primary: #8bc34a;
+  --theme-accent: #8bc34a;
+  --theme-warn: #8bc34a;
+
+  --theme-color-sidebar: #8bc34a;
+  --theme-color-icon: #8bc34a;
+  --theme-background-hover: #8bc34a;
+  --theme-checked: #8bc34a;
+  --theme-border-input: #8bc34a;
+
+  --mdc-outlined-text-field-hover-outline-color: #78e000 !important;
+
+  @include custom-material-theme(mat.m2-define-palette(mat.$m2-light-green-palette, 500),
+    mat.m2-define-palette(mat.$m2-pink-palette, A200),
+    mat.m2-define-palette(mat.$m2-red-palette));
+}

@@ -1,0 +1,14 @@
+::ng-deep .mdc-checkbox__native-control:enabled:checked~.mdc-checkbox__background,
+.mdc-checkbox__native-control:enabled:indeterminate~.mdc-checkbox__background {
+    border-color: var(--theme-primary) !important;
+    background-color: var(--theme-primary) !important;
+}
+
+::ng-deep .mdc-checkbox__background {
+    border-color: var(--theme-primary) !important;
+}
+
+::ng-deep .mdc-checkbox--disabled .mdc-checkbox__background {
+    background-color: rgba(0, 0, 0, 0.38) !important;
+    border-color: rgba(0, 0, 0, 0) !important;
+}

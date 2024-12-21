@@ -1,0 +1,59 @@
+body,
+html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+#app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+app-header {
+    border-bottom: 1px solid #ddd;
+}
+
+app-side-bar-left {
+    border-right: 1px solid #ddd;
+    animation: slideIn 0.4s forwards;
+    z-index: 2;
+    position: relative;
+}
+
+app-side-bar-left.hide {
+    animation: slideOut 0.4s forwards;
+}
+
+.layout-container {
+    display: flex;
+    flex: 1;
+}
+
+.layout-wrapper {
+    flex: 1;
+    background-color: #fff;
+    overflow: auto;
+    padding: 5px;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(-100%);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-100%);
+    }
+}

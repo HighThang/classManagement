@@ -1,0 +1,153 @@
+<div class="container">
+    <div class="content">
+        <h3 class="centered-title" style="margin-bottom: 5px;">Thông tin người dùng</h3>
+        <mat-card class="register-card">
+            <mat-card-content>
+                <form [formGroup]="userInfoForm">
+                    <mat-card-header>
+                        <mat-card-title>Chức vụ: <u>Giáo viên</u></mat-card-title>
+                        <app-button *ngIf="!isEditing" [type]="'primary'" class="edit-button" (click)="enableEdit()">
+                            <mat-icon>edit</mat-icon>Sửa thông tin
+                        </app-button>
+                        <div class="edit" *ngIf="isEditing" style="display: flex;">
+                            <button mat-raised-button class="save-button" (click)="saveInfo()"
+                                style="background-color: rgb(46, 219, 46); color: white;">
+                                <mat-icon>save</mat-icon>Lưu
+                            </button>
+                            <button mat-raised-button class="cancel-button" (click)="disableEdit()"
+                                style="background-color: rgb(150, 150, 150); color: white; margin-left: 10px;">
+                                <mat-icon>cancel</mat-icon>Hủy
+                            </button>
+                        </div>
+                    </mat-card-header>
+
+                    <div class="form-grid">
+                        <!-- Left -->
+                        <div class="form-section">
+                            <div class="icon-grid-1">
+                                <app-icon iconName="person"></app-icon>
+                                <mat-form-field appearance="outline" style="margin-bottom: 10px;">
+                                    <mat-label>Tên</mat-label>
+                                    <input matInput formControlName="firstName" [placeholder]="'Điền tên'">
+                                    <mat-error *ngIf="userInfoForm.get('firstName')?.hasError('required')">
+                                        Tên là <strong>bắt buộc</strong>
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+
+                            <div class="icon-grid-1">
+                                <app-icon iconName="person"></app-icon>
+                                <mat-form-field appearance="outline" style="margin-bottom: 10px;">
+                                    <mat-label>Tên đệm</mat-label>
+                                    <input matInput formControlName="surname" [placeholder]="'Điền tên đệm'">
+                                </mat-form-field>
+                            </div>
+
+                            <div class="icon-grid-1">
+                                <app-icon iconName="person"></app-icon>
+                                <mat-form-field appearance="outline" style="margin-bottom: 10px;">
+                                    <mat-label>Họ</mat-label>
+                                    <input matInput formControlName="lastName" [placeholder]="'Điền họ'">
+                                    <mat-error *ngIf="userInfoForm.get('lastName')?.hasError('required')">
+                                        Họ là <strong>bắt buộc</strong>
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+
+                            <div class="icon-grid-1">
+                                <app-icon iconName="email"></app-icon>
+                                <mat-form-field appearance="outline" style="margin-bottom: 10px;">
+                                    <mat-label>Email</mat-label>
+                                    <input type="email" matInput formControlName="email">
+
+                                </mat-form-field>
+                            </div>
+
+                            <div class="icon-grid-1">
+                                <app-icon iconName="phone"></app-icon>
+                                <mat-form-field appearance="outline" style="margin-bottom: 10px;">
+                                    <mat-label>Số điện thoại</mat-label>
+                                    <input matInput formControlName="phone" [placeholder]="'Vd: 0987654321'">
+                                    <mat-error *ngIf="userInfoForm.get('phone')?.hasError('required')">
+                                        Số điện thoại là <strong>bắt buộc</strong>
+                                    </mat-error>
+                                    <mat-error *ngIf="userInfoForm.get('phone')?.hasError('pattern')">
+                                        Vui lòng nhập số điện thoại hợp lệ
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+
+                            <div class="icon-grid-1">
+                                <app-icon iconName="calendar_today"></app-icon>
+                                <mat-form-field appearance="outline" style="margin-bottom: 10px;">
+                                    <mat-label>Ngày sinh</mat-label>
+                                    <input matInput [matDatepicker]="picker" formControlName="dob">
+                                    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                                    <mat-datepicker #picker></mat-datepicker>
+                                    <mat-error *ngIf="userInfoForm.get('dob')?.hasError('required')">
+                                        Ngày sinh là <strong>bắt buộc</strong>
+                                    </mat-error>
+                                    <mat-error *ngIf="userInfoForm.get('dob')?.hasError('dateInvalid')">
+                                        Ngày sinh không hợp lệ, phải nhỏ hơn ngày hiện tại
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+
+                        <div class="divider"></div>
+
+                        <!-- Right -->
+                        <div class="form-section">
+                            <div class="icon-grid-2">
+                                <mat-form-field appearance="outline" class="file-input">
+                                    <mat-label>Ảnh đại diện</mat-label>
+                                    <mat-icon class="file-icon" matPrefix 
+                                        [ngClass]="{ 'disabled-icon': !isEditing }"
+                                        (click)="isEditing ? f_input.click() : null"
+                                        style="padding: 5px; margin-left: 5px;">attach_file</mat-icon>
+                                    <input type="text" readonly matInput formControlName="imageURL" />
+                                    <input type="file" multiple hidden #f_input (change)="handleFileInputChange(f_input.files)"
+                                        (change)="onFileSelected($event)" accept="image/*" />
+                                    <img *ngIf="selectedImage" [src]="selectedImage" class="preview-image" alt="User Image">
+                                    <mat-error>Ảnh là <strong>bắt buộc</strong></mat-error>
+                                </mat-form-field>
+                                <app-icon iconName="image"></app-icon>
+                            </div>
+
+                            <div class="icon-grid-2">
+                                <mat-form-field appearance="outline" style="margin-bottom: 10px;">
+                                    <mat-label>Loại tài khoản</mat-label>
+                                    <input matInput formControlName="role">
+                                </mat-form-field>
+                                <app-icon iconName="card_travel"></app-icon>
+                            </div>
+
+                            <div class="icon-grid-2">
+                                <mat-form-field appearance="outline" style="margin-bottom: 10px;">
+                                    <mat-label>Địa chỉ giảng dạy</mat-label>
+                                    <input matInput formControlName="address" [placeholder]="'Điền địa chỉ'">
+                                    <mat-error *ngIf="userInfoForm.get('address')?.hasError('required')">
+                                        Địa chỉ là <strong>bắt buộc</strong>
+                                    </mat-error>
+                                </mat-form-field>
+                                <app-icon iconName="home"></app-icon>
+                            </div>
+
+                            <div class="icon-grid-2">
+                                <mat-form-field appearance="outline" style="margin-bottom: 10px;">
+                                    <mat-label>Nghề nghiệp / Chức vụ / Trình độ học vấn</mat-label>
+                                    <input matInput formControlName="business"
+                                        [placeholder]="'Vd: ThS/TS/PSG ...; Giáo viên môn ... trường ...'">
+                                    <mat-error *ngIf="userInfoForm.get('business')?.hasError('required')">
+                                        Nghề nghiệp / Chức vụ / Trình độ học vấn là <strong>bắt buộc</strong>
+                                    </mat-error>
+                                </mat-form-field>
+                                <app-icon iconName="business"></app-icon>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </mat-card-content>
+        </mat-card>
+    </div>
+</div>

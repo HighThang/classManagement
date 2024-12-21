@@ -1,0 +1,286 @@
+<div class="container">
+    <div class="content">
+        <div class="class_details">
+            <div class="header">
+                <h3 class="centered-title">Chi tiết lớp học</h3>
+                <button mat-raised-button routerLink="/student/class"
+                    style="background-color: var(--theme-background) ; color: white">Quay lại "Danh sách"</button>
+            </div>
+
+            <div class="table">
+                <div class="class-info" style="padding-top: 20px; padding-left: 10px; padding-right: 10px;">
+                    <div class="form-section">
+                        <div class="icon-grid-1">
+                            <app-icon iconName="classroom"></app-icon>
+                            <mat-form-field appearance="outline" style="margin-bottom: 10px;">
+                                <mat-label>Tên lớp</mat-label>
+                                <input matInput [(ngModel)]="classDetails.className" disabled>
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="icon-grid-1">
+                            <app-icon iconName="subject"></app-icon>
+                            <mat-form-field appearance="outline" style="margin-bottom: 10px;">
+                                <mat-label>Tên môn học</mat-label>
+                                <input matInput [(ngModel)]="classDetails.subjectName" disabled>
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="icon-grid-1">
+                            <app-icon iconName="schedule"></app-icon>
+                            <mat-form-field appearance="outline" style="margin-bottom: 10px;">
+                                <mat-label>Ngày tạo lớp</mat-label>
+                                <input matInput [ngModel]="classDetails.createdDate | date: 'dd/MM/yyyy, HH:mm:ss'" disabled>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="class-info" style="padding-left: 10px; padding-right: 10px;">
+                    <div class="form-section">
+                        <div class="icon-grid-1">
+                            <app-icon iconName="person"></app-icon>
+                            <mat-form-field appearance="outline" style="margin-bottom: 10px;">
+                                <mat-label>Tên giáo viên</mat-label>
+                                <input matInput [(ngModel)]="classDetails.teacherName" disabled>
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="icon-grid-1">
+                            <app-icon iconName="email"></app-icon>
+                            <mat-form-field appearance="outline" style="margin-bottom: 10px;">
+                                <mat-label>Email</mat-label>
+                                <input matInput [(ngModel)]="classDetails.teacherEmail" disabled>
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="icon-grid-1">
+                            <app-icon iconName="phone"></app-icon>
+                            <mat-form-field appearance="outline" style="margin-bottom: 10px;">
+                                <mat-label>Số điện thoại</mat-label>
+                                <input matInput [ngModel]="classDetails.teacherPhone" disabled>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section2" style="padding-left: 10px; padding-right: 10px;">
+                    <div class="icon-grid-1">
+                        <app-icon iconName="note"></app-icon>
+                        <mat-form-field appearance="outline">
+                            <mat-label>Ghi chú</mat-label>
+                            <textarea matInput [(ngModel)]="classDetails.note" disabled></textarea>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="more-detail">
+            <div class="table">
+                <mat-tab-group>
+                    <mat-tab label="Danh sách học viên">
+                        <div class="header">
+                            <div class="icon-grid-1" style="padding-top: 20px">
+                                <app-icon iconName="search" style="padding: 10px;"></app-icon>
+                                <mat-form-field appearance="outline" style="width: 29vw;">
+                                    <mat-label>Tìm kiếm</mat-label>
+                                    <input matInput #input1 (input)="applyFilterStudent($event)"
+                                        placeholder="Nhập từ khóa tìm kiếm">
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <hr>
+                        <table mat-table [dataSource]="dataSourceStudent" matSort #sortStudent="matSort" matSortActive="id"
+                            matSortDirection="asc" class="example-table">
+                            <ng-container matColumnDef="id">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                    style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                                    ID</th>
+                                <td mat-cell *matCellDef="let row" style="height: 70px;">{{ row.id }}</td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="email">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                    style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                                    Email</th>
+                                <td mat-cell *matCellDef="let row">{{ row.email }}</td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="lastName">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                    style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                                    Họ</th>
+                                <td mat-cell *matCellDef="let row">{{ row.lastName }}</td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="surname">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                    style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                                    Tên đệm</th>
+                                <td mat-cell *matCellDef="let row">{{ row.surname }}</td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="firstName">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                    style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                                    Tên</th>
+                                <td mat-cell *matCellDef="let row">{{ row.firstName }}</td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="phone">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                    style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                                    Số điện thoại</th>
+                                <td mat-cell *matCellDef="let row">{{ row.phone }}</td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="dob">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                    style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                                    Ngày sinh</th>
+                                <td mat-cell *matCellDef="let row">{{ row.dob }}</td>
+                            </ng-container>
+
+                            <tr mat-header-row *matHeaderRowDef="displayedColumnsStudent"></tr>
+                            <tr mat-row *matRowDef="let row; columns: displayedColumnsStudent;"></tr>
+
+                            <tr class="mat-row" *matNoDataRow>
+                                <td class="mat-cell" colspan="7">Không có dữ liệu</td>
+                            </tr>
+                        </table>
+                        <mat-paginator #paginatorStudent [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page">
+                        </mat-paginator>
+                    </mat-tab>
+
+                    <mat-tab label="Lịch học">
+                        <div class="header">
+                            <div class="icon-grid-1" style="padding-top: 20px">
+                                <app-icon iconName="search" style="padding: 10px;"></app-icon>
+                                <mat-form-field appearance="outline" style="width: 29vw;">
+                                    <mat-label>Tìm kiếm môn học</mat-label>
+                                    <input matInput #input2 (input)="applyFilterSchedule($event)"
+                                        placeholder="Nhập từ khóa tìm kiếm">
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <hr>
+                        <table mat-table [dataSource]="dataSourceSchedule" matSort #sortSchedule="matSort" matSortActive="id"
+                            matSortDirection="asc" class="example-table">
+                            <ng-container matColumnDef="id">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                    style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                                    ID</th>
+                                <td mat-cell *matCellDef="let row" style="height: 70px;">{{ row.id }}</td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="day">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                    style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                                    Ngày</th>
+                                <td mat-cell *matCellDef="let row">{{ row.day | date: 'dd/MM/yyyy' }}</td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="periodInDay">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                    style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                                    Ca học</th>
+                                <td mat-cell *matCellDef="let row">{{ row.periodInDay }}</td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="dayInWeek">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                    style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                                    Thứ</th>
+                                <td mat-cell *matCellDef="let row">{{ row.dayInWeek }}</td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="createdDate">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                    style="justify-items: center; background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                                    Ngày Tạo</th>
+                                <td mat-cell *matCellDef="let row" style="text-align: center;">{{ row.createdDate | date: 'dd/MM/yyyy - HH:mm:ss' }}
+                                </td>
+                            </ng-container>
+
+                            <tr mat-header-row *matHeaderRowDef="displayedColumnsSchedule"></tr>
+                            <tr mat-row *matRowDef="let row; columns: displayedColumnsSchedule;"></tr>
+
+                            <tr class="mat-row" *matNoDataRow>
+                                <td class="mat-cell" colspan="5">Không có dữ liệu</td>
+                            </tr>
+                        </table>
+                        <mat-paginator #paginatorSchedule [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page">
+                        </mat-paginator>
+                    </mat-tab>
+
+                    <mat-tab label="Tài liệu">
+                        <div class="header">
+                            <div class="icon-grid-1" style="padding-top: 20px">
+                                <app-icon iconName="search" style="padding: 10px;"></app-icon>
+                                <mat-form-field appearance="outline" style="width: 29vw;">
+                                    <mat-label>Tìm kiếm</mat-label>
+                                    <input matInput #input3 (input)="applyFilterDocument($event)" placeholder="Nhập từ khóa tìm kiếm">
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <hr>
+                        <table mat-table [dataSource]="dataSourceDocument" matSort #sortDocument="matSort" matSortActive="id"
+                            matSortDirection="asc" class="example-table">
+                            <ng-container matColumnDef="id">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                    style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                                    ID</th>
+                                <td mat-cell *matCellDef="let row" style="height: 70px;">{{ row.id }}</td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="documentName">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                    style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                                    Tên tài liệu</th>
+                                <td mat-cell *matCellDef="let row" style="height: 70px;">{{ row.documentName }}</td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="createdDate">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                    style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                                    Ngày tải tài liệu</th>
+                                <td mat-cell *matCellDef="let row">{{ row.createdDate | date: 'dd/MM/yyyy - HH:mm:ss' }}
+                                </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="download">
+                                <th mat-header-cell *matHeaderCellDef
+                                    style="text-align: center; background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%);">
+                                    Tải xuống tài liệu</th>
+                                <td mat-cell *matCellDef="let row" style="text-align: center;">
+                                    <button mat-mini-fab (click)="downloadDocument(row.id)"
+                                        style="background-color: rgb(0, 194, 0); border-radius: 15%; color: white;">
+                                        <mat-icon>download</mat-icon>
+                                    </button>
+                                </td>
+                            </ng-container>
+
+                            <tr mat-header-row *matHeaderRowDef="displayedColumnsDocument"></tr>
+                            <tr mat-row *matRowDef="let row; columns: displayedColumnsDocument;"></tr>
+
+                            <tr class="mat-row" *matNoDataRow>
+                                <td class="mat-cell" colspan="3">Không có dữ liệu</td>
+                            </tr>
+                        </table>
+                        <mat-paginator #paginatorDocument [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page">
+                        </mat-paginator>
+                    </mat-tab>
+                </mat-tab-group>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,207 @@
+<div class="container">
+    <div class="content">
+        <h4 class="title">Đăng ký môn học / khóa học & giáo viên giảng dạy</h4>
+        <mat-stepper [linear]="true" #stepper [animationDuration]="'500'">
+            <mat-step [stepControl]="firstFormGroup">
+                <form [formGroup]="firstFormGroup">
+                    <ng-template matStepLabel>Điền thông tin cá nhân</ng-template>
+
+                    <div class="box">
+                        <p class="name">Họ tên:</p>
+
+                        <mat-form-field class="lastname" appearance="outline">
+                            <mat-label>Họ</mat-label>
+                            <input matInput formControlName="lastName" [placeholder]="'Điền họ'">
+                            <mat-error *ngIf="firstFormGroup.get('lastName')?.hasError('required')">
+                                Họ là <strong>bắt buộc</strong>
+                            </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field class="surname" appearance="outline">
+                            <mat-label>Tên đệm</mat-label>
+                            <input matInput formControlName="surname" [placeholder]="'Điền tên đệm'">
+                        </mat-form-field>
+
+                        <mat-form-field class="firstname" appearance="outline">
+                            <mat-label>Tên</mat-label>
+                            <input matInput formControlName="firstName" [placeholder]="'Điền tên'">
+                            <mat-error *ngIf="firstFormGroup.get('firstName')?.hasError('required')">
+                                Tên là <strong>bắt buộc</strong>
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+
+                    <div class="box">
+                        <p class="name">Email:</p>
+
+                        <mat-form-field class="email" appearance="outline">
+                            <mat-label>Email</mat-label>
+                            <input type="email" matInput formControlName="email" placeholder="Vd: nva@gmail.com">
+                            <mat-error *ngIf="firstFormGroup.get('email')?.hasError('required')">
+                                Email là <strong>bắt buộc</strong>
+                            </mat-error>
+                            <mat-error *ngIf="firstFormGroup.get('email')?.hasError('email')">
+                                Vui lòng điền địa chỉ email hợp lệ
+                            </mat-error>
+                            <mat-error *ngIf="firstFormGroup.get('email')?.hasError('emailExists')">
+                                Email đã tồn tại. Vui lòng sử dụng email khác.
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+
+                    <div class="box">
+                        <p class="name">Thông tin khác:</p>
+
+                        <mat-form-field class="dob" appearance="outline">
+                            <mat-label>Ngày sinh</mat-label>
+                            <input matInput [matDatepicker]="picker" formControlName="dob"
+                                [placeholder]="'Vd: 5/29/2002'">
+                            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                            <mat-datepicker #picker></mat-datepicker>
+                            <mat-error *ngIf="firstFormGroup.get('dob')?.hasError('required')">
+                                Ngày sinh là <strong>bắt buộc</strong>
+                            </mat-error>
+                            <mat-error *ngIf="firstFormGroup.get('dob')?.hasError('dateInvalid')">
+                                Ngày sinh không hợp lệ, phải nhỏ hơn ngày hiện tại
+                            </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field class="sdt" appearance="outline">
+                            <mat-label>Số điện thoại</mat-label>
+                            <input matInput formControlName="phone" [placeholder]="'Vd: 0987654321'">
+                            <mat-error *ngIf="firstFormGroup.get('phone')?.hasError('required')">
+                                Số điện thoại là <strong>bắt buộc</strong>
+                            </mat-error>
+                            <mat-error *ngIf="firstFormGroup.get('phone')?.hasError('pattern')">
+                                Vui lòng nhập số điện thoại hợp lệ
+                            </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field class="adr" appearance="outline">
+                            <mat-label>Địa chỉ</mat-label>
+                            <input matInput formControlName="address" [placeholder]="'Điền địa chỉ'">
+                            <mat-error *ngIf="firstFormGroup.get('address')?.hasError('required')">
+                                Địa chỉ là <strong>bắt buộc</strong>
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+
+                    <div class="box">
+                        <p class="name">Hình ảnh gương mặt:</p>
+
+                        <mat-form-field appearance="outline" class="file-input">
+                            <mat-label>Hình ảnh gương mặt</mat-label>
+                            <mat-icon class="file-icon" matPrefix (click)="f_input.click()"
+                                style="padding: 5px; margin-left: 5px;">attach_file</mat-icon>
+                            <input type="text" readonly matInput formControlName="image" />
+                            <input type="file" multiple hidden #f_input (change)="handleFileInputChange(f_input.files)"
+                                (change)="onFileSelected($event)" accept="image/*" />
+                            <img *ngIf="selectedImage" [src]="selectedImage" class="preview-image">
+                            <mat-error>Ảnh gương mặt là <strong>bắt buộc</strong></mat-error>
+                        </mat-form-field>
+                    </div>
+
+                    <button class="next" mat-button matStepperNext style="color: white;">Tiếp tục</button>
+                </form>
+            </mat-step>
+            <mat-step [stepControl]="secondFormGroup">
+                <form [formGroup]="secondFormGroup">
+                    <ng-template matStepLabel>Chọn môn/khóa học</ng-template>
+
+                    <div class="box">
+                        <p class="name">Môn học:</p>
+                        <mat-form-field class="course" appearance="outline">
+                            <mat-label>Môn/Khóa học</mat-label>
+                            <mat-select formControlName="subjects">
+                                <mat-option value="">-- None --</mat-option>
+                                <mat-option *ngFor="let subject of subjects" [value]="subject">
+                                    {{ subject }}
+                                </mat-option>
+                            </mat-select>
+                            <mat-error>Môn/Khóa học là <strong>bắt buộc</strong></mat-error>
+                        </mat-form-field>
+                    </div>
+
+                    <div class="btn">
+                        <button class="back" mat-button matStepperPrevious style="color: white; margin-right: 5px;">Quay
+                            lại</button>
+                        <button class="next" mat-button matStepperNext style="color: white; margin-left: 5px;">Tiếp
+                            tục</button>
+                    </div>
+                </form>
+            </mat-step>
+            <mat-step [stepControl]="thirdFormGroup">
+                <form [formGroup]="thirdFormGroup">
+                    <ng-template matStepLabel>Chọn lớp học / giáo viên</ng-template>
+
+                    <div class="box">
+                        <p class="name">Lớp học & giáo viên:</p>
+                        <mat-form-field class="teacher" appearance="outline">
+                            <mat-label>Lớp học & giáo viên</mat-label>
+                            <mat-select formControlName="teachers" (selectionChange)="onTeacherSelect($event.value)">
+                                <mat-option value=''>-- None --</mat-option>
+                                <mat-option *ngFor="let teacher of teachers" [value]="teacher">
+                                    {{ teacher }}
+                                </mat-option>
+                            </mat-select>
+                            <mat-error>Lớp học / giáo viên là <strong>bắt buộc</strong></mat-error>
+                        </mat-form-field>
+                    </div>
+
+                    <div *ngIf="showDetails && selectedTeacher" [@fadeInOut]>
+                        <hr>
+                        <h6 style="padding-top: 10px; color: var(--theme-background); font-weight: 500;">
+                            Thông tin chi tiết:
+                        </h6>
+                        <div class="class-info" style="padding-top: 10px;">
+                            <div class="form-section">
+                                <div class="icon-grid-1">
+                                    <app-icon iconName="email"></app-icon>
+                                    <mat-form-field class="email" appearance="outline">
+                                        <mat-label>Email</mat-label>
+                                        <input matInput disabled value="{{ selectedTeacher.email }}">
+                                    </mat-form-field>
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <div class="icon-grid-1">
+                                    <app-icon iconName="phone"></app-icon>
+                                    <mat-form-field class="phone" appearance="outline">
+                                        <mat-label>Số điện thoại</mat-label>
+                                        <input matInput disabled value="{{ selectedTeacher.phone }}">
+                                    </mat-form-field>
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <div class="icon-grid-1">
+                                    <app-icon iconName="business"></app-icon>
+                                    <mat-form-field class="business" appearance="outline">
+                                        <mat-label>Nghề nghiệp / Trình độ</mat-label>
+                                        <input matInput disabled value="{{ selectedTeacher.business }}">
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section2">
+                            <div class="icon-grid-1">
+                                <app-icon iconName="note"></app-icon>
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Ghi chú lớp học</mat-label>
+                                    <textarea matInput disabled value="{{ selectedTeacher.note}}"></textarea>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="btn">
+                        <button class="back" mat-button matStepperPrevious style="color: white; margin-right: 5px;">Quay lại</button>
+                        <app-button class="submit" (click)="submitRegistration()">Xác nhận gửi đăng ký</app-button>
+                    </div>
+                </form>
+            </mat-step>
+        </mat-stepper>
+    </div>
+</div>

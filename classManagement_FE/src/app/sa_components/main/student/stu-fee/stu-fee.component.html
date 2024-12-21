@@ -1,0 +1,169 @@
+<div class="container">
+    <div class="content">
+        <div class="class_details">
+            <div class="header">
+                <h3 class="centered-title">Học phí hàng tháng</h3>
+            </div>
+
+            <div class="table">
+                <div class="form-grid">
+                    <div class="left" style="padding-top: 20px; padding-right: 10px;">
+                        <div class="form-section">
+                            <form [formGroup]="formGroup">
+                                <div class="icon-grid-1">
+                                    <app-icon iconName="classroom"></app-icon>
+                                    <mat-form-field class="form-field" appearance="outline">
+                                        <mat-label>Chọn lớp học</mat-label>
+                                        <mat-select formControlName="classroomId">
+                                            <mat-optgroup *ngIf="activeClassrooms.length > 0" label="Đang học">
+                                                <mat-option *ngFor="let classroom of activeClassrooms"
+                                                    [value]="classroom.id">
+                                                    #{{ classroom.id }} - {{ classroom.className }}
+                                                </mat-option>
+                                            </mat-optgroup>
+
+                                            <mat-optgroup *ngIf="deletedClassrooms.length > 0" label="Ngừng học">
+                                                <mat-option *ngFor="let classroom of deletedClassrooms"
+                                                    [value]="classroom.id">
+                                                    #{{ classroom.id }} - {{ classroom.className }}
+                                                </mat-option>
+                                            </mat-optgroup>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="divider" *ngIf="classDetails && showDetails" [@fadeInOut]></div>
+
+                    <div class="right" *ngIf="classDetails && showDetails" [@fadeInOut]>
+                        <div class="class-info" style="padding-top: 20px; padding-right: 10px;">
+                            <div class="form-section">
+                                <div class="icon-grid-1">
+                                    <app-icon iconName="subject"></app-icon>
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Tên môn học</mat-label>
+                                        <input matInput [(ngModel)]="classDetails.subjectName" disabled>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <div class="icon-grid-1">
+                                    <app-icon iconName="person"></app-icon>
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Tên giáo viên</mat-label>
+                                        <input matInput
+                                            [ngModel]="classDetails.teacherName" disabled>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section2" style="padding-right: 10px;">
+                            <div class="icon-grid-1">
+                                <app-icon iconName="note"></app-icon>
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Ghi chú</mat-label>
+                                    <textarea matInput [(ngModel)]="classDetails.note" disabled></textarea>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="more-detail">
+            <div class="table">
+                <div class="header">
+                    <div class="icon-grid-1" style="padding-top: 20px">
+                        <app-icon iconName="search" style="padding: 10px; margin-bottom: 0px;"></app-icon>
+                        <mat-form-field appearance="outline" style="width: 29vw;">
+                            <mat-label>Tìm kiếm</mat-label>
+                            <input matInput #input1 (input)="applyFilterFee($event)" placeholder="Nhập từ khóa tìm kiếm">
+                        </mat-form-field>
+                    </div>
+                </div>
+                <hr>
+                <table mat-table [dataSource]="dataSourceFee" matSort #sortFee="matSort" matSortActive="id" matSortDirection="asc" class="example-table">
+                    <ng-container matColumnDef="year">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header
+                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%); justify-items: center; padding-left: 29px;">
+                            Năm học</th>
+                        <td mat-cell *matCellDef="let row" style="text-align: center;">{{ row.year }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="month">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header
+                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%); justify-items: center; padding-left: 29px;">
+                            Tháng</th>
+                        <td mat-cell *matCellDef="let row" style="text-align: center;">
+                            {{ row.month }}
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="totalNumberOfClasses">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header
+                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%); justify-items: center; padding-left: 29px;">
+                            Tổng số buổi</th>
+                        <td mat-cell *matCellDef="let row" style="text-align: center;">{{ row.totalNumberOfClasses }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="numberOfClassesAttended">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header
+                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%); justify-items: center; padding-left: 29px;">
+                            Số buổi đi học</th>
+                        <td mat-cell *matCellDef="let row" style="text-align: center;">{{ row.numberOfClassesAttended }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="lessonPrice">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header
+                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%); justify-items: center; padding-left: 29px;">
+                            Giá 1 buổi</th>
+                        <td mat-cell *matCellDef="let row" style="text-align: center;">{{ row.lessonPrice | number:'1.0-0' }}đ</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="feeAmount">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header
+                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%); justify-items: center; padding-left: 29px;">
+                            Tổng tiền</th>
+                        <td mat-cell *matCellDef="let row" style="text-align: center;">{{ row.feeAmount | number:'1.0-0' }}đ</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="feeSubmitted">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header
+                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%); justify-items: center; padding-left: 29px;">
+                            Đã đóng</th>
+                        <td mat-cell *matCellDef="let row" style="text-align: center;">{{ row.feeSubmitted | number:'1.0-0' }}đ</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="feeNotSubmitted">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header
+                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%); justify-items: center; padding-left: 29px;">
+                            Còn nợ</th>
+                        <td mat-cell *matCellDef="let row" style="text-align: center;">{{ row.feeNotSubmitted | number:'1.0-0' }}đ</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="createdDate">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header
+                            style="background-color: color-mix(in srgb, var(--theme-background) 20%, white 80%); justify-items: center; padding-left: 29px;">
+                            Ngày tạo</th>
+                        <td mat-cell *matCellDef="let row" style="text-align: center;">{{ row.createdDate | date: 'dd/MM/yyyy, HH:mm:ss' }}</td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="displayedColumnsFee"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumnsFee;"></tr>
+
+                    <tr class="mat-row" *matNoDataRow>
+                        <td class="mat-cell" colspan="8">Không có dữ liệu</td>
+                    </tr>
+                </table>
+
+                <mat-paginator #paginatorFee [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page">
+                </mat-paginator>
+            </div>
+        </div>
+    </div>
+</div>
