@@ -82,6 +82,7 @@ export class AdminService {
       responseType: 'text',
     });
   }
+  
   // Subjects
   getPendingSubjects(): Observable<Subject[]> {
     return this.http.get<Subject[]>(`${this.baseUrl}/subjects?active=false&deleted=false`);

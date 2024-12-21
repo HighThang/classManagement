@@ -94,7 +94,7 @@ export class ForgetPasswordComponent implements OnInit{
 
   openDialog(): void {
     const dialogRef = this.dialog.open(this.dialogTemplate, {
-      width: '33%', maxHeight: '50vh'
+      width: '33%', maxHeight: '66vh'
     });
 
     dialogRef.afterClosed().subscribe(() => {
