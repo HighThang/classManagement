@@ -1,6 +1,5 @@
 package ptit.d20.do_an.class_management.domain;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

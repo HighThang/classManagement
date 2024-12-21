@@ -15,7 +15,6 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 public class Classroom extends BaseEntity {
-
     @Column(name = "class_name")
     private String className;
 
@@ -44,9 +43,4 @@ public class Classroom extends BaseEntity {
     @JsonIgnore
     @OneToMany(mappedBy = "classroom", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Exam> exams;
-
-//    @JsonIgnore
-//    @OneToMany(mappedBy = "classroom", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-//    private List<TutorFee> tutorFees;
-
 }

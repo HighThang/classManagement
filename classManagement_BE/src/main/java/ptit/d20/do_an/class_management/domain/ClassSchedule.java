@@ -22,9 +22,9 @@ public class ClassSchedule extends BaseEntity {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private ClassPeriod periodInDay; // ca hoc trong ngay
+    private ClassPeriod periodInDay;
 
-    private String dayInWeek; // MON, TUE, ...
+    private String dayInWeek;
 
     @JsonIgnore
     @ManyToOne

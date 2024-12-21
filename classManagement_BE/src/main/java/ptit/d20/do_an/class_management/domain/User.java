@@ -22,7 +22,7 @@ import java.util.List;
 @NoArgsConstructor
 public class User extends BaseEntity {
     @NotBlank(message = "username must be not blank!")
-    @Size(max = 30)
+    @Size(max = 40)
     @Column(unique = true)
     private String username;
 
@@ -58,7 +58,7 @@ public class User extends BaseEntity {
     @Column(name = "active_code")
     private String activeCode;
 
-    @Column(name = "number_active_attempt") // number attempt to verify email
+    @Column(name = "number_active_attempt")
     private Integer numberActiveAttempt = 0;
 
     @Column(name = "last_active_attempt")

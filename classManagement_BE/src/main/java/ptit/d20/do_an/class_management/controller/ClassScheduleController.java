@@ -2,7 +2,6 @@ package ptit.d20.do_an.class_management.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,7 +11,6 @@ import ptit.d20.do_an.class_management.dto.NewClassScheduleRequest;
 import ptit.d20.do_an.class_management.service.ClassScheduleService;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/class-schedule")
@@ -24,21 +22,10 @@ public class ClassScheduleController {
         this.classScheduleService = classScheduleService;
     }
 
-    @GetMapping("/teacher")
-    public ResponseEntity<List<ClassSchedule>> getSchedulesByTeacherEmail(@RequestParam String email) {
-        List<ClassSchedule> schedules = classScheduleService.getSchedulesByTeacherEmail(email);
-        return ResponseEntity.ok(schedules);
-    }
-
     @GetMapping
     public ResponseEntity<?> getAllClassSchedule(@RequestParam Long classId) throws Exception {
         List<ClassSchedule> students = classScheduleService.getAllClassSchedule(classId);
         return ResponseEntity.ok(new PageImpl<>(students));
-    }
-
-    @GetMapping("/search")
-    public ResponseEntity<?> search(@RequestParam Map<String, String> params, Pageable pageable) throws Exception {
-        return ResponseEntity.ok(classScheduleService.search(params, pageable));
     }
 
     @PostMapping
@@ -47,7 +34,7 @@ public class ClassScheduleController {
     }
 
     @PutMapping("/delete/{scheduleId}")
-    public ResponseEntity<?> deleteDocument(@PathVariable Long scheduleId) {
+    public ResponseEntity<?> deleteSchedule(@PathVariable Long scheduleId) {
         return ResponseEntity.ok(classScheduleService.deleteSchedule(scheduleId));
     }
 

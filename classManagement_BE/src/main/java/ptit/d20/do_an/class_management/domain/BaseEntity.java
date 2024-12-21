@@ -1,6 +1,5 @@
 package ptit.d20.do_an.class_management.domain;
 
-
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedBy;
@@ -17,7 +16,6 @@ import java.time.Instant;
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -40,5 +38,4 @@ public abstract class BaseEntity {
 
     @Column(name = "deleted", columnDefinition = "boolean default false")
     private Boolean deleted;
-
 }

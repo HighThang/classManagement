@@ -2,11 +2,9 @@ package ptit.d20.do_an.class_management.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ptit.d20.do_an.class_management.domain.ClassRegistration;
-import ptit.d20.do_an.class_management.dto.StudentDto;
 import ptit.d20.do_an.class_management.service.StudentService;
 
 import javax.servlet.ServletOutputStream;
@@ -15,22 +13,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/student")
 public class StudentController {
-
     private final StudentService studentService;
 
     @Autowired
     public StudentController(StudentService studentService) {
         this.studentService = studentService;
-    }
-
-    @GetMapping("/search")
-    public ResponseEntity<?> search(@RequestParam Map<String, String> params, Pageable pageable) {
-        return ResponseEntity.ok( studentService.search(params, pageable));
     }
 
     @GetMapping
@@ -39,19 +30,12 @@ public class StudentController {
         return ResponseEntity.ok(new PageImpl<>(students));
     }
 
-    @PostMapping("/{classId}")
-    public ResponseEntity<?> addStudentForClass(@RequestBody StudentDto studentDto, @PathVariable Long classId) {
-        return ResponseEntity.ok(studentService.addStudentForClass(studentDto, classId));
-    }
-
     @GetMapping("/{classId}/download")
     public void downloadListStudent(HttpServletResponse response, @PathVariable Long classId) throws IOException {
         String filePath = studentService.extractListStudent(classId);
         File file = new File(filePath);
 
-        // Check if the file exists
         if (!file.exists()) {
-            // If the file doesn't exist, return a 404 error response
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
@@ -74,21 +58,17 @@ public class StudentController {
         }
     }
 
-    @PutMapping("/delete/{studentId}")
-    public ResponseEntity<?> deleteDocument(@PathVariable Long studentId) {
-        return ResponseEntity.ok(studentService.deleteStudent(studentId));
-    }
-
-    @PutMapping
-    public ResponseEntity<?> updateStudent(@RequestBody StudentDto studentDto) {
-        return ResponseEntity.ok(studentService.updateStudent(studentDto));
-    }
-
     @PutMapping("/active/{studentId}")
     public ResponseEntity<?> activeStudent(@PathVariable Long studentId) {
         return ResponseEntity.ok(studentService.activeStudent(studentId));
     }
 
+    @PutMapping("/delete/{studentId}")
+    public ResponseEntity<?> deleteDocument(@PathVariable Long studentId) {
+        return ResponseEntity.ok(studentService.deleteStudent(studentId));
+    }
+
+    // check-student-req
     @GetMapping("/isExistingRequestInWishList")
     public ResponseEntity<Boolean> isExistingRequestInWishList(@RequestParam Long studentId, Long classroomId) {
         boolean exists = studentService.isExistingRequestInWishList(studentId, classroomId);

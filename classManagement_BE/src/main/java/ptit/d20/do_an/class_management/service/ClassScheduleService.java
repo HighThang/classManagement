@@ -63,43 +63,6 @@ public class ClassScheduleService {
         return classScheduleRepository.findAllByClassroomIdOrderByDayAsc(classId);
     }
 
-    public Page<ClassSchedule> search(Map<String, String> params, Pageable pageable) {
-        Specification<ClassSchedule> specs = getSpecification(params);
-        return classScheduleRepository.findAll(specs, pageable);
-    }
-
-    private Specification<ClassSchedule> getSpecification(Map<String, String> params) {
-        return Specification.where((root, criteriaQuery, criteriaBuilder) -> {
-            Predicate predicate = null;
-            List<Predicate> predicateList = new ArrayList<>();
-            for (Map.Entry<String, String> p : params.entrySet()) {
-                String key = p.getKey();
-                String value = p.getValue();
-                if (!"page".equalsIgnoreCase(key) && !"size".equalsIgnoreCase(key) && !"sort".equalsIgnoreCase(key)) {
-                    if (StringUtils.equalsIgnoreCase("startCreatedDate", key)) { //"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
-                        predicateList.add(criteriaBuilder.greaterThanOrEqualTo(root.get("createdDate"), LocalDate.parse(value, DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay().toInstant(ZoneOffset.UTC)));
-                    } else if (StringUtils.equalsIgnoreCase("endCreatedDate", key)) {
-                        predicateList.add(criteriaBuilder.lessThanOrEqualTo(root.get("createdDate"), LocalDate.parse(value, DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay().toInstant(ZoneOffset.UTC)));
-                    } else if (StringUtils.equalsIgnoreCase("classId", key)) {
-                        predicateList.add(criteriaBuilder.equal(root.get("classroom").get("id"), Long.valueOf(value)));
-                    } else {
-                        if (value != null && (value.contains("*") || value.contains("%"))) {
-                            predicateList.add(criteriaBuilder.like(root.get(key), "%" + value + "%"));
-                        } else if (value != null) {
-                            predicateList.add(criteriaBuilder.like(root.get(key), value + "%"));
-                        }
-                    }
-                }
-            }
-
-            if (!predicateList.isEmpty()) {
-                predicate = criteriaBuilder.and(predicateList.toArray(new Predicate[]{}));
-            }
-
-            return predicate;
-        });
-    }
-
     public ApiResponse createClassSchedule(NewClassScheduleRequest request) {
         Classroom classroom = classroomRepository.findById(request.getClassId())
                 .orElseThrow(() -> new ResourceNotFoundException("Not found classroom"));
@@ -166,10 +129,6 @@ public class ClassScheduleService {
         }
 
         return new ApiResponse(true,"Success");
-    }
-
-    public List<ClassSchedule> getSchedulesByTeacherEmail(String email) {
-        return classScheduleRepository.findByCreatedBy(email);
     }
 
     public Boolean uploadImageToAttend(MultipartFile file, Long scheduleId) {

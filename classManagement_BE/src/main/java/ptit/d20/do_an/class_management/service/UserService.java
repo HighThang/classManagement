@@ -55,7 +55,6 @@ public class UserService {
     private final ClassRegistrationRepository classRegistrationRepository;
     private final String tempFolder;
 
-
     @Autowired
     public UserService(UserRepository userRepository,
                        RoleRepository roleRepository,
@@ -106,10 +105,7 @@ public class UserService {
         user.setActive(false);
         user.setDeleted(false);
         user.setNumberActiveAttempt(0);
-//        String activeCode = RandomStringUtils.randomAlphanumeric(6);
-//        user.setActiveCode(activeCode);
 
-//        sendEmailVerification(user);
         user = userRepository.save(user);
     }
 
@@ -383,14 +379,6 @@ public class UserService {
     }
 
     private boolean verifyEmail(String code, User user) {
-//        Instant startOfToday = LocalDate.now().atStartOfDay(ZoneOffset.UTC).toInstant();
-//        if (user.getNumberActiveAttempt() >= 3) {
-//            if (user.getLastActiveAttempt().isAfter(startOfToday)) {
-//                throw new BusinessException("Only 3 times to verify email a day, please try in next day!");
-//            } else {
-//                user.setNumberActiveAttempt(0);
-//            }
-//        }
         boolean result = StringUtils.equalsIgnoreCase(code, user.getActiveCode());
         user.setNumberActiveAttempt(user.getNumberActiveAttempt() + 1);
         user.setLastActiveAttempt(Instant.now());
@@ -407,8 +395,8 @@ public class UserService {
         userRepository.save(user);
 
         EmailDetail emailDetail = new EmailDetail();
-        emailDetail.setSubject("Classroom verification");
-        emailDetail.setMsgBody("Here is your code to reset your password: " + user.getActiveCode());
+        emailDetail.setSubject("Xác thực tài khoản lớp học");
+        emailDetail.setMsgBody("Đây là mã xác thực email để đổi mật khẩu: " + user.getActiveCode());
         emailDetail.setRecipient(email);
 
         log.info("Sending email forgot password for email {}", user.getEmail());
@@ -437,21 +425,19 @@ public class UserService {
     }
 
     public boolean activateTeacherAccount(Long teacherId) {
-        // Fetch the user by ID
         Optional<User> teacherOptional = userRepository.findById(teacherId);
 
         if (teacherOptional.isPresent()) {
             User teacher = teacherOptional.get();
 
-            // Ensure the user has a TEACHER role and is inactive
             if (teacher.getRole() != null && RoleName.TEACHER.equals(teacher.getRole().getName()) && !teacher.getActive()) {
-                teacher.setActive(true); // Activate the account
-                teacher.setDeleted(false); // Activate the account
-                userRepository.save(teacher); // Save the updated user
+                teacher.setActive(true);
+                teacher.setDeleted(false);
+                userRepository.save(teacher);
                 return true;
             }
         }
-        return false; // Return false if the user doesn't exist or conditions aren't met
+        return false;
     }
 
     public String deleteTeacherAccount(Long teacherId) {
@@ -460,10 +446,8 @@ public class UserService {
         if (teacherOptional.isPresent()) {
             User teacher = teacherOptional.get();
 
-            // Ensure the user has a TEACHER role
             if (teacher.getRole() != null && RoleName.TEACHER.equals(teacher.getRole().getName())) {
                 if (teacher.getActive() && !teacher.getDeleted()) {
-                    // If active, deactivate the account
                     teacher.setActive(false);
                     teacher.setDeleted(true);
                     userRepository.save(teacher);
@@ -474,10 +458,9 @@ public class UserService {
                 }
             }
         }
-        return "Invalid"; // Return "Invalid" if user doesn't exist or isn't a TEACHER
+        return "Invalid";
     }
 
-    // Activate a student
     public boolean activateStudent(Long studentId) {
         Optional<User> studentOptional = userRepository.findById(studentId);
         if (studentOptional.isPresent()) {
@@ -492,7 +475,6 @@ public class UserService {
         return false;
     }
 
-    // Disable a student
     public boolean disableStudent(Long studentId) {
         Optional<User> studentOptional = userRepository.findById(studentId);
         if (studentOptional.isPresent()) {

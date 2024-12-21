@@ -25,7 +25,7 @@ public class ClassAttendanceController {
     }
 
     @GetMapping("/{scheduleId}")
-    public Page<?> fetchAllClasAttendance(@PathVariable Long scheduleId) {
+    public Page<?> fetchAllClassAttendance(@PathVariable Long scheduleId) {
         return classAttendanceService.fetchClassAttendance(scheduleId);
     }
 
@@ -34,6 +34,7 @@ public class ClassAttendanceController {
         return ResponseEntity.ok(classAttendanceService.saveAttendanceResult(attendanceDtoList));
     }
 
+    // for-student-view
     @GetMapping("/student-attendance-result")
     public ResponseEntity<?> getStudentAttendanceResult(@RequestParam Long classId) {
         return ResponseEntity.ok(classAttendanceService.getStudentAttendanceResult(classId));
@@ -44,9 +45,7 @@ public class ClassAttendanceController {
         String filePath = classAttendanceService.extractAttendanceResult(classId);
         File file = new File(filePath);
 
-        // Check if the file exists
         if (!file.exists()) {
-            // If the file doesn't exist, return a 404 error response
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
@@ -68,6 +67,4 @@ public class ClassAttendanceController {
             out.flush();
         }
     }
-
-
 }

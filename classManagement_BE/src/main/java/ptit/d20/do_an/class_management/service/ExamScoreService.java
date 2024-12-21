@@ -76,7 +76,7 @@ public class ExamScoreService {
         List<ExamScore> examScoreList = new ArrayList<>();
         for (ClassRegistration classRegistration : classRegistrations) {
             if (classRegistration.getActive() == false) {
-                continue; // Bỏ qua bản ghi này
+                continue;
             }
 
             Optional<ExamScore> existOne = examScoreListExist.stream()

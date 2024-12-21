@@ -29,5 +29,4 @@ public class TutorFee extends BaseEntity {
     @JsonIgnore
     @OneToMany(mappedBy = "tutorFee", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<TutorFeeDetail> tutorFeeDetails;
-
 }

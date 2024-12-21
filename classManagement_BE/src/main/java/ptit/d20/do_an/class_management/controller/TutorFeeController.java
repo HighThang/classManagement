@@ -1,7 +1,6 @@
 package ptit.d20.do_an.class_management.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ptit.d20.do_an.class_management.dto.TutorFeeDetailDto;
@@ -25,6 +24,7 @@ public class TutorFeeController {
         this.tutorFeeService = tutorFeeService;
     }
 
+    // get-all-fee
     @GetMapping("/search")
     public ResponseEntity<?> search(@RequestParam Long classroomId) {
         return ResponseEntity.ok(tutorFeeService.searchByClassroomId(classroomId));
@@ -34,11 +34,6 @@ public class TutorFeeController {
     public ResponseEntity<?> getTutorFeeDetailsByTutorFeeId(@RequestParam Long tutorFeeId) {
         List<TutorFeeDetailDto> tutorFeeDetails = tutorFeeService.getTutorFeeDetailsByTutorFeeId(tutorFeeId);
         return ResponseEntity.ok(tutorFeeDetails);
-    }
-
-    @GetMapping("/student-not-submitted-tutor-fee")
-    public ResponseEntity<?> getStudentNotSubmittedTutorFee(@RequestParam Map<String, String> params) {
-        return ResponseEntity.ok(tutorFeeService.getStudentNotSubmittedTutorFee(params));
     }
 
     @GetMapping("/calculate")
@@ -58,7 +53,7 @@ public class TutorFeeController {
     }
 
     @GetMapping("/{classId}/result")
-    public void downloadExamResult(HttpServletResponse response,
+    public void downloadFeeResult(HttpServletResponse response,
                                    @PathVariable Long classId,
                                    @RequestParam Integer month,
                                    @RequestParam Integer year,
@@ -66,9 +61,7 @@ public class TutorFeeController {
         String filePath = tutorFeeService.extractTutorFeeResult(classId, month, year, classSessionPrice);
         File file = new File(filePath);
 
-        // Check if the file exists
         if (!file.exists()) {
-            // If the file doesn't exist, return a 404 error response
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
@@ -92,11 +85,14 @@ public class TutorFeeController {
     }
 
     @GetMapping("/send-tutor-fee-notification")
-    public ResponseEntity<?> sendTutorFeeNotification( @RequestParam Long classId,
-                                                       @RequestParam Integer month,
-                                                       @RequestParam Integer year,
-                                                       @RequestParam Integer classSessionPrice) {
+    public ResponseEntity<?> sendTutorFeeNotification(@RequestParam Long classId, @RequestParam Integer month,
+                                                      @RequestParam Integer year, @RequestParam Integer classSessionPrice) {
         return ResponseEntity.ok(tutorFeeService.sendTutorFeeNotificationEmail(classId, month, year, classSessionPrice));
+    }
+
+    @GetMapping("/student-not-submitted-tutor-fee")
+    public ResponseEntity<?> getStudentNotSubmittedTutorFee(@RequestParam Map<String, String> params) {
+        return ResponseEntity.ok(tutorFeeService.getStudentNotSubmittedTutorFee(params));
     }
 
     @PutMapping("/pay")

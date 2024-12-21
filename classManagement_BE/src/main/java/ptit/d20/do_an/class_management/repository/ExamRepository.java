@@ -6,4 +6,5 @@ import ptit.d20.do_an.class_management.domain.Exam;
 
 @Repository
 public interface ExamRepository extends JpaRepository<Exam, Long> {
+
 }

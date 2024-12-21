@@ -22,13 +22,12 @@ public class CustomerUserDetailService implements UserDetailsService {
 
     @Override
     @Transactional
-    public UserDetails loadUserByUsername(String userName)
-            throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(userName)
                 .filter(User::getActive)
                 .stream().findFirst()
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + userName));
-//todo return user not active?
+        //todo return user not active?
         return UserPrincipal.create(user);
     }
 

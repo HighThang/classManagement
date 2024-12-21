@@ -54,48 +54,7 @@ public class DocumentService {
         this.documentFolder = documentFolder;
     }
 
-    public Page<ClassDocument> search(Map<String, String> params, Pageable pageable) {
-        User currentLoginUser = userService.getCurrentUserLogin();
-        if (currentLoginUser.getRole().getName() != RoleName.TEACHER) {
-            throw new BusinessException("Require Role Teacher!");
-        }
-        List<Classroom> classrooms = classroomRepository.findAllByTeacherId(currentLoginUser.getId());
-        List<Long> classId = classrooms.stream().map(Classroom::getId).collect(Collectors.toList());
-        Specification<ClassDocument> specs = getSpecification(params, classId);
-        return documentRepository.findAll(specs, pageable);
-    }
-
-    private Specification<ClassDocument> getSpecification(Map<String, String> params, List<Long> classIds) {
-        return Specification.where((root, criteriaQuery, criteriaBuilder) -> {
-            Predicate predicate = null;
-            List<Predicate> predicateList = new ArrayList<>();
-            for (Map.Entry<String, String> p : params.entrySet()) {
-                String key = p.getKey();
-                String value = p.getValue();
-                if (!"page".equalsIgnoreCase(key) && !"size".equalsIgnoreCase(key) && !"sort".equalsIgnoreCase(key)) {
-                    if (StringUtils.equalsIgnoreCase("startCreatedDate", key)) { //"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
-                        predicateList.add(criteriaBuilder.greaterThanOrEqualTo(root.get("createdDate"), LocalDate.parse(value, DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay().toInstant(ZoneOffset.UTC)));
-                    } else if (StringUtils.equalsIgnoreCase("endCreatedDate", key)) {
-                        predicateList.add(criteriaBuilder.lessThanOrEqualTo(root.get("createdDate"), LocalDate.parse(value, DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay().toInstant(ZoneOffset.UTC)));
-                    } else {
-                        if (value != null && (value.contains("*") || value.contains("%"))) {
-                            predicateList.add(criteriaBuilder.like(root.get(key), "%" + value + "%"));
-                        } else if (value != null) {
-                            predicateList.add(criteriaBuilder.like(root.get(key), value + "%"));
-                        }
-                    }
-                }
-            }
-
-            predicateList.add(root.get("classroom").get("id").in(classIds));
-
-            predicate = criteriaBuilder.and(predicateList.toArray(new Predicate[]{}));
-
-            return predicate;
-        });
-    }
-
-    public List<ClassDocument> search(Long classId) {
+    public List<ClassDocument> getAllDocumentInClass(Long classId) {
         return documentRepository.findAllByClassroomIdOrderByLastModifiedDateDesc(classId);
     }
 

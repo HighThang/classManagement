@@ -26,14 +26,14 @@ public class ExamScoreController {
         this.examScoreService = examScoreService;
     }
 
-    @PostMapping
-    public ResponseEntity<?> createExam(@Valid @RequestBody NewExamRequest request) {
-        return ResponseEntity.ok(examScoreService.createNewExam(request));
-    }
-
     @GetMapping("/{classId}/exam")
     public Page<?> fetchAllExam(@PathVariable Long classId) {
         return examScoreService.fetchAllExam(classId);
+    }
+
+    @PostMapping
+    public ResponseEntity<?> createExam(@Valid @RequestBody NewExamRequest request) {
+        return ResponseEntity.ok(examScoreService.createNewExam(request));
     }
 
     @GetMapping("/{examId}")
@@ -46,8 +46,9 @@ public class ExamScoreController {
         return ResponseEntity.ok(examScoreService.saveExamResult(examScoreDtos));
     }
 
+    // view-for-student
     @GetMapping("/student-exam-result")
-    public ResponseEntity<?> getStudentAttendanceResult(@RequestParam Long classId) {
+    public ResponseEntity<?> getStudentExamResult(@RequestParam Long classId) {
         return ResponseEntity.ok(examScoreService.getStudentExamResult(classId));
     }
 
@@ -56,9 +57,7 @@ public class ExamScoreController {
         String filePath = examScoreService.extractExamResult(classId);
         File file = new File(filePath);
 
-        // Check if the file exists
         if (!file.exists()) {
-            // If the file doesn't exist, return a 404 error response
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }

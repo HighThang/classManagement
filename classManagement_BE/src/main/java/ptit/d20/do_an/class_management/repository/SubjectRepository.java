@@ -8,7 +8,7 @@ import java.util.List;
 
 @Repository
 public interface SubjectRepository extends JpaRepository<Subject, Integer> {
-    List<Subject> findAll(); // Method to get all subjects
+    List<Subject> findAll();
     List<Subject> findByActiveAndDeleted(int active, int deleted);
 
     boolean existsBySubName(String subName);

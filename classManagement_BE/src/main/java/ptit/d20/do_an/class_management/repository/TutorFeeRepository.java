@@ -13,5 +13,4 @@ public interface TutorFeeRepository extends JpaRepository<TutorFee, Long>, JpaSp
     Optional<TutorFee> findFirstByClassroomIdAndYearAndMonth(Long classId, Integer month, Integer year);
 
     List<TutorFee> findAllByClassroomId(Long classroomId);
-
 }

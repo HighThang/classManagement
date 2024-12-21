@@ -23,10 +23,7 @@ public class SubjectController {
     }
 
     @PostMapping
-    public ResponseEntity<String> createSubject(
-            @RequestParam String subName,
-            @RequestParam Long idTeacher
-    ) {
+    public ResponseEntity<String> createSubject(@RequestParam String subName, @RequestParam Long idTeacher) {
         Subject createdSubject = subjectService.createSubject(subName, idTeacher);
         return ResponseEntity.status(HttpStatus.CREATED).body("Subject created successfully with ID: " + createdSubject.getId());
     }

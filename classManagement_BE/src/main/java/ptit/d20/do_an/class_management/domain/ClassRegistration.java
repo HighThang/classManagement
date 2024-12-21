@@ -38,7 +38,7 @@ public class ClassRegistration extends BaseEntity {
     private String note;
 
     @Column(name = "email_confirmed")
-    private Boolean emailConfirmed = false; // check that student has click agree in email invitation
+    private Boolean emailConfirmed = false;
 
     private Date dob;
 

@@ -11,7 +11,6 @@ import javax.persistence.*;
 @Entity
 @Table(name = "class_document")
 public class ClassDocument extends BaseEntity {
-
     @Column(name = "document_name")
     private String documentName;
 

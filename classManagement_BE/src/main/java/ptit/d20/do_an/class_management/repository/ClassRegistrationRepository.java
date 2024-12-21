@@ -12,8 +12,7 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 @Repository
-public interface ClassRegistrationRepository extends JpaSpecificationExecutor<ClassRegistration>,
-        JpaRepository<ClassRegistration, Long> {
+public interface ClassRegistrationRepository extends JpaSpecificationExecutor<ClassRegistration>, JpaRepository<ClassRegistration, Long> {
     List<ClassRegistration> findAllByClassroomIdOrderByLastNameAsc(Long classId);
 
     List<ClassRegistration> findAllByStudentIdAndActive(Long studentId, boolean active);

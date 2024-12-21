@@ -17,10 +17,8 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public String sendSimpleEmail(EmailDetail details) {
         try {
-
             // Creating a simple mail message
-            SimpleMailMessage mailMessage
-                    = new SimpleMailMessage();
+            SimpleMailMessage mailMessage = new SimpleMailMessage();
 
             // Setting up necessary details
             mailMessage.setFrom(sender);
@@ -40,11 +38,11 @@ public class EmailServiceImpl implements EmailService {
     }
 
 //    @PostConstruct
-    public void testSendEmail() {
-        EmailDetail emailDetail = new EmailDetail();
-        emailDetail.setRecipient("thangptit2905@gmail.com");
-        emailDetail.setSubject("Test by JavaMailSender");
-        emailDetail.setMsgBody("body txt");
-        sendSimpleEmail(emailDetail);
-    }
+//    public void testSendEmail() {
+//        EmailDetail emailDetail = new EmailDetail();
+//        emailDetail.setRecipient("thangptit2905@gmail.com");
+//        emailDetail.setSubject("Test by JavaMailSender");
+//        emailDetail.setMsgBody("body txt");
+//        sendSimpleEmail(emailDetail);
+//    }
 }

@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import ptit.d20.do_an.class_management.domain.*;
 import ptit.d20.do_an.class_management.exception.BusinessException;
 import ptit.d20.do_an.class_management.exception.ResourceNotFoundException;
@@ -23,11 +22,8 @@ import ptit.d20.do_an.class_management.enumeration.RoleName;
 import ptit.d20.do_an.class_management.repository.ClassScheduleRepository;
 import ptit.d20.do_an.class_management.repository.ClassroomRepository;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -67,7 +63,7 @@ public class ClassAttendanceService {
         List<ClassAttendance> classAttendances = new ArrayList<>();
         for (ClassRegistration classRegistration : classRegistrations) {
             if (classRegistration.getActive() == false) {
-                continue; // Bỏ qua bản ghi này
+                continue;
             }
 
             Optional<ClassAttendance> existOne = exisits.stream()
@@ -179,7 +175,7 @@ public class ClassAttendanceService {
             int rowIndex = 1;
             for (ClassRegistration student : students) {
                 if (student.getActive() == false) {
-                    continue; // Bỏ qua bản ghi này
+                    continue;
                 }
 
                 Row row = sheet.createRow(rowIndex++);

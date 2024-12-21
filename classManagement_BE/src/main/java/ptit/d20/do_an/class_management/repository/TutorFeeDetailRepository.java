@@ -10,11 +10,11 @@ import ptit.d20.do_an.class_management.domain.TutorFeeDetail;
 
 @Repository
 public interface TutorFeeDetailRepository extends JpaRepository<TutorFeeDetail, Long>, JpaSpecificationExecutor<TutorFeeDetail> {
-    boolean existsByClassRegistrationId(Long studentId);
+//    boolean existsByClassRegistrationId(Long studentId);
 
     @Modifying
     @Query("DELETE FROM TutorFeeDetail tfd WHERE tfd.classRegistration.id = :studentId")
     void deleteAllByClassRegistrationId(@Param("studentId") Long studentId);
 
-    boolean existsByClassRegistrationIdAndNumberOfAttendedLessonNot(Long studentId, int numberOfAttendedLesson);
+//    boolean existsByClassRegistrationIdAndNumberOfAttendedLessonNot(Long studentId, int numberOfAttendedLesson);
 }

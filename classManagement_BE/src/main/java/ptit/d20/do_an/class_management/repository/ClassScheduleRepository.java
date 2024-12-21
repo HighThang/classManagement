@@ -17,7 +17,7 @@ import java.util.List;
 public interface ClassScheduleRepository extends JpaRepository<ClassSchedule, Long>, JpaSpecificationExecutor<ClassSchedule> {
     List<ClassSchedule> findAllByClassroomIdOrderByDayAsc(Long classId);
 
-    List<ClassSchedule> findAllByClassroomIdInAndDayBetween(List<Long> classIds, LocalDate startOfWeek, LocalDate endOfWeek);
+//    List<ClassSchedule> findAllByClassroomIdInAndDayBetween(List<Long> classIds, LocalDate startOfWeek, LocalDate endOfWeek);
 
     @Modifying
     @Transactional
@@ -29,5 +29,4 @@ public interface ClassScheduleRepository extends JpaRepository<ClassSchedule, Lo
 
     @Query("SELECT cs FROM ClassSchedule cs WHERE cs.classroom.id IN :classroomIds")
     List<ClassSchedule> findAllByClassroomIds(@Param("classroomIds") List<Long> classroomIds);
-
 }

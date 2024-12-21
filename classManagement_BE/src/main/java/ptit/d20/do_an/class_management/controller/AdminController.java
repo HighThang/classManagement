@@ -23,12 +23,17 @@ public class AdminController {
         this.subjectService = subjectService;
     }
 
-//    // Get all teachers
-//    @GetMapping("/teachers")
-//    public ResponseEntity<List<UserDetailDto>> getAllTeachers() {
-//        List<UserDetailDto> teachers = userService.getAllTeachers();
-//        return ResponseEntity.ok(teachers);
-//    }
+    // teachers
+    @GetMapping("/teachers")
+    public ResponseEntity<List<UserDetailDto>> getTeachersByStatus(
+            @RequestParam boolean active,
+            @RequestParam boolean deleted) {
+        List<UserDetailDto> teachers = userService.getTeacherByActiveAndDeleted(active, deleted);
+        if (teachers.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(teachers);
+        }
+        return ResponseEntity.ok(teachers);
+    }
 
     @PutMapping("/activate-teacher/{teacherId}")
     public ResponseEntity<String> activateTeacher(@PathVariable Long teacherId) {
@@ -52,87 +57,7 @@ public class AdminController {
         }
     }
 
-//    // 1. Get a list of all students
-//    @GetMapping("/students")
-//    public ResponseEntity<List<UserDetailDto>> getAllStudents() {
-//        List<UserDetailDto> students = userService.getAllStudents();
-//        return ResponseEntity.ok(students);
-//    }
-
-    // 2. Activate a student
-    @PutMapping("/activate-student/{studentId}")
-    public ResponseEntity<String> activateStudent(@PathVariable Long studentId) {
-        boolean isActivated = userService.activateStudent(studentId);
-        if (isActivated) {
-            return ResponseEntity.ok("Student account activated successfully.");
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to activate student account.");
-        }
-    }
-
-    // 3. Disable a student
-    @PutMapping("/disable-student/{studentId}")
-    public ResponseEntity<String> disableStudent(@PathVariable Long studentId) {
-        boolean isDisabled = userService.disableStudent(studentId);
-        if (isDisabled) {
-            return ResponseEntity.ok("Student account disabled successfully.");
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to disable student account.");
-        }
-    }
-
-//    // Get all subjects
-//    @GetMapping("/subjects")
-//    public ResponseEntity<List<SubjectDto>> getAllSubjects() {
-//        List<SubjectDto> subjects = subjectService.getAllSubjects();
-//        return ResponseEntity.ok(subjects);
-//    }
-
-    // Activate a subject by subject ID
-    @PutMapping("/subjects/{id}/activate")
-    public ResponseEntity<String> activateSubject(@PathVariable Integer id) {
-        boolean isActivated = subjectService.activateSubject(id);
-        if (isActivated) {
-            return ResponseEntity.ok("Subject activated successfully.");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Subject not found.");
-        }
-    }
-
-    // Delete (deactivate and mark deleted or remove) a subject by subject ID
-    @DeleteMapping("/subjects/{id}")
-    public ResponseEntity<String> deleteSubject(@PathVariable Integer id) {
-        boolean isDeleted = subjectService.deleteSubject(id);
-        if (isDeleted) {
-            return ResponseEntity.ok("Subject deleted successfully.");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Subject not found or cannot be deleted.");
-        }
-    }
-
-//    @GetMapping("/inactive-teachers")
-//    public ResponseEntity<List<UserDetailDto>> getInactiveTeachers() {
-//        List<UserDetailDto> inactiveTeachers = userService.getInactiveTeachers();
-//        return ResponseEntity.ok(inactiveTeachers);
-//    }
-//
-//    @GetMapping("/active-or-deleted-teachers")
-//    public ResponseEntity<List<UserDetailDto>> getActiveOrDeletedTeachers() {
-//        List<UserDetailDto> teachers = userService.getActiveOrDeletedTeachers();
-//        return ResponseEntity.ok(teachers);
-//    }
-
-    @GetMapping("/teachers")
-    public ResponseEntity<List<UserDetailDto>> getTeachersByStatus(
-            @RequestParam boolean active,
-            @RequestParam boolean deleted) {
-        List<UserDetailDto> teachers = userService.getTeacherByActiveAndDeleted(active, deleted);
-        if (teachers.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(teachers);
-        }
-        return ResponseEntity.ok(teachers);
-    }
-
+    // students
     @GetMapping("/students")
     public ResponseEntity<List<UserDetailDto>> getStudentsByStatus(
             @RequestParam boolean active,
@@ -144,6 +69,27 @@ public class AdminController {
         return ResponseEntity.ok(students);
     }
 
+    @PutMapping("/activate-student/{studentId}")
+    public ResponseEntity<String> activateStudent(@PathVariable Long studentId) {
+        boolean isActivated = userService.activateStudent(studentId);
+        if (isActivated) {
+            return ResponseEntity.ok("Student account activated successfully.");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to activate student account.");
+        }
+    }
+
+    @PutMapping("/disable-student/{studentId}")
+    public ResponseEntity<String> disableStudent(@PathVariable Long studentId) {
+        boolean isDisabled = userService.disableStudent(studentId);
+        if (isDisabled) {
+            return ResponseEntity.ok("Student account disabled successfully.");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to disable student account.");
+        }
+    }
+
+    // subjects
     @GetMapping("/subjects")
     public ResponseEntity<List<SubjectDto>> getSubjectsByActiveAndDeleted(
             @RequestParam boolean active,
@@ -152,4 +98,23 @@ public class AdminController {
         return ResponseEntity.ok(subjects);
     }
 
+    @PutMapping("/subjects/{id}/activate")
+    public ResponseEntity<String> activateSubject(@PathVariable Integer id) {
+        boolean isActivated = subjectService.activateSubject(id);
+        if (isActivated) {
+            return ResponseEntity.ok("Subject activated successfully.");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Subject not found.");
+        }
+    }
+
+    @DeleteMapping("/subjects/{id}")
+    public ResponseEntity<String> deleteSubject(@PathVariable Integer id) {
+        boolean isDeleted = subjectService.deleteSubject(id);
+        if (isDeleted) {
+            return ResponseEntity.ok("Subject deleted successfully.");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Subject not found or cannot be deleted.");
+        }
+    }
 }

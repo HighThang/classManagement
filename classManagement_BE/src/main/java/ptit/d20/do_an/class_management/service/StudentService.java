@@ -71,108 +71,6 @@ public class StudentService {
         return classRegistrationRepository.findAllByClassroomIdOrderByLastNameAsc(classId);
     }
 
-    public Page<?> search(Map<String, String> params, Pageable pageable) {
-        User currentLoginUser = userService.getCurrentUserLogin();
-        if (currentLoginUser.getRole().getName() != RoleName.TEACHER) {
-            throw new BusinessException("Require Role Teacher!");
-        }
-        List<Classroom> classrooms = classroomRepository.findAllByTeacherId(currentLoginUser.getId());
-        List<Long> classId = classrooms.stream().map(Classroom::getId).collect(Collectors.toList());
-        Specification<ClassRegistration> specs = getSpecification(params, classId);
-        Page<ClassRegistration> all = classRegistrationRepository.findAll(specs, pageable);
-        List<ClassRegistration> students = all.getContent();
-        List<StudentDto> studentDtos = new ArrayList<>();
-        for (ClassRegistration classRegistration : students) {
-            List<TutorFeeDetail> tutorFeeDetails = classRegistration.getTutorFeeDetails();
-            Long feeNotSubmitted = 0L;
-            for (TutorFeeDetail feeDetail : tutorFeeDetails) {
-                TutorFee tutorFee = feeDetail.getTutorFee();
-                feeNotSubmitted += (long)tutorFee.getLessonPrice() * feeDetail.getNumberOfAttendedLesson() - feeDetail.getFeeSubmitted();
-            }
-            Classroom classroom = classRegistration.getClassroom();
-            StudentDto studentDto = StudentDto.builder().
-                    id(classRegistration.getId())
-                    .dob(classRegistration.getDob())
-                    .firstName(classRegistration.getFirstName())
-                    .surname(classRegistration.getSurname())
-                    .lastName(classRegistration.getLastName())
-                    .email(classRegistration.getEmail())
-                    .phone(classRegistration.getPhone())
-                    .note(classRegistration.getNote())
-                    .feeNotSubmitted(feeNotSubmitted)
-                    .className(classroom.getClassName())
-                    .build();
-            studentDtos.add(studentDto);
-        }
-        return new PageImpl<>(studentDtos, pageable, all.getTotalElements());
-    }
-
-    private Specification<ClassRegistration> getSpecification(Map<String, String> params, List<Long> classIds) {
-        return Specification.where((root, criteriaQuery, criteriaBuilder) -> {
-            Predicate predicate = null;
-            List<Predicate> predicateList = new ArrayList<>();
-            for (Map.Entry<String, String> p : params.entrySet()) {
-                String key = p.getKey();
-                String value = p.getValue();
-                if (!"page".equalsIgnoreCase(key) && !"size".equalsIgnoreCase(key) && !"sort".equalsIgnoreCase(key)) {
-                    if (StringUtils.equalsIgnoreCase("startCreatedDate", key)) { //"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
-                        predicateList.add(criteriaBuilder.greaterThanOrEqualTo(root.get("createdDate"), LocalDate.parse(value, DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay().toInstant(ZoneOffset.UTC)));
-                    } else if (StringUtils.equalsIgnoreCase("endCreatedDate", key)) {
-                        predicateList.add(criteriaBuilder.lessThanOrEqualTo(root.get("createdDate"), LocalDate.parse(value, DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay().toInstant(ZoneOffset.UTC)));
-                    } else if (StringUtils.equalsIgnoreCase("className", key)) {
-                        predicateList.add(criteriaBuilder.like(root.get("classroom").get("className"), "%" + value + "%"));
-                    } else {
-                        if (value != null && (value.contains("*") || value.contains("%"))) {
-                            predicateList.add(criteriaBuilder.like(root.get(key), "%" + value + "%"));
-                        } else if (value != null) {
-                            predicateList.add(criteriaBuilder.like(root.get(key), value + "%"));
-                        }
-                    }
-                }
-            }
-
-            predicateList.add(root.get("classroom").get("id").in(classIds));
-
-            if (!predicateList.isEmpty()) {
-                predicate = criteriaBuilder.and(predicateList.toArray(new Predicate[]{}));
-            }
-
-            return predicate;
-        });
-    }
-
-    public Object addStudentForClass(StudentDto studentDto, Long classId) {
-        Classroom classroom = classroomService.getById(classId);
-        ClassRegistration student = ClassRegistration.newBuilder()
-                .firstName(studentDto.getFirstName())
-                .surname(studentDto.getSurname())
-                .lastName(studentDto.getLastName())
-                .email(studentDto.getEmail())
-                .phone(studentDto.getPhone())
-                .address(studentDto.getAddress()).build();
-        student.setClassroom(classroom);
-        if (StringUtils.isNotBlank(student.getEmail())) {
-            List<User> users = userService.findAllByEmailIn(List.of(studentDto.getEmail()));
-            Optional<User> existingUser = users.stream().filter(user -> StringUtils.equalsIgnoreCase(user.getEmail(), student.getEmail())).findAny();
-            existingUser.ifPresent(student::setStudent);
-            if (existingUser.isPresent()) {
-                student.setStudent(existingUser.get());
-            } else {
-                if (StringUtils.isNotBlank(student.getEmail())) {
-                    try {
-                        userService.createDefaultStudentAccount(student);
-                    } catch (Exception e) {
-                        log.error("Failed to create account for email {}", student.getEmail(), e);
-                    }
-                }
-
-            }
-        }
-        classRegistrationRepository.save(student);
-
-        return new ApiResponse(true, "Success");
-    }
-
     public String extractListStudent(Long classId) {
         List<ClassRegistration> students = getAllStudentForClass(classId);
         String fileName = tempFolder + "/" + "students_class_" + classId + ".xlsx";
@@ -226,29 +124,6 @@ public class StudentService {
         return fileName;
     }
 
-//    @Transactional
-//    public ApiResponse deleteStudent(Long studentId) {
-//        User user = userService.getCurrentUserLogin();
-//        if (user.getRole().getName() != RoleName.TEACHER) {
-//            throw new BusinessException("Missing permission");
-//        }
-//        List<Classroom> classrooms = user.getClassrooms();
-//        List<ClassRegistration> classRegistrations = classrooms.stream().flatMap(classroom -> classroom.getClassRegistrations().stream()).collect(Collectors.toList());
-//        classRegistrations.stream()
-//                .filter(student -> student.getId().equals(studentId)).findFirst()
-//                .orElseThrow(() -> new ResourceNotFoundException("Not found student"));
-//        try {
-//            classAttendanceRepository.deleteAllByClassRegistrationId(studentId);
-//            // if exist tutorFee -> can not delete
-//            classRegistrationRepository.deleteById(studentId);
-//        } catch (Exception e) {
-//            log.error("Exception during delete operation", e);
-//            throw new BusinessException("Deletion failed due to an error");
-//        }
-//
-//        return new ApiResponse(true, "Success");
-//    }
-
     @Transactional
     public ApiResponse deleteStudent(Long studentId) {
         User user = userService.getCurrentUserLogin();
@@ -268,7 +143,7 @@ public class StudentService {
                 .findFirst()
                 .orElseThrow(() -> new ResourceNotFoundException("Not found student"));
 
-        // Kiểm tra tồn tại trong Attendance hoặc TutorFee
+        // Kiểm tra tồn tại trong Attendance
         boolean hasRelevantAttendance = classAttendanceRepository.existsByClassRegistrationIdAndIsAttended(studentId, true);
 
         try {
@@ -291,25 +166,6 @@ public class StudentService {
         }
 
         return new ApiResponse(true, "Success");
-    }
-
-
-    public Object updateStudent(StudentDto studentDto) {
-        ClassRegistration existingStudent = classRegistrationRepository.findById(studentDto.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Student not found with id: " + studentDto.getDob()));
-
-        // Update the fields
-        existingStudent.setFirstName(studentDto.getFirstName());
-        existingStudent.setSurname(studentDto.getSurname());
-        existingStudent.setLastName(studentDto.getLastName());
-        existingStudent.setEmail(studentDto.getEmail());
-        existingStudent.setPhone(studentDto.getPhone());
-        existingStudent.setAddress(studentDto.getAddress());
-        existingStudent.setDob(studentDto.getDob());
-
-        classRegistrationRepository.save(existingStudent);
-
-        return "Success";
     }
 
     public Object activeStudent(Long studentId) {

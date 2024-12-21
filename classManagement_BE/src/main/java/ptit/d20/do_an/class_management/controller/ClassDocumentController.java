@@ -1,9 +1,7 @@
 package ptit.d20.do_an.class_management.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,7 +14,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/document")
@@ -28,15 +25,9 @@ public class ClassDocumentController {
         this.documentService = documentService;
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<?> search(@RequestParam Map<String, String> params, Pageable pageable) throws Exception {
-        Page<ClassDocument> page = documentService.search(params, pageable);
-        return ResponseEntity.ok(page);
-    }
-
     @GetMapping
-    public ResponseEntity<?> search(@RequestParam Long classId) throws Exception {
-        List<ClassDocument> list = documentService.search(classId);
+    public ResponseEntity<?> getAllDocumentInClass(@RequestParam Long classId) throws Exception {
+        List<ClassDocument> list = documentService.getAllDocumentInClass(classId);
         return ResponseEntity.ok(new PageImpl<>(list));
     }
 
@@ -55,9 +46,7 @@ public class ClassDocumentController {
         String filePath = documentService.getFilePath(documentId);
         File file = new File(filePath);
 
-        // Check if the file exists
         if (!file.exists()) {
-            // If the file doesn't exist, return a 404 error response
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }

@@ -1,7 +1,5 @@
 package ptit.d20.do_an.class_management.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,7 +20,6 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
-    private final Logger log = LoggerFactory.getLogger(AuthController.class);
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserService userService;
@@ -37,14 +34,14 @@ public class AuthController {
         this.userService = userService;
     }
 
+    // login
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.getUsername(),
-                        loginRequest.getPassword()
-                )
+            new UsernamePasswordAuthenticationToken(
+                loginRequest.getUsername(),
+                loginRequest.getPassword()
+            )
         );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -53,21 +50,24 @@ public class AuthController {
         return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
     }
 
+    // signup
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
         userService.createNewUser(signUpRequest);
-//        URI location = ServletUriComponentsBuilder
-//                .fromCurrentContextPath().path("/users/{username}")
-//                .buildAndExpand(result.getUsername()).toUri();
-
-        return ResponseEntity.ok(new ApiResponse(true, "Created new user. Please check your email!"));
+        return ResponseEntity.ok(new ApiResponse(true, "Account created successfully."));
     }
 
-//    @PutMapping("/active-account")
-//    public ResponseEntity<?> verifyEmail(@RequestBody ActiveAccountRequest request) {
-//        return ResponseEntity.ok(userService.activeAccount(request));
-//    }
+    @PostMapping("/send-code")
+    public ResponseEntity<?> sendEmailCode(String email) {
+        return ResponseEntity.ok(userService.sendEmailCode(email));
+    }
 
+    @GetMapping("/verify-code")
+    public ResponseEntity<?> verifyEmailToCreateAccount(String email, String code) {
+        return ResponseEntity.ok(userService.verifyEmailToCreateAccount(email, code));
+    }
+
+    // forget-pass
     @GetMapping("/send-mail-forgot-password")
     public ResponseEntity<?> sendMailForgotPassword(@RequestParam String email) {
         return ResponseEntity.ok(userService.sendMailForgotPassword(email));
@@ -78,6 +78,7 @@ public class AuthController {
         return ResponseEntity.ok(userService.resetPassword(request));
     }
 
+    // check-existed-email
     @GetMapping("/isExistingEmail")
     public ResponseEntity<Boolean> isExistingEmail(@RequestParam String email) {
         boolean exists = userService.isEmailExisting(email);
@@ -90,19 +91,10 @@ public class AuthController {
         return ResponseEntity.ok(exists);
     }
 
+    // check-existed-req
     @GetMapping("/isExistingRequestInWishList")
     public ResponseEntity<Boolean> isExistingRequestInWishList(@RequestParam String email, Long classroomId) {
         boolean exists = userService.isExistingRequestInWishList(email, classroomId);
         return ResponseEntity.ok(exists);
-    }
-
-    @GetMapping("/verify-code")
-    public ResponseEntity<?> verifyEmailToCreateAccount(String email, String code) {
-        return ResponseEntity.ok(userService.verifyEmailToCreateAccount(email, code));
-    }
-
-    @PostMapping("/send-code")
-    public ResponseEntity<?> sendEmailCode(String email) {
-        return ResponseEntity.ok(userService.sendEmailCode(email));
     }
 }

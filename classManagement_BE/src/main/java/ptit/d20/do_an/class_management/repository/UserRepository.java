@@ -20,14 +20,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> findAllByEmailIn(List<String> emails);
 
-    List<User> findByRoleNameAndActiveFalse(RoleName teacher);
+//    List<User> findByRoleNameAndActiveFalse(RoleName teacher);
 
-    List<User> findByRoleName(RoleName student);
+//    List<User> findByRoleName(RoleName student);
 
     List<User> findByRoleNameAndActiveAndDeleted(RoleName roleName, boolean active, boolean deleted);
 
-    List<User> findByRoleNameAndActiveOrDeleted(RoleName roleName, boolean active, boolean deleted);
+//    List<User> findByRoleNameAndActiveOrDeleted(RoleName roleName, boolean active, boolean deleted);
 
     Optional<User> findByIdAndRoleName(Long idTeacher, RoleName teacher);
-
 }

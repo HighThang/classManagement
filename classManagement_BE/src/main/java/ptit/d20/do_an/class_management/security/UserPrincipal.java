@@ -1,4 +1,5 @@
 package ptit.d20.do_an.class_management.security;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;

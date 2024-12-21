@@ -14,7 +14,6 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Table(name = "subjects")
 public class Subject {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -26,8 +25,8 @@ public class Subject {
     private Long idTeacher;
 
     @Column(name = "active", nullable = false)
-    private Integer active = 0; // Default value 1 (active)
+    private Integer active = 0;
 
     @Column(name = "deleted", nullable = false)
-    private Integer deleted = 0; // Default value 0 (not deleted)
+    private Integer deleted = 0;
 }
