@@ -117,16 +117,25 @@ def recognize_faces():
             matched_student = students_not_in_photo.pop(best_match_index)
             matched_students.append(matched_student)
 
-            # Cập nhật trạng thái điểm danh
-            cursor.execute("""
-                UPDATE class_attendance 
-                SET is_attended = TRUE 
-                WHERE class_registration_id = %s AND schedule_id = %s
-            """, (matched_student["student_id"], schedule_id))
-            conn.commit()
+            # # Cập nhật trạng thái điểm danh
+            # cursor.execute("""
+            #     UPDATE class_attendance 
+            #     SET is_attended = TRUE 
+            #     WHERE class_registration_id = %s AND schedule_id = %s
+            # """, (matched_student["student_id"], schedule_id))
+            # conn.commit()
 
             unmatched_faces.remove(face)
             student_encodings.pop(best_match_index)
+
+    # Cập nhật trạng thái điểm danh
+    for student in matched_students:
+        cursor.execute("""
+            UPDATE class_attendance 
+            SET is_attended = TRUE 
+            WHERE class_registration_id = %s AND schedule_id = %s
+        """, (student["student_id"], schedule_id))
+        conn.commit()
 
     # Cập nhật trạng thái điểm danh cho các học sinh không có trong ảnh
     for student in students_not_in_photo:
